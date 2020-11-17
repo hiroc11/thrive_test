@@ -1,0 +1,49 @@
+name: thrive_test
+description: A new Flutter application.
+
+
+publish_to:
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  cupertino_icons: ^0.1.2
+  animated_text_kit: ^1.3.0
+  firebase_core: ^0.5.0+1
+  firebase_auth: ^0.18.1+2
+  cloud_firestore: ^0.14.1
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - images/yoichi.jpg
+    - images/sea.jpg
+    - images/thrive-logo@2x.png
+    - images/coffee.jpg
+    - images/coffee2.jpg
+
+
+
+
+  fonts:
+    - family: Pacifico
+      fonts:
+        - asset: fonts/Pacifico-Regular.ttf
+
+    - family: Commissioner
+      fonts:
+        - asset: fonts/Commissioner-VariableFont_wght.ttf

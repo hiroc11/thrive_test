@@ -300,12 +300,45 @@
   .hold { --p: 0; width: 100%; margin-top: 10px; padding: 14px; border: 0; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 900; color: #fff;
     background: linear-gradient(90deg, var(--accent) calc(var(--p) * 100%), color-mix(in srgb, var(--accent) 50%, var(--page)) 0);
     cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; }
-  .ghost { position: fixed; z-index: 10; width: 72px; pointer-events: none; transform: translate(-50%, -50%) scale(1.15); }
+  .drag-ghost { position: fixed; z-index: 10; width: 72px; pointer-events: none; transform: translate(-50%, -50%) scale(1.15); }
   .done { display: grid; gap: 10px; justify-items: center; text-align: center; padding: 18px 6px 6px; }
   .done h2 { margin: 0; font-size: 24px; font-weight: 900; }
   .done .got { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
   .done .got .st { width: 120px; }
   .done p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .modes { display: flex; gap: 6px; justify-content: center; padding-top: 10px; }
+  .mode { font: inherit; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px; cursor: pointer;
+    border: 2px solid var(--page-line); background: transparent; color: var(--muted); }
+  .mode[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .mode:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  /* ふせたカードの裏面 */
+  .item.down > * { visibility: hidden; }
+  .item.down::before {
+    content: "?"; position: absolute; left: 8px; top: 4px; width: 52px; height: 60px; display: grid; place-items: center;
+    border: 3px solid #fff; border-radius: 10px; box-shadow: 0 4px 8px -4px var(--shadow);
+    background: repeating-linear-gradient(45deg, var(--accent) 0 6px, color-mix(in srgb, var(--accent) 65%, #fff) 6px 12px);
+    color: #fff; font-size: 24px; font-weight: 900;
+  }
+  .stub { display: block; width: 68px; aspect-ratio: 1; }
+  .ask { position: absolute; top: 0; left: 0; background: #2b5b95; color: #fff; font-size: 9px; font-weight: 900; padding: 1px 5px; border-radius: 6px; }
+
+  .avatar.net { background: linear-gradient(135deg, #8fd0ff, #c9b3ff); }
+  .join { position: relative; display: grid; gap: 8px; padding: 4px; }
+  .join h2 { margin: 0; padding-right: 44px; font-size: 20px; font-weight: 900; }
+  .join p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .join label { font-size: 12px; font-weight: 700; margin-top: 4px; }
+  .join input { min-width: 0; padding: 10px 12px; border: 2px solid var(--page-line); border-radius: 12px;
+    background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; }
+  .join input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+  .join .row { display: flex; gap: 8px; }
+  .join .row input { flex: 1; font-family: var(--mono); letter-spacing: .2em; }
+  .join .x { position: absolute; top: 0; right: 0; }
+  .join .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .warn { color: var(--chip-srare-ink) !important; }
+  .code-chip { font-family: var(--mono); font-size: 12px; padding: 3px 8px; border-radius: 8px; background: var(--page-line); white-space: nowrap; }
+  .wait { display: grid; gap: 6px; padding: 28px 8px; text-align: center; font-size: 13px; color: var(--muted); }
+  .wait b { font-family: var(--mono); font-size: 38px; letter-spacing: .18em; color: var(--ink); }
 
   /* ---------- 拡大表示 ---------- */
   dialog {
@@ -375,6 +408,12 @@
     <button type="button" class="btn" id="tradeOpen">交換する</button>
   </section>
 
+  <section class="friend-card" aria-label="オンライン交換">
+    <div class="avatar net" aria-hidden="true">友</div>
+    <div class="who"><b>友達とオンラインで交換</b><span>2人で同じページを開いて、4けたのコードでつながる</span></div>
+    <button type="button" class="btn" id="onlineOpen">つなぐ</button>
+  </section>
+
   <section class="book" id="book" aria-label="シール帳 1ページ目"></section>
 
   <section class="legend" aria-label="シールの種類">
@@ -403,11 +442,15 @@
       <button type="button" class="x" id="tClose" aria-label="交換をやめる">×</button>
       <div class="bubble friend" id="fBubble" hidden></div>
     </div>
+    <div class="modes" role="group" aria-label="交換のしかた">
+      <button type="button" class="mode" data-mode="normal" aria-pressed="true">ふつう交換</button>
+      <button type="button" class="mode" data-mode="blind" aria-pressed="false">ふせて交換</button>
+    </div>
     <div class="hand" id="fHand" aria-label="ゆいなの手持ち（タップでおねだり）"></div>
     <div class="table">
-      <div class="zone" id="fZone"><span class="zlabel">ゆいなが出す</span></div>
-      <div class="scale" aria-hidden="true"><span>ゆいな</span><div class="beam" id="beam"></div><span>あなた</span></div>
-      <div class="zone mine" id="mZone"><span class="zlabel">あなたが出す（ドラッグかタップで置く）</span></div>
+      <div class="zone" id="fZone"><span class="zlabel" id="fLabel">ゆいなが出す</span></div>
+      <div class="scale" id="bScale" aria-hidden="true"><span>ゆいな</span><div class="beam" id="beam"></div><span>あなた</span></div>
+      <div class="zone mine" id="mZone"><span class="zlabel" id="mLabel">あなたが出す（ドラッグかタップで置く）</span></div>
       <div class="bubble me" id="mBubble" hidden></div>
     </div>
     <div class="hand" id="mHand" aria-label="あなたの手持ち"></div>
@@ -427,6 +470,66 @@
   </div>
 </dialog>
 
+<dialog id="online" class="trade" aria-label="オンライン交換">
+  <div class="join" id="oJoin">
+    <h2>友達とオンラインで交換</h2>
+    <p>2人で同じページを開いて、同じ4けたのコードを入れると交換テーブルがつながります。</p>
+    <label for="oNick">ニックネーム</label>
+    <input id="oNick" maxlength="10" autocomplete="nickname" placeholder="例：あや">
+    <label for="oCode">コード</label>
+    <div class="row">
+      <input id="oCode" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="1234" autocomplete="off">
+      <button type="button" class="btn" id="oEnter">入る</button>
+    </div>
+    <button type="button" class="btn ghost" id="oMake">新しいコードを作る</button>
+    <p class="warn" id="oWarn" hidden></p>
+    <button type="button" class="x" id="oClose1" aria-label="閉じる">×</button>
+  </div>
+
+  <div id="oTable" hidden>
+    <div class="t-head">
+      <div class="avatar net" id="oAv" aria-hidden="true">?</div>
+      <div class="who"><b id="oPeerName">相手を待っています</b><span id="oStatus"></span></div>
+      <span class="code-chip" id="oCodeChip"></span>
+      <button type="button" class="x" id="oClose2" aria-label="交換をやめる">×</button>
+      <div class="bubble friend" id="oBubbleP" hidden></div>
+    </div>
+    <div class="wait" id="oWait">
+      <span>友達にこのコードを伝えてね</span>
+      <b id="oWaitCode"></b>
+      <span>同じページを開いて、コードを入れるとつながります</span>
+    </div>
+    <div id="oLive" hidden>
+      <div class="modes" role="group" aria-label="交換のしかた">
+        <button type="button" class="mode" data-mode="normal" aria-pressed="true">ふつう交換</button>
+        <button type="button" class="mode" data-mode="blind" aria-pressed="false">ふせて交換</button>
+      </div>
+      <div class="hand" id="pHand" aria-label="相手の手持ち（タップでおねだり）"></div>
+      <div class="table">
+        <div class="zone" id="pZone"><span class="zlabel" id="pLabel">相手が出す</span></div>
+        <div class="scale" id="oScale" aria-hidden="true"><span id="oScaleName">相手</span><div class="beam" id="oBeam"></div><span>あなた</span></div>
+        <div class="zone mine" id="myZone"><span class="zlabel" id="myLabel">あなたが出す（ドラッグかタップで置く）</span></div>
+        <div class="bubble me" id="oBubbleMe" hidden></div>
+      </div>
+      <div class="hand" id="myHand" aria-label="あなたの手持ち"></div>
+      <div class="stamps">
+        <button type="button" class="stamp ostamp">おねがい</button>
+        <button type="button" class="stamp ostamp">ほしい！</button>
+        <button type="button" class="stamp ostamp">むり〜</button>
+        <button type="button" class="stamp ostamp">かわいい</button>
+      </div>
+      <button type="button" class="hold" id="oHold">長押しで「せーの」</button>
+    </div>
+  </div>
+
+  <div class="done" id="oDone" hidden>
+    <h2>交換成立！</h2>
+    <div class="got" id="oGot"></div>
+    <p id="oGotText"></p>
+    <button type="button" class="btn" id="oAgain">続けて交換する</button>
+  </div>
+</dialog>
+
 <script>
 (() => {
   const SHAPES = {
@@ -443,17 +546,17 @@
   };
 
   const STICKERS = [
-    { name: 'ゆめかわハート', shape: 'heart', kind: 'holo', rarity: 'rare', no: 37, of: 300, rate: 3,
+    { name: 'ゆめかわハート', code: 'yume', shape: 'heart', kind: 'holo', rarity: 'rare', no: 37, of: 300, rate: 3,
       base: 'linear-gradient(135deg,#c9d0dc,#8f9bb0 45%,#d7dce6 70%,#9aa6ba)' },
-    { name: 'もちまる', shape: 'circle', kind: 'puffy', rarity: 'normal', no: 1204, of: 5000, rate: 1, kao: true,
+    { name: 'もちまる', code: 'mochi', shape: 'circle', kind: 'puffy', rarity: 'normal', no: 1204, of: 5000, rate: 1, kao: true,
       base: 'radial-gradient(circle at 45% 40%,#ffd9ea,#ffa1ca 60%,#ef6aa6 100%)' },
-    { name: 'きらきらくも', shape: 'cloud', kind: 'glitter', rarity: 'rare', no: 88, of: 500, rate: 3,
+    { name: 'きらきらくも', code: 'kumo', shape: 'cloud', kind: 'glitter', rarity: 'rare', no: 88, of: 500, rate: 3,
       base: 'linear-gradient(160deg,#d6c5ff,#a28af3)' },
-    { name: 'いちごミルク', shape: 'heart', kind: 'puffy', rarity: 'srare', no: 12, of: 200, rate: 4,
+    { name: 'いちごミルク', code: 'ichigo', shape: 'heart', kind: 'puffy', rarity: 'srare', no: 12, of: 200, rate: 4,
       base: 'radial-gradient(circle at 45% 38%,#ffe4e9,#ff8ea3 55%,#e44f6d 100%)' },
-    { name: 'ながれぼし', shape: 'star', kind: 'holo', rarity: 'srare', no: 45, of: 150, rate: 4,
+    { name: 'ながれぼし', code: 'nagare', shape: 'star', kind: 'holo', rarity: 'srare', no: 45, of: 150, rate: 4,
       base: 'linear-gradient(135deg,#b9c6ef,#7486c4 50%,#c8d2f5)' },
-    { name: 'ひみつの一番星', shape: 'star', kind: 'secret', rarity: 'secret', no: 7, of: 100, rate: 5,
+    { name: 'ひみつの一番星', code: 'himitsu', shape: 'star', kind: 'secret', rarity: 'secret', no: 7, of: 100, rate: 5,
       base: 'linear-gradient(135deg,#f3d27a,#c8922a 45%,#f5dc92 70%,#a8741c)' }
   ];
 
@@ -511,22 +614,49 @@
     s.cell = cell;
     s.st = st;
     if (isNew) owned.unshift(s); else owned.push(s);
+    saveOwned();
   }
   const owned = []; // 自分のシール帳に入っているシール
   function removeOwned(s) {
     owned.splice(owned.indexOf(s), 1);
     live.splice(live.indexOf(s.st), 1);
     s.cell.remove();
+    saveOwned();
   }
-  STICKERS.forEach(s => addCell(s, false));
+  // デザイン一覧（コード → デザイン）。ここから通し番号つきのシールを作る
+  const DESIGNS = [
+    ...STICKERS.map(s => ({ ...s })),
+    { name: 'みかんまる', code: 'mikan', shape: 'circle', kind: 'puffy', rarity: 'normal', no: 2210, of: 5000, rate: 1, kao: true,
+      base: 'radial-gradient(circle at 45% 40%,#ffe7c2,#ffb45c 60%,#f08a2c 100%)' },
+    { name: 'ミントぐも', code: 'mint', shape: 'cloud', kind: 'glitter', rarity: 'normal', no: 1873, of: 5000, rate: 1,
+      base: 'linear-gradient(160deg,#c6f5e6,#7fd8bd)' }
+  ];
+  const DESIGN_OF = Object.fromEntries(DESIGNS.map(d => [d.code, d]));
+  const sid = s => `${s.code}-${s.no}`;
+  function fromId(id) {
+    const m = /^([a-z]{2,10})-(\d{1,6})$/.exec(String(id));
+    const d = m && DESIGN_OF[m[1]];
+    const n = m ? Number(m[2]) : 0;
+    if (!d || n < 1 || n > d.of) return null;
+    return { ...d, no: n };
+  }
+
+  // 手持ちはこのブラウザにだけ保存（別の端末やほかの人には届かない）
+  const STORE = 'puku-holo-owned-v1';
+  let restoring = true;
+  function saveOwned() {
+    if (restoring) return;
+    try { localStorage.setItem(STORE, JSON.stringify(owned.map(sid))); } catch {}
+  }
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch {}
+  const start = Array.isArray(saved) ? saved.map(fromId).filter(Boolean) : [];
+  (start.length ? start : STICKERS).forEach(s => addCell(s, false));
+  restoring = false;
 
   // ---------- パックの中身（デザインごとに発行済み枚数を数える） ----------
   const POOL = [
-    ...STICKERS.map(s => ({ ...s, issued: s.no })),
-    { name: 'みかんまる', shape: 'circle', kind: 'puffy', rarity: 'normal', issued: 2210, of: 5000, rate: 1, kao: true,
-      base: 'radial-gradient(circle at 45% 40%,#ffe7c2,#ffb45c 60%,#f08a2c 100%)' },
-    { name: 'ミントぐも', shape: 'cloud', kind: 'glitter', rarity: 'normal', issued: 1873, of: 5000, rate: 1,
-      base: 'linear-gradient(160deg,#c6f5e6,#7fd8bd)' }
+    ...DESIGNS.map(s => ({ ...s, issued: s.no }))
   ];
   const ODDS = [['normal', 60], ['rare', 28], ['srare', 10], ['secret', 2]];
   function draw() {
@@ -679,7 +809,7 @@
   const tStatus = document.getElementById('tStatus');
   const beam = document.getElementById('beam');
   const hold = document.getElementById('hold');
-  let wanted = null, ready = false, conceded = false, thinkTimer = 0, busy = false;
+  let wanted = null, ready = false, conceded = false, thinkTimer = 0, busy = false, botMode = 'normal';
 
   const pick = a => a[Math.floor(Math.random() * a.length)];
   function pickWanted() {
@@ -735,6 +865,11 @@
   function changed() {
     ready = false;
     conceded = false;
+    if (botMode === 'blind') {
+      ready = items(fZone).length === 1 && items(mZone).length === 1;
+      setStatus(ready ? 'そろった！ せーのでめくろう' : items(fZone).length ? 'ゆいなは1枚ふせてるよ' : 'ふせるシールを選んでる…', ready);
+      return;
+    }
     setStatus('考え中…');
     updateScale();
     clearTimeout(thinkTimer);
@@ -778,27 +913,116 @@
     items(mZone).forEach(b => b.remove());
     friendHand.forEach(s => fHand.append(tItem(s, 'friend')));
     owned.forEach(s => mHand.append(tItem(s, 'me')));
-    const first = items(fHand).find(b => b.s.name === 'きらきらくも') || items(fHand).find(b => b.s.name !== TREASURE);
-    if (first) fZone.append(first);
     document.getElementById('tMain').hidden = false;
     document.getElementById('tDone').hidden = true;
     ready = conceded = busy = false;
     hold.style.setProperty('--p', 0);
-    updateScale();
     trade.showModal();
+    setMode(botMode);
+    if (botMode === 'blind') return;
+    const first = items(fHand).find(b => b.s.name === 'きらきらくも') || items(fHand).find(b => b.s.name !== TREASURE);
+    if (first) fZone.append(first);
+    clearTimeout(thinkTimer);
+    updateScale();
     setStatus('あなたのシール待ち');
     friendSay(wanted ? `交換しよ〜！「${wanted.name}」ほしいな` : '交換しよ〜！');
   }
   document.getElementById('tradeOpen').addEventListener('click', openTrade);
   document.getElementById('tClose').addEventListener('click', () => trade.close());
 
+  // ---------- ドラッグ・タップ・長押し（ゆいな／オンライン共通） ----------
+  function wireDrag(root, cfg) {
+    let drag = null;
+    root.addEventListener('pointerdown', e => {
+      const b = e.target.closest('.item');
+      if (!b || cfg.busy() || b.classList.contains('down')) return;
+      drag = { b, x: e.clientX, y: e.clientY, ghost: null };
+    });
+    root.addEventListener('pointermove', e => {
+      if (!drag || drag.b.owner !== 'me') return;
+      if (!drag.ghost && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8) {
+        drag.ghost = makeSticker(drag.b.s);
+        drag.ghost.classList.add('drag-ghost');
+        drag.ghost.idx = 40;
+        root.append(drag.ghost); // ダイアログの上に表示するため中に置く
+        drag.b.classList.add('lifted');
+      }
+      if (drag.ghost) {
+        drag.ghost.style.left = e.clientX + 'px';
+        drag.ghost.style.top = e.clientY + 'px';
+        const over = document.elementFromPoint(e.clientX, e.clientY);
+        cfg.zone.classList.toggle('over', !!(over && cfg.zone.contains(over)));
+      }
+    });
+    function end(e) {
+      if (!drag) return;
+      const { b, ghost } = drag;
+      drag = null;
+      cfg.zone.classList.remove('over');
+      if (!ghost) { // ただのタップ
+        if (b.owner === 'me') cfg.tapMine(b); else cfg.tapOther(b);
+        return;
+      }
+      ghost.remove();
+      b.classList.remove('lifted');
+      const over = e && document.elementFromPoint(e.clientX, e.clientY);
+      if (over && cfg.zone.contains(over) && b.parentElement !== cfg.zone) cfg.toZone(b);
+      else if (over && cfg.hand.contains(over) && b.parentElement !== cfg.hand) cfg.toHand(b);
+    }
+    root.addEventListener('pointerup', end);
+    root.addEventListener('pointercancel', () => end(null));
+    root.addEventListener('click', e => { // キーボード操作（Enter / Space）
+      if (e.detail !== 0 || cfg.busy()) return;
+      const b = e.target.closest('.item');
+      if (b && !b.classList.contains('down')) b.owner === 'me' ? cfg.tapMine(b) : cfg.tapOther(b);
+    });
+  }
+
+  function shake(el) {
+    el.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 90, iterations: 3 });
+  }
+
+  function wireHold(btn, isBusy, onDone) {
+    let start = 0, raf = 0;
+    function tick(now) {
+      const p = Math.min(1, (now - start) / 900);
+      btn.style.setProperty('--p', p.toFixed(3));
+      if (p < 1) { raf = requestAnimationFrame(tick); return; }
+      start = 0;
+      btn.style.setProperty('--p', 0);
+      onDone();
+    }
+    btn.addEventListener('pointerdown', e => {
+      if (isBusy()) return;
+      btn.setPointerCapture(e.pointerId);
+      start = performance.now();
+      raf = requestAnimationFrame(tick);
+    });
+    const cancel = () => {
+      if (!start) return;
+      start = 0;
+      cancelAnimationFrame(raf);
+      btn.style.setProperty('--p', 0);
+    };
+    btn.addEventListener('pointerup', cancel);
+    btn.addEventListener('pointercancel', cancel);
+    btn.addEventListener('keydown', e => { // キーボードでは Enter / Space で決定
+      if ((e.key === 'Enter' || e.key === ' ') && !isBusy()) { e.preventDefault(); onDone(); }
+    });
+  }
+
   // 自分のシール：タップで出し入れ、ドラッグでテーブルへ
-  let drag = null;
-  function moveMine(b) {
-    (b.parentElement === mZone ? mHand : mZone).append(b);
+  function placeMine(b) {
+    if (botMode === 'blind') items(mZone).forEach(x => mHand.append(x)); // ふせ交換は1枚だけ
+    mZone.append(b);
+    changed();
+  }
+  function returnMine(b) {
+    mHand.append(b);
     changed();
   }
   function tapFriend(b) {
+    if (botMode === 'blind') { friendSay('ふせ交換では選べないよ〜'); return; }
     if (b.parentElement === fZone) {
       fHand.append(b);
       friendSay('え、それいらないの？');
@@ -813,49 +1037,11 @@
     friendSay('これ？いいよ〜');
     changed();
   }
-  trade.addEventListener('pointerdown', e => {
-    const b = e.target.closest('.item');
-    if (!b || busy) return;
-    drag = { b, x: e.clientX, y: e.clientY, ghost: null };
+  wireDrag(trade, {
+    zone: mZone, hand: mHand, busy: () => busy,
+    tapMine: b => (b.parentElement === mZone ? returnMine(b) : placeMine(b)),
+    tapOther: tapFriend, toZone: placeMine, toHand: returnMine
   });
-  trade.addEventListener('pointermove', e => {
-    if (!drag || drag.b.owner !== 'me') return;
-    if (!drag.ghost && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 8) {
-      drag.ghost = makeSticker(drag.b.s);
-      drag.ghost.classList.add('ghost');
-      drag.ghost.idx = 40;
-      trade.append(drag.ghost); // ダイアログの上に表示するため中に置く
-      drag.b.classList.add('lifted');
-    }
-    if (drag.ghost) {
-      drag.ghost.style.left = e.clientX + 'px';
-      drag.ghost.style.top = e.clientY + 'px';
-      const over = document.elementFromPoint(e.clientX, e.clientY);
-      mZone.classList.toggle('over', !!(over && mZone.contains(over)));
-    }
-  });
-  function endDrag(e) {
-    if (!drag) return;
-    const { b, ghost } = drag;
-    drag = null;
-    mZone.classList.remove('over');
-    if (!ghost) { // ただのタップ
-      if (b.owner === 'me') moveMine(b); else tapFriend(b);
-      return;
-    }
-    ghost.remove();
-    b.classList.remove('lifted');
-    const over = e && document.elementFromPoint(e.clientX, e.clientY);
-    const target = over && mZone.contains(over) ? mZone : over && mHand.contains(over) ? mHand : null;
-    if (target && b.parentElement !== target) { target.append(b); changed(); }
-  }
-  trade.addEventListener('pointerup', endDrag);
-  trade.addEventListener('click', e => { // キーボード操作（Enter / Space）
-    if (e.detail !== 0 || busy) return;
-    const b = e.target.closest('.item');
-    if (b) b.owner === 'me' ? moveMine(b) : tapFriend(b);
-  });
-  trade.addEventListener('pointercancel', () => endDrag(null));
 
   // スタンプ
   trade.querySelectorAll('.stamp').forEach(btn => btn.addEventListener('click', () => {
@@ -863,7 +1049,8 @@
     meSay(t);
     setTimeout(() => {
       const vf = value(fZone), vm = value(mZone), need = vf - (wantedOffered() ? 1 : 0);
-      if (t === 'おねがい') {
+      if (botMode === 'blind' && t === 'おねがい') friendSay('めくるまでナイショ〜');
+      else if (t === 'おねがい') {
         if (ready) friendSay('もうOKだってば〜');
         else if (vm > 0 && vm === need - 1 && !conceded) {
           conceded = true;
@@ -878,37 +1065,59 @@
   }));
 
   // 長押しで「せーの」
-  let holdStart = 0, holdRaf = 0;
-  function holdTick(now) {
-    const p = Math.min(1, (now - holdStart) / 900);
-    hold.style.setProperty('--p', p.toFixed(3));
-    if (p < 1) { holdRaf = requestAnimationFrame(holdTick); return; }
-    holdStart = 0;
+  wireHold(hold, () => busy, () => {
+    if (botMode === 'blind') {
+      if (!ready) { friendSay('1枚ずつふせてからね〜'); shake(hold); return; }
+      doBlind();
+      return;
+    }
     if (!ready || value(mZone) === 0) {
       friendSay(value(mZone) === 0 ? 'まだなにも出してないよ〜' : 'まだだめ〜！');
-      hold.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 90, iterations: 3 });
-      hold.style.setProperty('--p', 0);
+      shake(hold);
       return;
     }
     doTrade();
+  });
+
+  // ふせて交換：ゆいなは宝物以外からランダムに1枚ふせる
+  function botBlindPick() {
+    if (!trade.open || botMode !== 'blind' || items(fZone).length) return;
+    const pool = items(fHand).filter(b => b.s.name !== TREASURE);
+    if (!pool.length) { friendSay('出せるシールがないや…'); return; }
+    const b = pick(pool);
+    b.classList.add('down');
+    fZone.append(b);
+    friendSay('ふせたよ〜！そっちも1枚ふせて');
+    changed();
   }
-  hold.addEventListener('pointerdown', e => {
-    if (busy) return;
-    hold.setPointerCapture(e.pointerId);
-    holdStart = performance.now();
-    holdRaf = requestAnimationFrame(holdTick);
-  });
-  const cancelHold = () => {
-    if (!holdStart) return;
-    holdStart = 0;
-    cancelAnimationFrame(holdRaf);
-    hold.style.setProperty('--p', 0);
-  };
-  hold.addEventListener('pointerup', cancelHold);
-  hold.addEventListener('pointercancel', cancelHold);
-  hold.addEventListener('keydown', e => { // キーボードでは Enter / Space で決定
-    if ((e.key === 'Enter' || e.key === ' ') && !busy) { e.preventDefault(); holdStart = performance.now() - 900; holdTick(performance.now()); }
-  });
+  function setMode(m) {
+    botMode = m;
+    trade.querySelectorAll('.mode').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.mode === m)));
+    items(fZone).forEach(b => { b.classList.remove('down'); fHand.append(b); });
+    items(mZone).forEach(b => mHand.append(b));
+    document.getElementById('fLabel').textContent = m === 'blind' ? 'ゆいながふせた1枚' : 'ゆいなが出す';
+    document.getElementById('mLabel').textContent = m === 'blind' ? 'あなたがふせる1枚（ドラッグかタップ）' : 'あなたが出す（ドラッグかタップで置く）';
+    document.getElementById('bScale').hidden = m === 'blind';
+    changed();
+    if (m === 'blind') { setStatus('ふせるシールを選んでる…'); setTimeout(botBlindPick, 700); }
+  }
+  trade.querySelectorAll('.mode').forEach(x => x.addEventListener('click', () => { if (!busy && x.dataset.mode !== botMode) setMode(x.dataset.mode); }));
+
+  async function flipOpen(card) {
+    await card.animate([{ transform: 'rotateY(0)' }, { transform: 'rotateY(90deg)' }], { duration: reduce ? 1 : 260, fill: 'forwards' }).finished;
+    card.classList.remove('down');
+    await card.animate([{ transform: 'rotateY(90deg)' }, { transform: 'rotateY(0)' }], { duration: reduce ? 1 : 260, fill: 'forwards' }).finished;
+  }
+
+  async function doBlind() {
+    busy = true;
+    friendSay('せーの！');
+    await flipOpen(items(fZone)[0]);
+    const diff = value(mZone) - value(fZone);
+    friendSay(diff > 0 ? 'やったー！ラッキー' : diff < 0 ? 'うわ〜やられた〜' : 'おあいこだね！');
+    await wait(reduce ? 300 : 1300);
+    doTrade();
+  }
 
   async function doTrade() {
     busy = true;
@@ -944,6 +1153,338 @@
   document.getElementById('tFinish').addEventListener('click', () => {
     trade.close();
     book.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  // ---------- 友達とオンラインで交換（room capability） ----------
+  // 同じコードを入れた2人の presence（手持ち・出したシール・せーの）を突き合わせて交換する。
+  // ふせて交換は「中身のハッシュだけ先に出し、2人のせーの後に中身を明かす」ので、めくるまで相手に分からない。
+  const online = document.getElementById('online');
+  const $ = id => document.getElementById(id);
+  const pHand = $('pHand'), pZone = $('pZone'), myHand = $('myHand'), myZone = $('myZone'), oHold = $('oHold');
+  const STAMPS = ['おねがい', 'ほしい！', 'むり〜', 'かわいい'];
+  let room = null;
+  const roomReady = window.claude && typeof window.claude.use === 'function'
+    ? window.claude.use('room').then(r => (room = r), () => null)
+    : Promise.resolve(null);
+  const o = { code: null, mode: 'normal', ready: null, ask: [], blind: null, flip: false, revealed: false, verifying: false,
+    peer: null, peerKey: '', lastStamp: null, executed: new Set(), busy: false, unsub: null };
+
+  const pub = patch => { if (room) room.presence(patch).catch(() => {}); };
+  const oSay = t => say($('oBubbleP'), t);
+  const oMeSay = t => say($('oBubbleMe'), t);
+  function oStatus(text, ok) { const el = $('oStatus'); el.textContent = text; el.className = ok ? 'ok' : ''; }
+  const myHandIds = () => owned.slice(0, 40).map(sid);
+  const myOfferIds = () => items(myZone).map(b => sid(b.s));
+  const list = (v, max) => (Array.isArray(v) ? v.slice(0, max).map(String).filter(id => fromId(id)) : []);
+  const peerOffer = p => list(p.presence.offer, 20);
+  const peerName = p => String(p.presence.nick || '友達').slice(0, 10);
+  const peerMode = p => (p.presence.mode === 'blind' ? 'blind' : 'normal');
+  const meLabel = () => (room.peers().find(p => p.sameTab) || {}).peer || 'me';
+
+  async function sha(text) {
+    try {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch { // 使えない環境向けの簡易ハッシュ
+      let h = 5381;
+      for (const ch of text) h = ((h * 33) ^ ch.codePointAt(0)) >>> 0;
+      return 'd' + h.toString(16);
+    }
+  }
+  const salt = () => [...crypto.getRandomValues(new Uint8Array(12))].map(b => b.toString(16).padStart(2, '0')).join('');
+
+  function deal(p) {
+    const pair = [[meLabel(), myOfferIds().sort()], [p.peer, peerOffer(p).sort()]].sort((a, b) => (a[0] < b[0] ? -1 : 1));
+    return JSON.stringify(pair).slice(0, 900);
+  }
+
+  function renderMyHand() {
+    myHand.innerHTML = '';
+    items(myZone).forEach(b => b.remove());
+    owned.forEach(s => {
+      const b = tItem(s, 'me');
+      b.querySelector('.want')?.remove();
+      myHand.append(b);
+    });
+  }
+
+  function openOnline() {
+    $('oJoin').hidden = false;
+    $('oTable').hidden = true;
+    $('oDone').hidden = true;
+    online.showModal();
+    roomReady.then(r => {
+      const off = !r;
+      $('oEnter').disabled = off;
+      $('oMake').disabled = off;
+      $('oWarn').hidden = !off;
+      if (off) $('oWarn').textContent = 'この画面ではオンライン交換につなげません。claude.ai で共有されたこのページを、サインインした状態で開いてください。';
+    });
+  }
+  $('onlineOpen').addEventListener('click', openOnline);
+
+  function enter(code) {
+    if (!room) return;
+    if (!/^\d{4}$/.test(code)) { $('oWarn').hidden = false; $('oWarn').textContent = 'コードは4けたの数字で入れてね'; return; }
+    Object.assign(o, { code, mode: 'normal', ready: null, ask: [], blind: null, flip: false, revealed: false, verifying: false,
+      peer: null, peerKey: '', lastStamp: null, busy: false });
+    renderMyHand();
+    setOnlineMode('normal', true);
+    pub({ code, nick: ($('oNick').value.trim() || 'わたし').slice(0, 10), hand: myHandIds(), offer: [], ready: null, ask: [],
+      mode: 'normal', bh: null, br: null, flip: false, stamp: null });
+    $('oJoin').hidden = true;
+    $('oTable').hidden = false;
+    $('oCodeChip').textContent = `コード ${code}`;
+    $('oWaitCode').textContent = code;
+    if (!o.unsub) o.unsub = room.onPeers(renderOnline);
+    renderOnline();
+  }
+  $('oEnter').addEventListener('click', () => enter($('oCode').value.trim()));
+  $('oCode').addEventListener('keydown', e => { if (e.key === 'Enter') enter($('oCode').value.trim()); });
+  $('oMake').addEventListener('click', () => {
+    const code = String(1000 + Math.floor(Math.random() * 9000));
+    $('oCode').value = code;
+    enter(code);
+  });
+
+  function leave() {
+    if (o.unsub) { o.unsub(); o.unsub = null; }
+    if (o.code) pub({ code: null, offer: [], ready: null, ask: [], bh: null, br: null, flip: false });
+    o.code = null;
+  }
+  online.addEventListener('close', leave);
+  [$('oClose1'), $('oClose2')].forEach(b => b.addEventListener('click', () => online.close()));
+
+  function setOnlineMode(m, silent) {
+    o.mode = m;
+    online.querySelectorAll('.mode').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.mode === m)));
+    items(myZone).forEach(b => myHand.append(b));
+    $('pLabel').textContent = m === 'blind' ? '相手がふせた1枚' : '相手が出す';
+    $('myLabel').textContent = m === 'blind' ? 'あなたがふせる1枚（ドラッグかタップ）' : 'あなたが出す（ドラッグかタップで置く）';
+    $('oScale').hidden = m === 'blind';
+    o.ready = null; o.blind = null; o.flip = false; o.revealed = false;
+    o.peerKey = '';
+    if (!silent) { pub({ mode: m, offer: [], ready: null, bh: null, br: null, flip: false }); renderOnline(); }
+  }
+  online.querySelectorAll('.mode').forEach(x => x.addEventListener('click', () => {
+    if (!o.busy && x.dataset.mode !== o.mode) setOnlineMode(x.dataset.mode);
+  }));
+
+  async function offerChanged() {
+    o.ready = null;
+    if (o.mode === 'normal') {
+      pub({ offer: myOfferIds(), ready: null });
+    } else {
+      const b = items(myZone)[0];
+      o.flip = false; o.revealed = false;
+      if (b) {
+        const blind = { id: sid(b.s), salt: salt() };
+        blind.h = await sha(blind.id + blind.salt);
+        o.blind = blind;
+        pub({ bh: blind.h, br: null, flip: false });
+      } else {
+        o.blind = null;
+        pub({ bh: null, br: null, flip: false });
+      }
+    }
+    renderOnline();
+  }
+  function oPlace(b) {
+    if (o.mode === 'blind') items(myZone).forEach(x => myHand.append(x));
+    myZone.append(b);
+    offerChanged();
+  }
+  function oReturn(b) { myHand.append(b); offerChanged(); }
+  function toggleAsk(b) {
+    if (b.parentElement !== pHand || o.mode === 'blind') return;
+    const id = sid(b.s);
+    o.ask = o.ask.includes(id) ? o.ask.filter(x => x !== id) : [...o.ask, id].slice(-10);
+    pub({ ask: o.ask });
+    o.peerKey = '';
+    renderOnline();
+  }
+  wireDrag(online, {
+    zone: myZone, hand: myHand, busy: () => o.busy || !o.peer,
+    tapMine: b => (b.parentElement === myZone ? oReturn(b) : oPlace(b)),
+    tapOther: toggleAsk, toZone: oPlace, toHand: oReturn
+  });
+
+  online.querySelectorAll('.ostamp').forEach(btn => btn.addEventListener('click', () => {
+    oMeSay(btn.textContent);
+    pub({ stamp: { t: btn.textContent, at: Date.now() } });
+  }));
+
+  wireHold(oHold, () => o.busy, () => {
+    const p = o.peer;
+    if (!p) { shake(oHold); return; }
+    if (peerMode(p) !== o.mode) { oStatus('交換のしかたをそろえてね'); shake(oHold); return; }
+    if (o.mode === 'normal') {
+      if (!myOfferIds().length && !peerOffer(p).length) { oStatus('まだどちらもシールを出してないよ'); shake(oHold); return; }
+      o.ready = deal(p);
+      pub({ ready: o.ready });
+    } else {
+      if (!o.blind || !p.presence.bh) { oStatus('1枚ずつふせてからね'); shake(oHold); return; }
+      o.flip = true;
+      pub({ flip: true });
+    }
+    renderOnline();
+  });
+
+  function renderOnline() {
+    if (!o.code || !room) return;
+    const p = room.peers().find(x => !x.sameTab && x.kind === 'viewer' && x.presence && x.presence.code === o.code) || null;
+    o.peer = p;
+    $('oWait').hidden = !!p;
+    $('oLive').hidden = !p;
+    if (!p) {
+      $('oPeerName').textContent = '相手を待っています';
+      $('oAv').textContent = '?';
+      oStatus(room.connected() ? 'コードを友達に伝えてね' : '接続中…');
+      return;
+    }
+    const pp = p.presence;
+    const name = peerName(p);
+    $('oPeerName').textContent = name + (p.guest ? '（ゲスト）' : '');
+    $('oAv').textContent = name.slice(0, 1);
+    $('oScaleName').textContent = name;
+
+    // 相手の手持ちとテーブル（変わったときだけ作り直す）
+    const key = JSON.stringify([pp.hand, pp.offer, pp.mode, pp.bh, o.ask, o.mode, o.busy]);
+    if (key !== o.peerKey && !o.busy) {
+      o.peerKey = key;
+      const offer = o.mode === 'normal' ? peerOffer(p) : [];
+      pHand.innerHTML = '';
+      items(pZone).forEach(b => b.remove());
+      pZone.querySelectorAll('.stub-item').forEach(b => b.remove());
+      list(pp.hand, 40).filter(id => !offer.includes(id)).forEach(id => {
+        const b = tItem(fromId(id), 'peer');
+        b.querySelector('.treasure')?.remove();
+        if (o.ask.includes(id)) b.insertAdjacentHTML('beforeend', '<span class="ask">おねだり中</span>');
+        pHand.append(b);
+      });
+      offer.forEach(id => { const b = tItem(fromId(id), 'peer'); b.querySelector('.treasure')?.remove(); pZone.append(b); });
+      if (o.mode === 'blind' && peerMode(p) === 'blind' && typeof pp.bh === 'string') {
+        const stub = document.createElement('div');
+        stub.className = 'item down stub-item';
+        stub.innerHTML = '<span class="stub"></span>';
+        pZone.append(stub);
+      }
+    }
+    // 相手からの「ほしいって」
+    const asked = list(pp.ask, 10);
+    [...items(myHand), ...items(myZone)].forEach(b => {
+      const tag = b.querySelector('.ask');
+      const on = asked.includes(sid(b.s));
+      if (on && !tag) b.insertAdjacentHTML('beforeend', '<span class="ask">ほしいって</span>');
+      if (!on && tag) tag.remove();
+    });
+    // スタンプ
+    const st = pp.stamp;
+    if (st && typeof st === 'object' && st.at !== o.lastStamp) {
+      const first = o.lastStamp === null;
+      o.lastStamp = st.at;
+      if (!first && STAMPS.includes(st.t)) oSay(st.t);
+    } else if (o.lastStamp === null) o.lastStamp = 0;
+
+    if (o.busy) return;
+    if (peerMode(p) !== o.mode) {
+      oStatus(`${name}は「${peerMode(p) === 'blind' ? 'ふせて交換' : 'ふつう交換'}」を選んでるよ。そろえてね`);
+      return;
+    }
+    if (o.mode === 'normal') checkNormal(p); else checkBlind(p);
+  }
+
+  function checkNormal(p) {
+    const pp = p.presence;
+    const mv = items(myZone).reduce((v, b) => v + b.s.rate, 0);
+    const pv = peerOffer(p).reduce((v, id) => v + fromId(id).rate, 0);
+    $('oBeam').style.transform = `rotate(${Math.max(-20, Math.min(20, (mv - pv) * 7))}deg)`;
+    const d = deal(p);
+    if (o.ready && o.ready !== d) { o.ready = null; pub({ ready: null }); }
+    if (o.ready === d && pp.ready === d && !o.executed.has(d)) { execNormal(d, p); return; }
+    if (pp.ready === d) oStatus(`${peerName(p)}はOK！ せーのして`, true);
+    else if (o.ready === d) oStatus(`${peerName(p)}のせーの待ち`);
+    else oStatus('かけひき中');
+  }
+
+  async function checkBlind(p) {
+    const pp = p.presence;
+    const theirs = typeof pp.bh === 'string';
+    if (pp.bh !== o.peerBh) { // 相手がカードを替えたら、こちらのせーのはやり直し
+      o.peerBh = pp.bh;
+      if (o.flip && !o.revealed) { o.flip = false; pub({ flip: false }); }
+    }
+    if (!o.flip) {
+      oStatus(o.blind && theirs ? (pp.flip ? `${peerName(p)}はせーの済み！` : 'そろった！ せーのでめくろう') : theirs ? `${peerName(p)}は1枚ふせたよ` : o.blind ? `${peerName(p)}がふせるのを待ってる` : '1枚ふせてね', !!(o.blind && theirs));
+      return;
+    }
+    if (!pp.flip || !theirs) { oStatus(`${peerName(p)}のせーの待ち`); return; }
+    if (!o.revealed) { o.revealed = true; pub({ br: { id: o.blind.id, s: o.blind.salt } }); }
+    const br = pp.br;
+    if (!br || typeof br !== 'object' || o.verifying) { oStatus('めくってるよ…'); return; }
+    const key = 'blind:' + [o.blind.h, pp.bh].sort().join(':');
+    if (o.executed.has(key)) return;
+    o.verifying = true;
+    const ok = (await sha(String(br.id) + String(br.s))) === pp.bh && fromId(br.id);
+    o.verifying = false;
+    if (!ok) { oStatus('相手のカードを確かめられなかったので、やり直してね'); setOnlineMode('blind'); return; }
+    execBlind(key, fromId(br.id));
+  }
+
+  async function swapAnim(give, get) {
+    const dist = myZone.getBoundingClientRect().top - pZone.getBoundingClientRect().top;
+    await Promise.all([
+      ...give.map(b => b.animate([{ transform: 'none' }, { transform: `translateY(${-dist}px) rotate(360deg) scale(.8)`, opacity: 0 }],
+        { duration: reduce ? 1 : 800, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }).finished),
+      ...get.map(b => b.animate([{ transform: 'none' }, { transform: `translateY(${dist}px) rotate(-360deg) scale(1.2)`, opacity: 0 }],
+        { duration: reduce ? 1 : 800, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'forwards' }).finished)
+    ]);
+  }
+
+  async function execNormal(d, p) {
+    o.executed.add(d);
+    o.busy = true;
+    oStatus('せーの！', true);
+    const give = items(myZone), get = items(pZone);
+    await swapAnim(give, get);
+    finish(give.map(b => b.s), peerOffer(p).map(fromId));
+  }
+
+  async function execBlind(key, gotS) {
+    o.executed.add(key);
+    o.busy = true;
+    oStatus('せーの！', true);
+    const stub = pZone.querySelector('.stub-item');
+    const card = tItem(gotS, 'peer');
+    card.classList.add('down');
+    if (stub) stub.replaceWith(card); else pZone.append(card);
+    await flipOpen(card);
+    await wait(reduce ? 200 : 1100);
+    const mine = items(myZone);
+    await swapAnim(mine, [card]);
+    finish(mine.map(b => b.s), [gotS]);
+  }
+
+  function finish(give, get) {
+    give.forEach(s => { if (owned.includes(s)) removeOwned(s); });
+    get.forEach(s => addCell({ ...s }, true));
+    updateFriendNote();
+    o.ready = null; o.blind = null; o.flip = false; o.revealed = false; o.ask = [];
+    pub({ hand: myHandIds(), offer: [], ready: null, ask: [], bh: null, br: null, flip: false });
+    const got = $('oGot');
+    got.innerHTML = '';
+    get.forEach(s => { const st = makeSticker(s); st.idx = 50; got.append(st); });
+    $('oGotText').textContent = get.length ? `${get.map(s => `「${s.name}」`).join('')}をゲット！ シール帳に貼りました。` : 'シールをプレゼントしました。';
+    $('oTable').hidden = true;
+    $('oDone').hidden = false;
+    o.busy = false;
+  }
+  $('oAgain').addEventListener('click', () => {
+    $('oDone').hidden = true;
+    $('oTable').hidden = false;
+    renderMyHand();
+    o.peerKey = '';
+    renderOnline();
   });
 
   // ---------- 拡大表示 ----------
@@ -1007,6 +1548,7 @@
   function frame(now) {
     const targets = big ? [...live, pack, big] : [...live, pack];
     if (trade.open) targets.push(...trade.querySelectorAll('.st'));
+    if (online.open) targets.push(...online.querySelectorAll('.st'));
     const idle = now - lastInput > 2500;
     for (const el of targets) {
       let tx = 0, ty = 0;

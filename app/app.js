@@ -222,11 +222,13 @@ async function joinRoom(server, room, me) {
   persist();
   sync.connect();
   pushUpdate();
+  checkFeatures();
 }
 
 function leaveRoom() {
   sync.disconnect();
   device.sync = null;
+  device.calToken = null;
   store.rev = 0;
   persist();
   sync.setStatus('local');
@@ -337,6 +339,74 @@ async function disablePush() {
     const sub = await reg.pushManager.getSubscription();
     if (sub) await sub.unsubscribe();
   } catch (e) { /* 無視 */ }
+}
+
+// ---------- カレンダー・レシート ----------
+const serverBase = () => device.sync.server.replace(/\/+$/, '');
+const features = { receipt: null }; // サーバーでレシート読み取りが使えるか（null = 未確認）
+
+async function checkFeatures() {
+  if (!sync.enabled) return;
+  try { Object.assign(features, await (await fetch(`${serverBase()}/api/features`)).json()); } catch (e) { /* オフライン */ }
+}
+
+async function calendarUrl(reset = false) {
+  const res = await fetch(sync.api('/calendar'), {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reset }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const { token } = await res.json();
+  device.calToken = token;
+  persist();
+  return token;
+}
+
+function calendarLinks(token, chores) {
+  const https = `${serverBase()}/api/cal/${token}.ics${chores ? '?chores=1' : ''}`;
+  const webcal = https.replace(/^https?:/, 'webcal:');
+  return { https, webcal, google: `https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}` };
+}
+
+// 写真を長辺 1600px の JPEG に縮めて送る（通信量と読み取り時間を減らす）
+async function shrinkImage(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = url;
+    });
+    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.naturalWidth * scale);
+    canvas.height = Math.round(img.naturalHeight * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+async function readReceipt(file) {
+  const data = await shrinkImage(file);
+  const res = await fetch(sync.api('/receipt'), {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mediaType: 'image/jpeg', data }),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))).error;
+    throw new Error({
+      'not configured': 'レシート読み取りはまだ設定されていません',
+      'daily limit': '今日の読み取り回数の上限に達しました',
+      busy: '混み合っています。少し待ってからもう一度お試しください',
+      refused: 'この画像は読み取れませんでした',
+      'image too large': '画像が大きすぎます',
+    }[err] || '読み取れませんでした。もう一度お試しください');
+  }
+  return res.json();
 }
 
 // ---------- 画面 ----------
@@ -469,6 +539,30 @@ function thanksItem(t) {
       </div>
       ${mine ? `<button class="icon-btn" data-act="del-thanks" data-id="${esc(t.id)}" aria-label="削除">🗑</button>` : ''}
     </li>`;
+}
+
+function calendarCard() {
+  if (!sync.enabled) {
+    return `<div class="card"><h2>📆 カレンダーに表示</h2>
+      <p class="muted">ふたりの同期をつなぐと、記念日やお願いの期日を Google カレンダー・iPhone のカレンダーに表示できます。</p></div>`;
+  }
+  if (!device.calToken) {
+    return `<div class="card"><h2>📆 カレンダーに表示</h2>
+      <p class="muted">記念日・お願いの期日（・曜日で決めた家事）を、Google カレンダーや iPhone のカレンダーに表示できます。</p>
+      <button class="btn" data-act="cal-create">カレンダー用のURLを作る</button></div>`;
+  }
+  const l = calendarLinks(device.calToken, device.calChores);
+  return `<div class="card"><h2>📆 カレンダーに表示</h2>
+    <label class="toggle"><input type="checkbox" data-act="cal-chores" ${device.calChores ? 'checked' : ''}> 曜日で決めた家事も入れる</label>
+    <div class="btn-col" style="margin-top:10px">
+      <a class="btn" href="${esc(l.webcal)}">iPhone・Mac のカレンダーに追加</a>
+      <a class="btn ghost" href="${esc(l.google)}" target="_blank" rel="noopener">Google カレンダーに追加</a>
+      <button class="btn small ghost" data-act="cal-copy">URLをコピー</button>
+    </div>
+    <p class="muted">カレンダー側で定期的に読み込まれます（Google は反映まで数時間かかることがあります）。カレンダーからアプリへの書き込みはできません。</p>
+    <p class="muted">Google カレンダーは、パソコンのブラウザで開いて「追加」を押すと確実です。</p>
+    <button class="btn small ghost danger" data-act="cal-reset">URLを作り直す（前のURLは使えなくなります）</button>
+  </div>`;
 }
 
 const REQUEST_STATUS = { open: 'お返事待ち', accepted: '引き受け済み', done: '完了', declined: 'むずかしい' };
@@ -712,7 +806,8 @@ const screens = {
       </div>
       ${past.length ? `<div class="card"><h2>過ぎた予定</h2><ul class="list">${past.map(ev => `
           <li class="done"><div class="grow"><div class="title">${esc(ev.title)}</div><div class="muted">${esc(ev.date)}</div></div>
-          <button class="icon-btn" data-act="del-event" data-id="${esc(ev.id)}" aria-label="削除">🗑</button></li>`).join('')}</ul></div>` : ''}`;
+          <button class="icon-btn" data-act="del-event" data-id="${esc(ev.id)}" aria-label="削除">🗑</button></li>`).join('')}</ul></div>` : ''}
+      ${calendarCard()}`;
   },
 
   budget() {
@@ -737,11 +832,19 @@ const screens = {
       </div>
       <div class="card">
         <h2>支出を記録</h2>
+        ${sync.enabled && features.receipt !== false ? `
+          <label class="btn ghost receipt-btn ${ui.reading ? 'disabled' : ''}">${ui.reading ? '読み取り中…' : '📷 レシート・スクショから読み取る'}
+            <input type="file" accept="image/*" data-act="receipt" hidden ${ui.reading ? 'disabled' : ''}>
+          </label>` : ''}
+        ${ui.receipt ? `<div class="receipt-result">
+          <div class="muted">読み取り結果（まちがっていたら直してから「記録」を押してください）</div>
+          ${ui.receipt.items.length ? `<ul class="list compact">${ui.receipt.items.map(i => `<li><span class="grow">${esc(i.name)}</span><span>${fmtYen(i.price)}</span></li>`).join('')}</ul>` : ''}
+        </div>` : ''}
         <form class="add" data-form="expense">
-          <input name="title" placeholder="例: スーパー / 電気代" required maxlength="40">
+          <input name="title" placeholder="例: スーパー / 電気代" required maxlength="40" value="${esc(ui.receipt?.store || '')}">
           <div class="row">
-            <input name="amount" type="number" inputmode="numeric" min="1" max="10000000" placeholder="金額（円）" required>
-            <input name="date" type="date" value="${today()}" required>
+            <input name="amount" type="number" inputmode="numeric" min="1" max="10000000" placeholder="金額（円）" required value="${ui.receipt?.total || ''}">
+            <input name="date" type="date" value="${esc(ui.receipt?.date || today())}" required>
           </div>
           <div class="row">
             <label class="field">払った人
@@ -1018,6 +1121,14 @@ view.addEventListener('click', async e => {
       put('expenses', { id: uid(), kind: 'settle', from, to: other(from), amount: Math.abs(net), date: today(), at: Date.now() });
       break;
     }
+    case 'cal-create': case 'cal-reset':
+      if (el.dataset.act === 'cal-reset' && !confirm('今のURLは使えなくなります。カレンダーに登録済みなら、登録し直しが必要です。作り直しますか？')) return;
+      try { await calendarUrl(el.dataset.act === 'cal-reset'); } catch (err) { toast('サーバーにつながりません'); return; }
+      break;
+    case 'cal-copy':
+      try { await navigator.clipboard.writeText(calendarLinks(device.calToken, device.calChores).https); toast('コピーしました'); }
+      catch (err) { toast('コピーできませんでした'); }
+      return;
     case 'pin-note': { const n = get('notes', id); if (n) put('notes', { ...n, pinned: !n.pinned }); ui.openNote = id; break; }
     case 'del-note':
       if (!confirm('このメモを削除しますか？')) return;
@@ -1089,6 +1200,25 @@ view.addEventListener('change', e => {
     toast('通知の設定を保存しました');
     return;
   }
+  if (t.dataset.act === 'cal-chores') {
+    device.calChores = t.checked;
+    persist();
+    render();
+    return;
+  }
+  if (t.dataset.act === 'receipt') {
+    const file = t.files[0];
+    if (!file) return;
+    ui.reading = true;
+    ui.receipt = null;
+    render();
+    readReceipt(file).then(r => {
+      if (!r.is_receipt) { toast('レシートや支払い画面が見つかりませんでした'); return; }
+      ui.receipt = r;
+      toast(r.total ? `${fmtYen(r.total)} を読み取りました` : '金額が読み取れませんでした。入力してください');
+    }).catch(err => toast(err.message)).finally(() => { ui.reading = false; if (tab === 'budget') render(); });
+    return;
+  }
   if (t.dataset.act !== 'import') return;
   const file = t.files[0];
   if (!file) return;
@@ -1153,7 +1283,11 @@ view.addEventListener('submit', async e => {
     case 'expense': {
       const amount = Math.round(Number(f.get('amount')));
       if (!(amount > 0)) { toast('金額を入力してください'); return; }
-      put('expenses', { id: uid(), title: text('title'), amount, date: f.get('date') || today(), paidBy: f.get('paidBy'), split: f.get('split'), at: Date.now() });
+      put('expenses', {
+        id: uid(), title: text('title'), amount, date: f.get('date') || today(), paidBy: f.get('paidBy'), split: f.get('split'), at: Date.now(),
+        ...(ui.receipt?.items.length ? { items: ui.receipt.items.slice(0, 20) } : {}),
+      });
+      ui.receipt = null;
       toast('記録しました');
       break;
     }
@@ -1202,3 +1336,4 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 render();
 sync.connect();
 pushUpdate();
+checkFeatures().then(() => { if (tab === 'budget') render(); });

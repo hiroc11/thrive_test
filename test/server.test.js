@@ -7,7 +7,26 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
+const http = require('node:http');
+
 const PORT = 18000 + Math.floor(Math.random() * 1000);
+const MOCK_PORT = PORT + 1000;
+// Claude API の代わりに応答する偽サーバー（レシート読み取りのテスト用）
+const mockRequests = [];
+let mockReply = null;
+const mock = http.createServer((req, res) => {
+  let body = '';
+  req.on('data', c => { body += c; });
+  req.on('end', () => {
+    mockRequests.push({ url: req.url, headers: req.headers, body: JSON.parse(body || '{}') });
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      id: 'msg_test', type: 'message', role: 'assistant', model: 'claude-opus-5',
+      content: [{ type: 'text', text: JSON.stringify(mockReply) }],
+      stop_reason: 'end_turn', stop_sequence: null, usage: { input_tokens: 1, output_tokens: 1 },
+    }));
+  });
+});
 const BASE = `http://127.0.0.1:${PORT}`;
 const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'futari-test-'));
 let proc;
@@ -15,7 +34,10 @@ let proc;
 function startServer() {
   return new Promise((resolve, reject) => {
     proc = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
-      env: { ...process.env, PORT: String(PORT), DATA_DIR: dataDir, PUSH_DRY_RUN: '1', TZ: 'Asia/Tokyo' },
+      env: {
+        ...process.env, PORT: String(PORT), DATA_DIR: dataDir, PUSH_DRY_RUN: '1', TZ: 'Asia/Tokyo',
+        ANTHROPIC_API_KEY: 'test-key', ANTHROPIC_BASE_URL: `http://127.0.0.1:${MOCK_PORT}`, RECEIPT_DAILY_LIMIT: '3',
+      },
     });
     proc.stdout.once('data', () => resolve());
     proc.once('error', reject);
@@ -36,8 +58,8 @@ async function newRoom() {
   return (await res.json()).code;
 }
 
-before(startServer);
-after(async () => { await stopServer(); fs.rmSync(dataDir, { recursive: true, force: true }); });
+before(async () => { await new Promise(r => mock.listen(MOCK_PORT, r)); await startServer(); });
+after(async () => { await stopServer(); mock.close(); fs.rmSync(dataDir, { recursive: true, force: true }); });
 
 test('serves the app', async () => {
   const res = await fetch(BASE + '/');
@@ -198,4 +220,72 @@ test('test push and unsubscribe', async () => {
   assert.strictEqual((await post(`/api/rooms/${code}/push/test`, { endpoint: SUB('t').endpoint })).status, 200);
   await post(`/api/rooms/${code}/push/delete`, { endpoint: SUB('t').endpoint });
   assert.strictEqual((await post(`/api/rooms/${code}/push/test`, { endpoint: SUB('t').endpoint })).status, 404);
+});
+
+// ---------- カレンダー ----------
+test('publishes a calendar feed behind a read-only token', async () => {
+  const code = await newRoom();
+  await post(`/api/rooms/${code}/sync`, { since: 0, changes: [
+    { col: 'settings', rec: { id: 'names', a: 'ひろ', b: 'ゆき', updatedAt: 5 } },
+    { col: 'events', rec: { id: 'e1', title: '結婚記念日', date: '2020-10-10', yearly: true, updatedAt: 5 } },
+    { col: 'requests', rec: { id: 'r1', from: 'b', to: 'a', text: '電球', due: '2026-10-03', status: 'open', updatedAt: 5 } },
+    { col: 'requests', rec: { id: 'r2', from: 'b', to: 'a', text: '済んだ', due: '2026-10-03', status: 'done', updatedAt: 5 } },
+    { col: 'chores', rec: { id: 'c1', title: 'ゴミ出し', assignee: 'a', days: [1, 4], every: 0, points: 1, updatedAt: 5 } },
+  ] });
+  const { token } = await post(`/api/rooms/${code}/calendar`, {}).then(r => r.json());
+  assert.match(token, /^[A-Za-z0-9_-]{20,}$/);
+  // 2回目は同じトークン
+  assert.strictEqual((await post(`/api/rooms/${code}/calendar`, {}).then(r => r.json())).token, token);
+
+  let res = await fetch(`${BASE}/api/cal/${token}.ics`);
+  assert.strictEqual(res.status, 200);
+  assert.match(res.headers.get('content-type'), /text\/calendar/);
+  let body = await res.text();
+  assert.match(body, /SUMMARY:💞 結婚記念日\r\nRRULE:FREQ=YEARLY/);
+  assert.match(body, /DTSTART;VALUE=DATE:20261003/);
+  assert.match(body, /ひろへ: 電球/);
+  assert.doesNotMatch(body, /済んだ/);
+  assert.doesNotMatch(body, /ゴミ出し/);
+  body = await (await fetch(`${BASE}/api/cal/${token}.ics?chores=1`)).text();
+  assert.match(body, /SUMMARY:🧹 ゴミ出し（ひろ）\r\nRRULE:FREQ=WEEKLY;BYDAY=MO,TH/);
+
+  // 作り直すと前のURLは使えない
+  const { token: token2 } = await post(`/api/rooms/${code}/calendar`, { reset: true }).then(r => r.json());
+  assert.notStrictEqual(token2, token);
+  assert.strictEqual((await fetch(`${BASE}/api/cal/${token}.ics`)).status, 404);
+  assert.strictEqual((await fetch(`${BASE}/api/cal/${token2}.ics`)).status, 200);
+});
+
+// ---------- レシート ----------
+test('reads a receipt through the Claude API', async () => {
+  const features = await fetch(BASE + '/api/features').then(r => r.json());
+  assert.deepStrictEqual(features, { receipt: true });
+
+  const code = await newRoom();
+  mockReply = { is_receipt: true, store: 'スーパーふたり', date: '2026-09-26', total: 1234.4, items: [{ name: '牛乳', price: 198 }] };
+  const res = await post(`/api/rooms/${code}/receipt`, { mediaType: 'image/jpeg', data: Buffer.from('fake-jpeg').toString('base64') });
+  assert.strictEqual(res.status, 200);
+  assert.deepStrictEqual(await res.json(), { is_receipt: true, store: 'スーパーふたり', date: '2026-09-26', total: 1234, items: [{ name: '牛乳', price: 198 }] });
+
+  const sent = mockRequests.at(-1);
+  assert.match(sent.url, /^\/v1\/messages/);
+  assert.strictEqual(sent.headers['x-api-key'], 'test-key');
+  assert.match(sent.headers['anthropic-beta'], /server-side-fallback-2026-07-01/);
+  assert.strictEqual(sent.body.model, 'claude-opus-5');
+  assert.strictEqual(sent.body.fallbacks, 'default');
+  assert.strictEqual(sent.body.output_config.format.type, 'json_schema');
+  const [image, text] = sent.body.messages[0].content;
+  assert.deepStrictEqual(image, { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: Buffer.from('fake-jpeg').toString('base64') } });
+  assert.strictEqual(text.type, 'text');
+});
+
+test('rejects bad receipt images and enforces the daily limit', async () => {
+  const code = await newRoom();
+  assert.strictEqual((await post(`/api/rooms/${code}/receipt`, { mediaType: 'text/html', data: 'x' })).status, 400);
+  mockReply = { is_receipt: false, store: '', date: '', total: 0, items: [] };
+  const img = { mediaType: 'image/png', data: Buffer.from('png').toString('base64') };
+  const statuses = [];
+  for (let i = 0; i < 4; i++) statuses.push((await post(`/api/rooms/${code}/receipt`, img)).status);
+  // 形式エラーは回数に数えない（上限 3）
+  assert.deepStrictEqual(statuses, [200, 200, 200, 429]);
 });

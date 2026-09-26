@@ -11,6 +11,9 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const push = require('./push');
+const receipt = require('./receipt');
+const ics = require('./ics');
+const Logic = require('../app/logic.js');
 
 const PORT = Number(process.env.PORT) || 8080;
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', 'data'));
@@ -20,6 +23,7 @@ const COLLECTIONS = new Set(['settings', 'chores', 'log', 'shopping', 'thanks', 
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CODE_RE = /^[A-HJ-NP-Z2-9]{10}$/;
 const MAX_BODY = 1024 * 1024;
+const MAX_RECEIPT_BODY = 6 * 1024 * 1024; // レシート画像（base64）
 const MAX_RECORD = 4096;
 const MAX_RECORDS_PER_ROOM = 50000;
 const CREATE_LIMIT_PER_HOUR = 20;
@@ -30,7 +34,8 @@ fs.mkdirSync(DATA_DIR, { recursive: true });
 push.init(DATA_DIR);
 
 // ---------- ルームの保存 ----------
-const rooms = new Map(); // code -> { rev, count, records: { col: { id: rec } }, subs: { endpoint: sub }, listeners: Set, saveTimer }
+const rooms = new Map(); // code -> { rev, count, records: { col: { id: rec } }, subs: { endpoint: sub }, calToken, listeners: Set, saveTimer }
+const calIndex = new Map(); // カレンダー用トークン -> code
 
 function roomFile(code) { return path.join(DATA_DIR, `${code}.json`); }
 
@@ -39,7 +44,8 @@ function getRoom(code) {
   if (rooms.has(code)) return rooms.get(code);
   let stored;
   try { stored = JSON.parse(fs.readFileSync(roomFile(code), 'utf8')); } catch (e) { return null; }
-  const room = { rev: stored.rev || 0, records: stored.records || {}, subs: stored.subs || {}, listeners: new Set(), saveTimer: null };
+  const room = { rev: stored.rev || 0, records: stored.records || {}, subs: stored.subs || {}, calToken: stored.calToken || null, listeners: new Set(), saveTimer: null };
+  if (room.calToken) calIndex.set(room.calToken, code);
   room.count = Object.values(room.records).reduce((n, col) => n + Object.keys(col).length, 0);
   rooms.set(code, room);
   return room;
@@ -58,7 +64,7 @@ function createRoom() {
 
 function writeRoom(code, room) {
   const tmp = roomFile(code) + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify({ rev: room.rev, records: room.records, subs: room.subs }));
+  fs.writeFileSync(tmp, JSON.stringify({ rev: room.rev, records: room.records, subs: room.subs, calToken: room.calToken }));
   fs.renameSync(tmp, roomFile(code));
 }
 
@@ -156,13 +162,13 @@ function send(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
-function readJson(req) {
+function readJson(req, maxBytes = MAX_BODY) {
   return new Promise((resolve, reject) => {
     let size = 0;
     const chunks = [];
     req.on('data', c => {
       size += c.length;
-      if (size > MAX_BODY) { reject(new Error('too large')); req.destroy(); return; }
+      if (size > maxBytes) { reject(new Error('too large')); req.destroy(); return; }
       chunks.push(c);
     });
     req.on('end', () => {
@@ -204,6 +210,24 @@ async function handleApi(req, res, url) {
 
   if (parts[1] === 'push' && parts[2] === 'key') return send(res, 200, { key: push.getPublicKey() });
 
+  if (parts[1] === 'features') return send(res, 200, { receipt: receipt.configured() });
+
+  // カレンダー購読（読み取り専用のトークンで公開）
+  if (parts[1] === 'cal' && req.method === 'GET') {
+    const m = /^([A-Za-z0-9_-]{20,64})\.ics$/.exec(parts[2] || '');
+    const calRoom = m && calIndex.has(m[1]) ? getRoom(calIndex.get(m[1])) : null;
+    if (!calRoom) { res.writeHead(404); res.end('Not found'); return; }
+    const list = col => Logic.alive(Object.values(calRoom.records[col] || {}));
+    const n = (calRoom.records.settings || {}).names;
+    const body = ics.build({
+      names: n && !n.deleted ? n : { a: 'わたし', b: '奥さん' },
+      events: list('events'), requests: list('requests'), chores: list('chores'),
+    }, { chores: url.searchParams.get('chores') === '1' });
+    res.writeHead(200, { 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(body);
+    return;
+  }
+
   // テスト用（PUSH_DRY_RUN=1 のときだけ）
   if (push.DRY_RUN && parts[1] === 'debug') {
     if (parts[2] === 'pushes') return send(res, 200, push.sentLog);
@@ -238,6 +262,29 @@ async function handleApi(req, res, url) {
       push.onChanges(room, accepted);
     }
     return send(res, 200, { rev: room.rev, changes: changesSince(room, since) });
+  }
+
+  if (parts[3] === 'calendar' && req.method === 'POST') {
+    let body;
+    try { body = await readJson(req); } catch (e) { return send(res, 400, { error: 'bad request' }); }
+    if (!room.calToken || body.reset) {
+      if (room.calToken) calIndex.delete(room.calToken);
+      room.calToken = crypto.randomBytes(18).toString('base64url');
+      calIndex.set(room.calToken, code);
+      scheduleSave(code, room);
+    }
+    return send(res, 200, { token: room.calToken });
+  }
+
+  if (parts[3] === 'receipt' && req.method === 'POST') {
+    if (!receipt.configured()) return send(res, 503, { error: 'not configured' });
+    let body;
+    try { body = await readJson(req, MAX_RECEIPT_BODY); } catch (e) { return send(res, 413, { error: 'image too large' }); }
+    if (!receipt.validImage(body)) return send(res, 400, { error: 'bad image' });
+    const today = Logic.ymd(new Date());
+    if (!receipt.allow(code, today)) return send(res, 429, { error: 'daily limit' });
+    const r = await receipt.read({ mediaType: body.mediaType, data: body.data }, today);
+    return r.ok ? send(res, 200, r.result) : send(res, r.status, { error: r.error });
   }
 
   if (parts[3] === 'push' && req.method === 'POST') {

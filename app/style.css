@@ -178,3 +178,8 @@ details.note-item textarea { min-height: 120px; }
 .toggle-row .time { width: auto; padding: 6px 8px; }
 label.field.inline { display: flex; flex-direction: row; align-items: center; gap: 6px; flex: 0 0 auto; }
 label.field.inline input { width: auto; }
+.receipt-btn { display: block; text-align: center; margin-bottom: 10px; cursor: pointer; }
+.receipt-btn.disabled { opacity: .6; pointer-events: none; }
+.receipt-result { background: var(--bg); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+ul.list.compact li { padding: 4px 0; font-size: 13px; }
+a.btn { display: block; text-align: center; text-decoration: none; }

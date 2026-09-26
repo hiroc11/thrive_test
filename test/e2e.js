@@ -20,8 +20,21 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
 
 (async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'futari-e2e-'));
+  // Claude API の代わりにレシートの読み取り結果を返す偽サーバー
+  const mock = require('http').createServer((req, res) => {
+    req.resume();
+    req.on('end', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        id: 'msg_test', type: 'message', role: 'assistant', model: 'claude-opus-5', stop_reason: 'end_turn', stop_sequence: null,
+        usage: { input_tokens: 1, output_tokens: 1 },
+        content: [{ type: 'text', text: JSON.stringify({ is_receipt: true, store: 'ドラッグストア', date: '2026-09-20', total: 1980, items: [{ name: '洗剤', price: 498 }] }) }],
+      }));
+    });
+  });
+  await new Promise(r => mock.listen(PORT + 1000, r));
   const server = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, PORT: String(PORT), DATA_DIR: dataDir },
+    env: { ...process.env, PORT: String(PORT), DATA_DIR: dataDir, ANTHROPIC_API_KEY: 'test', ANTHROPIC_BASE_URL: `http://127.0.0.1:${PORT + 1000}` },
   });
   await new Promise(r => server.stdout.once('data', r));
   const b = await chromium.launch();
@@ -197,6 +210,30 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await until(B, () => document.querySelector('main').innerText.includes('貸し借りはありません'));
   console.log('✓ budget');
 
+  // レシート読み取り → フォームに入る → 記録
+  await A.setInputFiles('input[data-act=receipt]', path.join(__dirname, '..', 'app', 'icon-192.png'));
+  await until(A, () => document.querySelector('form[data-form=expense] input[name=title]')?.value === 'ドラッグストア');
+  assert.strictEqual(await A.inputValue('form[data-form=expense] input[name=amount]'), '1980');
+  assert.strictEqual(await A.inputValue('form[data-form=expense] input[name=date]'), '2026-09-20');
+  assert.match(await text(A), /洗剤/);
+  await A.click('form[data-form=expense] .btn');
+  await until(B, () => document.querySelector('main').innerText.includes('ドラッグストア'));
+  console.log('✓ receipt');
+
+  // カレンダー用URL
+  await nav(A, 'events');
+  await A.click('[data-act=cal-create]');
+  const webcal = await A.getAttribute('a[href^="webcal:"]', 'href');
+  const google = await A.getAttribute('a[href^="https://calendar.google.com"]', 'href');
+  assert.ok(google.includes(encodeURIComponent(webcal)));
+  const icsText = await (await fetch(webcal.replace(/^webcal:/, 'http:'))).text();
+  assert.match(icsText, /BEGIN:VCALENDAR/);
+  assert.match(icsText, /結婚記念日/);
+  await A.check('input[data-act=cal-chores]');
+  const withChores = await A.getAttribute('a[href^="webcal:"]', 'href');
+  assert.match(await (await fetch(withChores.replace(/^webcal:/, 'http:'))).text(), /燃えるゴミ出し/);
+  console.log('✓ calendar');
+
   // 共有メモ
   await nav(A, 'notes');
   await A.fill('form[data-form=note] input[name=title]', 'Wi-Fi');
@@ -223,5 +260,6 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   console.log('ALL OK');
   await b.close();
   server.kill();
+  mock.close();
   fs.rmSync(dataDir, { recursive: true, force: true });
 })().catch(e => { console.error(e); process.exit(1); });

@@ -53,11 +53,20 @@ jobs:
       - name: Create app (first time only)
         if: steps.token.outputs.ok == 'true'
         run: |
-          if flyctl status -a "$APP" >/dev/null 2>&1; then
+          if flyctl apps list --json | grep -q "\"Name\": *\"$APP\""; then
             echo "app $APP exists"
-          else
-            flyctl apps create "$APP" --org personal
+            exit 0
           fi
+          if flyctl apps create "$APP" --org personal; then exit 0; fi
+          # 失敗の原因を切り分ける: 別の名前なら作れるか？
+          probe="futari-probe-$(date +%s)"
+          if flyctl apps create "$probe" --org personal; then
+            flyctl apps destroy "$probe" --yes
+            echo "::error::アプリ名「$APP」はほかの人が使っています。Variables の FLY_APP_NAME に別の名前を設定してください"
+          else
+            echo "::error::このトークンではアプリを作れません。読み取り専用ではない Organization トークンを作るか、Fly.io にカードが登録されているか確認してください"
+          fi
+          exit 1
 
       - name: Create volume (first time only)
         if: steps.token.outputs.ok == 'true'

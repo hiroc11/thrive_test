@@ -23,6 +23,7 @@ PC でのコマンド操作は不要です。GitHub がかわりにデプロイ�
 5. 数分で完了します。実行結果の画面（Summary）に `https://futari-<GitHubユーザー名>.fly.dev` が表示されます
 
 **レシート読み取りを使うとき**: https://console.anthropic.com で API キーを作り、同じ画面の Secrets に `ANTHROPIC_API_KEY` として登録して、もう一度デプロイしてください。1枚あたり数円ほどかかります（Claude API の従量課金）。
+「This API key is not scoped to a workspace」というエラーになるときは、Console の Settings → Workspaces でワークスペースの ID（`wrkspc_...`）を調べ、Secrets に `ANTHROPIC_WORKSPACE_ID` として登録してください。
 
 アプリ名（URL）を変えたいときは、同じ画面の **Variables** タブで `FLY_APP_NAME` を追加してください（英小文字・数字・ハイフンのみ）。
 最初のデプロイでは、アプリとデータ用ディスクが自動で作られます。

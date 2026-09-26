@@ -47,7 +47,11 @@ const validImage = img => !!img && MEDIA_TYPES.has(img.mediaType) && typeof img.
 function configured() { return !!process.env.ANTHROPIC_API_KEY; }
 
 function getClient() {
-  if (!client) client = new Anthropic();
+  if (!client) {
+    // ワークスペースに属さない API キーでは、使うワークスペースの ID を毎回伝える必要がある
+    const workspace = process.env.ANTHROPIC_WORKSPACE_ID;
+    client = new Anthropic(workspace ? { defaultHeaders: { 'anthropic-workspace-id': workspace } } : {});
+  }
   return client;
 }
 
@@ -96,8 +100,13 @@ async function read({ mediaType, data }, today) {
     });
   } catch (e) {
     if (e instanceof Anthropic.RateLimitError) return { ok: false, status: 429, error: 'busy' };
-    if (e instanceof Anthropic.AuthenticationError) { console.error('receipt: invalid ANTHROPIC_API_KEY'); return { ok: false, status: 503, error: 'not configured' }; }
-    if (e instanceof Anthropic.BadRequestError) { console.error('receipt: bad request', e.message); return { ok: false, status: 400, error: 'bad image' }; }
+    if (e instanceof Anthropic.AuthenticationError || e instanceof Anthropic.PermissionDeniedError) { console.error('receipt: invalid ANTHROPIC_API_KEY'); return { ok: false, status: 503, error: 'not configured' }; }
+    if (e instanceof Anthropic.BadRequestError) {
+      console.error('receipt: bad request', e.message);
+      // キーやワークスペースの設定の問題は、画像の問題と区別して伝える
+      if (/workspace|api key|credit|billing/i.test(e.message)) return { ok: false, status: 503, error: 'not configured' };
+      return { ok: false, status: 400, error: 'bad image' };
+    }
     if (e instanceof Anthropic.APIError) { console.error('receipt: api error', e.status, e.message); return { ok: false, status: 502, error: 'api error' }; }
     console.error('receipt: failed', e);
     return { ok: false, status: 502, error: 'api error' };

@@ -36,7 +36,7 @@ function startServer() {
     proc = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'server.js')], {
       env: {
         ...process.env, PORT: String(PORT), DATA_DIR: dataDir, PUSH_DRY_RUN: '1', TZ: 'Asia/Tokyo',
-        ANTHROPIC_API_KEY: 'test-key', ANTHROPIC_BASE_URL: `http://127.0.0.1:${MOCK_PORT}`, RECEIPT_DAILY_LIMIT: '3',
+        ANTHROPIC_API_KEY: 'test-key', ANTHROPIC_WORKSPACE_ID: 'wrkspc_test', ANTHROPIC_BASE_URL: `http://127.0.0.1:${MOCK_PORT}`, RECEIPT_DAILY_LIMIT: '3',
       },
     });
     proc.stdout.once('data', () => resolve());
@@ -270,6 +270,7 @@ test('reads a receipt through the Claude API', async () => {
   const sent = mockRequests.at(-1);
   assert.match(sent.url, /^\/v1\/messages/);
   assert.strictEqual(sent.headers['x-api-key'], 'test-key');
+  assert.strictEqual(sent.headers['anthropic-workspace-id'], 'wrkspc_test');
   assert.match(sent.headers['anthropic-beta'], /server-side-fallback-2026-07-01/);
   assert.strictEqual(sent.body.model, 'claude-opus-5');
   assert.strictEqual(sent.body.fallbacks, 'default');

@@ -82,14 +82,17 @@ jobs:
         if: steps.token.outputs.ok == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
         run: |
-          # レシート読み取り用。GitHub の Secret に ANTHROPIC_API_KEY があれば Fly.io に渡す（次のデプロイで反映）
-          if [ -n "$ANTHROPIC_API_KEY" ]; then
-            printf 'ANTHROPIC_API_KEY=%s\n' "$ANTHROPIC_API_KEY" | flyctl secrets import -a "$APP" --stage
-            echo "ANTHROPIC_API_KEY を設定しました"
-          else
-            echo "ANTHROPIC_API_KEY は未設定です（レシート読み取りは使えません）"
-          fi
+          # レシート読み取り用。GitHub の Secret にあれば Fly.io に渡す（このあとのデプロイで反映）
+          for name in ANTHROPIC_API_KEY ANTHROPIC_WORKSPACE_ID; do
+            if [ -n "${!name}" ]; then
+              printf '%s=%s\n' "$name" "${!name}" | flyctl secrets import -a "$APP" --stage
+              echo "$name を設定しました"
+            else
+              echo "$name は未設定です"
+            fi
+          done
 
       - name: Deploy
         if: steps.token.outputs.ok == 'true'

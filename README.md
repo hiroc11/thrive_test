@@ -52,6 +52,7 @@ npm start
 | `TRUST_PROXY` | なし | `1` にすると、プロキシが付けた接続元 IP を使います（Fly.io など） |
 | `TZ` | システムの設定 | 朝の通知などの時刻のタイムゾーン（例: `Asia/Tokyo`） |
 | `ANTHROPIC_API_KEY` | なし | レシート読み取りに使う Claude API のキー。未設定なら読み取りボタンは表示されません |
+| `ANTHROPIC_WORKSPACE_ID` | なし | API キーがワークスペースに属していないときに、使うワークスペースの ID（`wrkspc_...`） |
 | `RECEIPT_MODEL` | `claude-opus-5` | レシート読み取りに使うモデル |
 | `RECEIPT_DAILY_LIMIT` | `30` | ルームごとの1日の読み取り回数の上限（使いすぎ防止） |
 | `VAPID_SUBJECT` | `https://<FLY_APP_NAME>.fly.dev` | プッシュ通知の送信者を表す URL または `mailto:` |

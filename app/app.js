@@ -399,7 +399,8 @@ async function readReceipt(file) {
   if (!res.ok) {
     const err = (await res.json().catch(() => ({}))).error;
     throw new Error({
-      'not configured': 'レシート読み取りはまだ設定されていません',
+      'not configured': 'レシート読み取りの設定（API キー）に問題があります。管理者に確認してください',
+      'bad image': 'この画像は読み込めませんでした。別の写真でお試しください',
       'daily limit': '今日の読み取り回数の上限に達しました',
       busy: '混み合っています。少し待ってからもう一度お試しください',
       refused: 'この画像は読み取れませんでした',

@@ -21,6 +21,7 @@ jobs:
       - name: Try reading a receipt image with the same code and key
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_WORKSPACE_ID: ${{ secrets.ANTHROPIC_WORKSPACE_ID }}
         run: |
           node -e "
             const r = require('./server/receipt.js');

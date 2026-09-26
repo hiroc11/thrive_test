@@ -5,10 +5,10 @@
 // 削除は deleted: true の「墓標」を残して相手の端末にも伝える。
 const STORE_KEY = 'futari-store-v2';     // { rev, records: { col: { id: rec } } }  ふたりで共有するデータ
 const PENDING_KEY = 'futari-pending-v2'; // ["col/id", ...]  まだサーバーに送っていない変更
-const DEVICE_KEY = 'futari-device-v2';   // { me, clientId, sync: { server, room } | null }  この端末だけの設定
+const DEVICE_KEY = 'futari-device-v2';   // { me, clientId, sync: { server, room } | null, push: { endpoint, prefs } | null }  この端末だけの設定
 const LEGACY_KEY = 'futari-data-v1';
 
-const COLLECTIONS = ['settings', 'chores', 'log', 'shopping', 'thanks', 'events'];
+const COLLECTIONS = ['settings', 'chores', 'log', 'shopping', 'thanks', 'events', 'requests', 'expenses', 'stock', 'notes'];
 // 初期データは updatedAt: 1 にしておき、どちらかの端末で編集されればそちらが勝つようにする
 const SEED = {
   settings: [{ id: 'names', a: 'わたし', b: '奥さん', updatedAt: 1 }],
@@ -221,6 +221,7 @@ async function joinRoom(server, room, me) {
   }
   persist();
   sync.connect();
+  pushUpdate();
 }
 
 function leaveRoom() {
@@ -232,19 +233,20 @@ function leaveRoom() {
 }
 
 // ---------- ユーティリティ ----------
-const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const L = window.Logic;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const names = () => get('settings', 'names') || SEED.settings[0];
 const name = who => who === 'both' ? 'ふたり' : names()[who];
-const other = who => (who === 'a' ? 'b' : 'a');
-const DAY = 86400000;
+const other = L.other;
+const DAY = L.DAY;
+const byNewest = (x, y) => (y.at || 0) - (x.at || 0);
+const fmtYen = n => `¥${Math.round(n).toLocaleString('ja-JP')}`;
+const today = () => L.ymd(new Date());
 
-function startOfDay(d = new Date()) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
-function daysBetween(a, b) { return Math.round((startOfDay(b) - startOfDay(a)) / DAY); }
 function fmtDate(ts) {
   const d = new Date(ts);
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
-const byNewest = (x, y) => y.at - x.at;
 
 function toast(msg) {
   document.querySelectorAll('.toast').forEach(t => t.remove());
@@ -252,79 +254,118 @@ function toast(msg) {
   el.className = 'toast';
   el.textContent = msg;
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1800);
+  setTimeout(() => el.remove(), 2200);
 }
 
-// ---------- 家事ロジック ----------
-// 最後に完了した日時は記録（log）から求める。ふたりが同時に完了しても記録が消えない。
-function lastDoneMap() {
-  const m = {};
-  all('log').forEach(l => { if (!m[l.choreId] || m[l.choreId] < l.at) m[l.choreId] = l.at; });
-  return m;
+function sendThanks(text) {
+  put('thanks', { id: uid(), from: device.me, text, at: Date.now() });
 }
 
-// every: 0 = 1回きり, n = n日ごと
-function choreStatus(c, lastDone) {
-  if (!lastDone) return { due: true, label: 'まだ' };
-  if (c.every === 0) return { due: false, label: '完了' };
-  const left = c.every - daysBetween(lastDone, new Date());
-  if (left <= 0) return { due: true, label: left === 0 ? '今日' : `${-left}日遅れ` };
-  return { due: false, label: `あと${left}日` };
-}
-
+// ---------- 家事 ----------
 function completeChore(id) {
   const c = get('chores', id);
   if (!c) return;
-  put('log', { id: uid(), choreId: c.id, title: c.title, by: device.me, at: Date.now(), points: c.points });
-  toast(`「${c.title}」おつかれさま！`);
+  const me = device.me;
+  const who = L.assigneeOf(c, all('log'));
+  const cover = who !== 'both' && who !== me;
+  put('log', { id: uid(), choreId: c.id, title: c.title, by: me, at: Date.now(), points: c.points, ...(cover ? { cover: true, for: who } : {}) });
+  toast(cover ? `代わりにやったことを${name(who)}に伝えます` : `「${c.title}」おつかれさま！`);
 }
 
 function weekPoints() {
-  const since = Date.now() - 7 * DAY;
-  const p = { a: 0, b: 0 };
-  all('log').filter(l => l.at >= since && p[l.by] !== undefined).forEach(l => { p[l.by] += l.points; });
-  return p;
+  return L.weekSummary({ log: all('log') }).points;
 }
 
-// ---------- 記念日ロジック ----------
-function nextOccurrence(ev) {
-  const today = startOfDay();
-  const [y, m, d] = ev.date.split('-').map(Number);
-  if (!ev.yearly) return new Date(y, m - 1, d);
-  let next = new Date(today.getFullYear(), m - 1, d);
-  if (next < today) next = new Date(today.getFullYear() + 1, m - 1, d);
-  return next;
+// ---------- プッシュ通知 ----------
+const DEFAULT_PUSH_PREFS = { morning: true, time: '08:00', shopping: true, partner: true, events: true, weekly: true };
+const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+function b64ToBytes(b64) {
+  const s = atob((b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from(s, c => c.charCodeAt(0));
 }
 
-function upcomingEvents() {
-  const today = startOfDay();
-  return all('events')
-    .map(ev => ({ ev, next: nextOccurrence(ev) }))
-    .filter(x => x.next >= today)
-    .sort((x, y) => x.next - y.next);
+async function postPush(action, body) {
+  const res = await fetch(sync.api(`/push${action ? '/' + action : ''}`), {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
 
-function eventLabel({ ev, next }) {
-  const days = daysBetween(new Date(), next);
-  const when = days === 0 ? '今日！' : `あと${days}日`;
-  let extra = '';
-  if (ev.yearly) {
-    const years = next.getFullYear() - Number(ev.date.slice(0, 4));
-    if (years > 0) extra = `（${years}回目）`;
+async function enablePush() {
+  if (!sync.enabled) { toast('先にふたりの同期をつないでください'); return; }
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') { toast('通知が許可されませんでした。端末の設定で許可してください'); return; }
+  const reg = await navigator.serviceWorker.ready;
+  const { key } = await (await fetch(`${device.sync.server.replace(/\/+$/, '')}/api/push/key`)).json();
+  const opts = { userVisibleOnly: true, applicationServerKey: b64ToBytes(key) };
+  let sub;
+  try { sub = await reg.pushManager.subscribe(opts); } catch (e) {
+    // 別のサーバー鍵で登録済みだった場合は作り直す
+    const old = await reg.pushManager.getSubscription();
+    if (old) await old.unsubscribe();
+    sub = await reg.pushManager.subscribe(opts);
   }
-  return { when, extra, dateText: `${next.getMonth() + 1}/${next.getDate()}` };
+  device.push = { endpoint: sub.endpoint, prefs: device.push?.prefs || { ...DEFAULT_PUSH_PREFS } };
+  persist();
+  await postPush('', { subscription: sub.toJSON(), who: device.me, prefs: device.push.prefs });
+  toast('通知をオンにしました');
+}
+
+// 担当者の切り替えや設定変更をサーバーに伝える
+async function pushUpdate() {
+  if (!device.push || !sync.enabled || !pushSupported()) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (!sub) { device.push = null; persist(); return; }
+    device.push.endpoint = sub.endpoint;
+    persist();
+    await postPush('', { subscription: sub.toJSON(), who: device.me, prefs: device.push.prefs });
+  } catch (e) { /* オフラインなど。次回起動時に再送 */ }
+}
+
+async function disablePush() {
+  const endpoint = device.push?.endpoint;
+  device.push = null;
+  persist();
+  try {
+    if (endpoint && sync.enabled) await postPush('delete', { endpoint });
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) await sub.unsubscribe();
+  } catch (e) { /* 無視 */ }
 }
 
 // ---------- 画面 ----------
 const view = document.getElementById('view');
-const titles = { home: 'ホーム', chores: '家事', shopping: '買い物', thanks: 'ありがとう', events: '記念日', settings: '設定' };
-let tab = 'home';
+const TABS = ['home', 'chores', 'shopping', 'futari', 'more'];
+const SUBPAGES = ['events', 'budget', 'notes', 'settings'];
+const titles = {
+  home: 'ホーム', chores: '家事', shopping: '買い物', futari: 'ふたり', more: 'その他',
+  events: '記念日', budget: '家計簿', notes: '共有メモ', settings: '設定',
+};
+let tab = TABS.includes(location.hash.slice(1)) || SUBPAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+let ui = {}; // 画面ごとの一時的な状態（編集中の家事、開いているメモなど）
 let renderDeferred = false;
+
+function go(t) {
+  if (!titles[t]) return;
+  tab = t;
+  ui = {};
+  try { history.replaceState(null, '', `#${t}`); } catch (e) { /* 無視 */ }
+  render();
+  window.scrollTo(0, 0);
+}
 
 function render() {
   renderDeferred = false;
+  const sub = SUBPAGES.includes(tab);
   document.getElementById('page-title').textContent = titles[tab];
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('back').hidden = !sub;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === (sub ? 'more' : tab)));
   document.getElementById('me-toggle').textContent = `👤 ${name(device.me)}`;
   view.innerHTML = screens[tab]();
 }
@@ -339,6 +380,7 @@ view.addEventListener('focusout', () => setTimeout(() => {
   if (renderDeferred && !view.contains(document.activeElement)) render();
 }, 0));
 
+// ---------- 画面の部品 ----------
 function balanceCard() {
   const p = weekPoints();
   const total = p.a + p.b;
@@ -358,94 +400,162 @@ function balanceCard() {
     </div>`;
 }
 
-function choreItem(c, st, withMenu) {
+const ROTATE_LABEL = { each: '🔁 毎回交代', weekly: '🔁 毎週交代' };
+
+function choreItem({ c, st, who }, withMenu) {
   return `
     <li>
       <button class="check" data-act="done-chore" data-id="${esc(c.id)}" aria-label="完了にする"></button>
       <div class="grow">
         <div class="title">${esc(c.title)}</div>
-        <div class="muted">${c.every === 0 ? '1回だけ' : `${c.every}日ごと`} · ${c.points}pt · ${esc(st.label)}</div>
+        <div class="muted">${esc(L.scheduleLabel(c))} · ${c.points}pt · ${esc(st.label)}${c.rotate && c.assignee !== 'both' ? ` · ${ROTATE_LABEL[c.rotate]}` : ''}</div>
       </div>
-      <span class="tag ${esc(c.assignee)}">${esc(name(c.assignee))}</span>
-      ${withMenu ? `<button class="icon-btn" data-act="del-chore" data-id="${esc(c.id)}" aria-label="削除">🗑</button>` : ''}
+      <span class="tag ${esc(who)}">${esc(name(who))}</span>
+      ${withMenu ? `<button class="icon-btn" data-act="edit-chore" data-id="${esc(c.id)}" aria-label="編集">✏️</button>` : ''}
     </li>`;
 }
 
-function choresWithStatus() {
-  const last = lastDoneMap();
-  return all('chores').map(c => ({ c, st: choreStatus(c, last[c.id]) }));
+function choreForm(c) {
+  const schedule = c ? (Array.isArray(c.days) && c.days.length ? 'days' : String(c.every ?? 1)) : '1';
+  const days = c?.days || [];
+  const opt = (v, label, cur) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${label}</option>`;
+  return `
+    <form class="add" data-form="chore" data-id="${esc(c?.id || '')}">
+      <input name="title" placeholder="例: 掃除機がけ" required maxlength="40" value="${esc(c?.title || '')}">
+      <div class="row">
+        <label class="field">担当
+          <select name="assignee">
+            ${opt('a', esc(name('a')), c?.assignee || device.me)}${opt('b', esc(name('b')), c?.assignee || device.me)}${opt('both', 'ふたり', c?.assignee)}
+          </select>
+        </label>
+        <label class="field">大変さ
+          <select name="points">${opt(1, '軽い 1pt', c?.points ?? 1)}${opt(2, '普通 2pt', c?.points)}${opt(3, '重い 3pt', c?.points)}</select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="field">予定
+          <select name="schedule">
+            ${opt(1, '毎日', schedule)}${opt(2, '2日ごと', schedule)}${opt(3, '3日ごと', schedule)}${opt(7, '毎週', schedule)}
+            ${opt(14, '2週ごと', schedule)}${opt(30, '毎月', schedule)}${opt(0, '1回だけ', schedule)}${opt('days', '曜日で決める', schedule)}
+          </select>
+        </label>
+        <label class="field">交代
+          <select name="rotate">${opt('', '固定', c?.rotate || '')}${opt('each', '毎回交代', c?.rotate)}${opt('weekly', '毎週交代', c?.rotate)}</select>
+        </label>
+      </div>
+      <div class="days-row" ${schedule === 'days' ? '' : 'hidden'}>
+        ${[1, 2, 3, 4, 5, 6, 0].map(d => `<label class="day"><input type="checkbox" name="days" value="${d}" ${days.includes(d) ? 'checked' : ''}><span>${L.WEEKDAYS[d]}</span></label>`).join('')}
+      </div>
+      <div class="btn-row">
+        <button class="btn">${c ? '保存' : '追加'}</button>
+        ${c ? `<button type="button" class="btn ghost" data-act="cancel-edit">キャンセル</button>
+               <button type="button" class="btn ghost danger" data-act="del-chore" data-id="${esc(c.id)}">削除</button>` : ''}
+      </div>
+    </form>`;
 }
 
+const REACTIONS = ['❤️', '😊', '🙏', '😂'];
+
+function thanksItem(t) {
+  const me = device.me;
+  const mine = t.from === me;
+  return `
+    <li>
+      <span class="tag ${esc(t.from)}">${esc(name(t.from))}</span>
+      <div class="grow">
+        <div class="note">${esc(t.text)}</div>
+        <div class="muted">${fmtDate(t.at)}${mine && t.reaction ? ` · ${esc(name(other(t.from)))}から ${esc(t.reaction)}` : ''}</div>
+        ${mine ? '' : `<div class="reactions">${REACTIONS.map(r => `<button class="react ${t.reaction === r ? 'on' : ''}" data-act="react" data-id="${esc(t.id)}" data-r="${r}" aria-label="${r}">${r}</button>`).join('')}</div>`}
+      </div>
+      ${mine ? `<button class="icon-btn" data-act="del-thanks" data-id="${esc(t.id)}" aria-label="削除">🗑</button>` : ''}
+    </li>`;
+}
+
+const REQUEST_STATUS = { open: 'お返事待ち', accepted: '引き受け済み', done: '完了', declined: 'むずかしい' };
+
+// ---------- 各画面 ----------
 const screens = {
   home() {
-    const due = choresWithStatus().filter(x => x.st.due);
-    const mine = due.filter(x => x.c.assignee === device.me || x.c.assignee === 'both');
-    const up = upcomingEvents()[0];
+    const me = device.me;
+    const due = L.choresWithStatus(all('chores'), all('log')).filter(x => x.st.due);
+    const mine = due.filter(x => x.who === me || x.who === 'both');
+    const up = L.upcomingEvents(all('events'))[0];
     const lastThanks = all('thanks').sort(byNewest)[0];
     const shopLeft = all('shopping').filter(s => !s.done).length;
+    const covered = all('log').filter(l => l.cover && l.for === me && !l.thanked && Date.now() - l.at < 3 * DAY).sort(byNewest);
+    const requests = all('requests').filter(r => r.to === me && (r.status === 'open' || r.status === 'accepted'));
+    const lowStock = all('stock').filter(s => s.low).length;
+    const showPushHint = sync.enabled && pushSupported() && (!isIos || isStandalone()) && !device.push && !device.pushHintOff;
     return `
       ${!sync.enabled ? `<div class="card hint">
         <h2>ふたりの端末をつなげましょう</h2>
         <p class="muted">共有コードでつなぐと、家事や買い物リストがふたりのスマホで自動的に同期されます。</p>
         <button class="btn small" data-goto="settings">つなぐ</button>
       </div>` : ''}
+      ${showPushHint ? `<div class="card hint">
+        <h2>🔔 通知をオンにしませんか？</h2>
+        <p class="muted">朝の家事リマインド、買い物リストの追加、ありがとうやお願いが届いたときにお知らせします。</p>
+        <div class="btn-row"><button class="btn small" data-act="enable-push">オンにする</button><button class="btn small ghost" data-act="push-hint-off">あとで</button></div>
+      </div>` : ''}
+      ${covered.map(l => `<div class="card hint">
+        <h2>🧹 ${esc(name(l.by))}が代わりにやってくれました</h2>
+        <p>「${esc(l.title)}」 <span class="muted">${fmtDate(l.at)}</span></p>
+        <button class="btn small" data-act="thank-cover" data-id="${esc(l.id)}">ありがとうを送る</button>
+      </div>`).join('')}
+      ${requests.length ? `<div class="card">
+        <h2>🙏 ${esc(name(other(me)))}からのお願い ${requests.length}件</h2>
+        <ul class="list">${requests.slice(0, 3).map(r => `<li><div class="grow">${esc(r.text)}</div><span class="muted">${REQUEST_STATUS[r.status]}</span></li>`).join('')}</ul>
+        <button class="btn small ghost" data-goto="futari">見る</button>
+      </div>` : ''}
       <div class="card">
-        <h2>今日やること（${esc(name(device.me))}）</h2>
-        ${mine.length ? `<ul class="list">${mine.map(x => choreItem(x.c, x.st, false)).join('')}</ul>` : '<p class="empty">今日の担当家事はありません 🎉</p>'}
-        ${due.length > mine.length ? `<p class="muted">相手の担当で残っている家事: ${due.length - mine.length}件</p>` : ''}
+        <h2>今日やること（${esc(name(me))}）</h2>
+        ${mine.length ? `<ul class="list">${mine.map(x => choreItem(x, false)).join('')}</ul>` : '<p class="empty">今日の担当家事はありません 🎉</p>'}
+        ${due.length > mine.length ? `<p class="muted">${esc(name(other(me)))}の担当で残っている家事: ${due.length - mine.length}件（代わりにやると伝わります）</p>` : ''}
       </div>
       ${balanceCard()}
       <div class="card">
         <h2>次の記念日</h2>
-        ${up ? (() => { const l = eventLabel(up); return `<div class="big">${esc(l.when)}</div><div>${esc(up.ev.title)}${esc(l.extra)} · ${l.dateText}</div>`; })()
-             : '<p class="empty">記念日タブから登録できます</p>'}
+        ${up ? (() => { const l = L.eventLabel(up); return `<div class="big">${esc(l.when)}</div><div>${esc(up.ev.title)}${esc(l.extra)} · ${l.dateText}</div>`; })()
+             : '<p class="empty">その他 → 記念日 から登録できます</p>'}
       </div>
       <div class="card">
         <h2>最近のありがとう</h2>
-        ${lastThanks ? `<div class="note">${esc(lastThanks.text)}</div><div class="muted">${esc(name(lastThanks.from))} → ${esc(name(other(lastThanks.from)))} · ${fmtDate(lastThanks.at)}</div>`
-                     : '<p class="empty">小さなことでも「ありがとう」を残してみましょう</p>'}
-        <p><button class="btn small" data-goto="thanks">ありがとうを書く</button></p>
+        ${lastThanks ? `<ul class="list">${thanksItem(lastThanks)}</ul>` : '<p class="empty">小さなことでも「ありがとう」を残してみましょう</p>'}
+        <p><button class="btn small" data-goto="futari">ありがとうを書く</button></p>
       </div>
       <div class="card">
         <h2>買い物リスト</h2>
-        <p>${shopLeft ? `未購入 ${shopLeft}件` : '買うものはありません'}</p>
+        <p>${shopLeft ? `未購入 ${shopLeft}件` : '買うものはありません'}${lowStock ? ` · 残りわずか ${lowStock}件` : ''}</p>
         <button class="btn small ghost" data-goto="shopping">開く</button>
       </div>`;
   },
 
   chores() {
-    const sorted = choresWithStatus().sort((x, y) => (y.st.due - x.st.due) || x.c.title.localeCompare(y.c.title, 'ja'));
+    const list = L.choresWithStatus(all('chores'), all('log'))
+      .sort((x, y) => (y.st.due - x.st.due) || x.c.title.localeCompare(y.c.title, 'ja'));
     const log = all('log').sort(byNewest).slice(0, 20);
+    const editing = ui.editChore && get('chores', ui.editChore);
+    const existing = new Set(all('chores').map(c => c.title));
+    const cat = ui.presetCat ?? 0;
     return `
+      ${editing ? `<div class="card hint"><h2>家事を編集</h2>${choreForm(editing)}</div>` : ''}
       <div class="card">
         <h2>家事リスト</h2>
-        ${sorted.length ? `<ul class="list">${sorted.map(x => choreItem(x.c, x.st, true)).join('')}</ul>` : '<p class="empty">家事を追加しましょう</p>'}
+        ${list.length ? `<ul class="list">${list.map(x => choreItem(x, true)).join('')}</ul>` : '<p class="empty">家事を追加しましょう</p>'}
       </div>
       <div class="card">
-        <h2>家事を追加</h2>
-        <form class="add" data-form="chore">
-          <input name="title" placeholder="例: 掃除機がけ" required maxlength="40">
-          <div class="row">
-            <label class="field">担当
-              <select name="assignee">
-                <option value="a">${esc(name('a'))}</option>
-                <option value="b">${esc(name('b'))}</option>
-                <option value="both">ふたり</option>
-              </select>
-            </label>
-            <label class="field">頻度
-              <select name="every">
-                <option value="1">毎日</option><option value="2">2日ごと</option><option value="3">3日ごと</option>
-                <option value="7">毎週</option><option value="14">2週ごと</option><option value="30">毎月</option>
-                <option value="0">1回だけ</option>
-              </select>
-            </label>
-            <label class="field">大変さ
-              <select name="points"><option value="1">軽い 1pt</option><option value="2">普通 2pt</option><option value="3">重い 3pt</option></select>
-            </label>
-          </div>
-          <button class="btn">追加</button>
-        </form>
+        <h2>よくある家事から選ぶ</h2>
+        <div class="chips">${L.PRESETS.map((p, i) => `<button class="chip ${i === cat ? 'on' : ''}" data-act="preset-cat" data-id="${i}">${esc(p.cat)}</button>`).join('')}</div>
+        <ul class="list">${L.PRESETS[cat].items.map((p, i) => `
+          <li>
+            <div class="grow"><div class="title">${esc(p.title)}</div><div class="muted">${esc(L.scheduleLabel(p))} · ${p.points}pt</div></div>
+            ${existing.has(p.title) ? '<span class="muted">✓ 追加済み</span>' : `<button class="btn small" data-act="add-preset" data-id="${i}">＋ 追加</button>`}
+          </li>`).join('')}</ul>
+        <p class="muted">追加した家事は、あとから ✏️ で担当や曜日を変えられます。</p>
+      </div>
+      <div class="card">
+        <h2>自分で追加</h2>
+        ${choreForm(null)}
       </div>
       ${balanceCard()}
       <div class="card">
@@ -453,7 +563,7 @@ const screens = {
         ${log.length ? `<ul class="list">${log.map(l => `
           <li>
             <span class="tag ${esc(l.by)}">${esc(name(l.by))}</span>
-            <div class="grow"><div class="title">${esc(l.title)}</div><div class="muted">${fmtDate(l.at)} · ${l.points}pt</div></div>
+            <div class="grow"><div class="title">${esc(l.title)}${l.cover ? ' <span class="badge">代わりに</span>' : ''}</div><div class="muted">${fmtDate(l.at)} · ${l.points}pt</div></div>
             <button class="icon-btn" data-act="undo-log" data-id="${esc(l.id)}" aria-label="取り消し">↩︎</button>
           </li>`).join('')}</ul>` : '<p class="empty">まだ記録がありません</p>'}
       </div>`;
@@ -461,6 +571,7 @@ const screens = {
 
   shopping() {
     const items = all('shopping').sort((x, y) => (x.done - y.done) || (x.at || 0) - (y.at || 0));
+    const stock = all('stock').sort((x, y) => (y.low - x.low) || x.name.localeCompare(y.name, 'ja'));
     return `
       <div class="card">
         <form class="add" data-form="shop">
@@ -471,40 +582,111 @@ const screens = {
         ${items.length ? `<ul class="list">${items.map(s => `
           <li class="${s.done ? 'done' : ''}">
             <button class="check ${s.done ? 'on' : ''}" data-act="toggle-shop" data-id="${esc(s.id)}" aria-label="購入済みにする">${s.done ? '✓' : ''}</button>
-            <div class="grow"><div class="title">${esc(s.name)}</div><div class="muted">${esc(name(s.by))}が追加</div></div>
+            <div class="grow"><div class="title">${esc(s.name)}</div><div class="muted">${esc(name(s.by))}が追加${s.stockId ? ' · 在庫から' : ''}</div></div>
             <button class="icon-btn" data-act="del-shop" data-id="${esc(s.id)}" aria-label="削除">🗑</button>
           </li>`).join('')}</ul>` : '<p class="empty">買うものはありません</p>'}
         ${items.some(s => s.done) ? '<p><button class="btn small ghost" data-act="clear-shop">購入済みを消す</button></p>' : ''}
+      </div>
+      <div class="card">
+        <h2>在庫チェック</h2>
+        <p class="muted">「少ない」にすると買い物リストに自動で入ります。買ったら「ある」に戻ります。</p>
+        ${stock.length ? `<ul class="list">${stock.map(s => `
+          <li>
+            <div class="grow"><div class="title">${esc(s.name)}</div></div>
+            <button class="stock-btn ${s.low ? 'low' : ''}" data-act="toggle-stock" data-id="${esc(s.id)}">${s.low ? '少ない' : 'ある'}</button>
+            <button class="icon-btn" data-act="del-stock" data-id="${esc(s.id)}" aria-label="削除">🗑</button>
+          </li>`).join('')}</ul>` : `<p><button class="btn small ghost" data-act="stock-presets">よくある日用品を追加</button></p>`}
+        <form class="add" data-form="stock" style="margin-top:10px">
+          <div class="row"><input name="name" placeholder="例: 洗濯洗剤" required maxlength="40"><button class="btn ghost" style="flex:0 0 auto">追加</button></div>
+        </form>
       </div>`;
   },
 
-  thanks() {
+  futari() {
     const me = device.me;
-    const list = all('thanks').sort(byNewest);
-    const count = who => list.filter(t => t.from === who).length;
+    const s = L.weekSummary({ log: all('log'), thanks: all('thanks'), requests: all('requests') });
+    const reqs = all('requests').sort(byNewest);
+    const forMe = reqs.filter(r => r.to === me && (r.status === 'open' || r.status === 'accepted'));
+    const fromMe = reqs.filter(r => r.from === me && r.status !== 'done');
+    const done = reqs.filter(r => r.status === 'done' && Date.now() - (r.doneAt || 0) < 14 * DAY);
+    const thanks = all('thanks').sort(byNewest);
+    const row = (label, key, unit) => `<tr><th>${label}</th><td>${s[key].a}${unit}</td><td>${s[key].b}${unit}</td></tr>`;
+    const covers = s.cover.a + s.cover.b;
     return `
       <div class="card">
-        <h2>${esc(name(other(me)))}へのありがとう</h2>
+        <h2>📝 この7日間のふりかえり</h2>
+        <table class="summary">
+          <tr><th></th><td><span class="tag a">${esc(name('a'))}</span></td><td><span class="tag b">${esc(name('b'))}</span></td></tr>
+          ${row('家事', 'chores', '回')}${row('ポイント', 'points', 'pt')}${row('ありがとう', 'thanks', '回')}${row('お願いに応えた', 'requestsDone', '回')}
+        </table>
+        <p class="muted">${covers ? `代わりにやった家事が${covers}回ありました。` : ''}${s.thanks.a + s.thanks.b ? 'ありがとうを伝え合えていますね。' : '今週はまだありがとうがありません。ひとこと送ってみませんか？'}</p>
+      </div>
+      <div class="card">
+        <h2>🙏 ${esc(name(other(me)))}へのお願い</h2>
+        <form class="add" data-form="request">
+          <input name="text" placeholder="例: 今度の休みに電球を替えてほしい" required maxlength="100">
+          <div class="row"><label class="field">いつまでに（任意）<input type="date" name="due"></label></div>
+          <button class="btn">お願いする</button>
+        </form>
+      </div>
+      ${forMe.length ? `<div class="card hint">
+        <h2>${esc(name(other(me)))}からのお願い</h2>
+        <ul class="list">${forMe.map(r => `
+          <li>
+            <div class="grow"><div class="title">${esc(r.text)}</div><div class="muted">${r.due ? `${esc(r.due)}まで · ` : ''}${REQUEST_STATUS[r.status]}</div></div>
+            <div class="btn-col">${r.status === 'open'
+              ? `<button class="btn small" data-act="req-accept" data-id="${esc(r.id)}">引き受ける</button><button class="btn small ghost" data-act="req-decline" data-id="${esc(r.id)}">むずかしい</button>`
+              : `<button class="btn small" data-act="req-done" data-id="${esc(r.id)}">やった！</button>`}</div>
+          </li>`).join('')}</ul>
+      </div>` : ''}
+      ${fromMe.length ? `<div class="card">
+        <h2>お願いしたこと</h2>
+        <ul class="list">${fromMe.map(r => `
+          <li>
+            <div class="grow"><div class="title">${esc(r.text)}</div><div class="muted">${r.due ? `${esc(r.due)}まで · ` : ''}${REQUEST_STATUS[r.status]}</div></div>
+            <button class="icon-btn" data-act="req-cancel" data-id="${esc(r.id)}" aria-label="取り消し">🗑</button>
+          </li>`).join('')}</ul>
+      </div>` : ''}
+      ${done.length ? `<div class="card">
+        <h2>かなったお願い</h2>
+        <ul class="list">${done.map(r => `
+          <li class="done">
+            <span class="tag ${esc(r.to)}">${esc(name(r.to))}</span>
+            <div class="grow"><div class="title">${esc(r.text)}</div></div>
+            ${r.from === me && !r.thanked ? `<button class="btn small" data-act="req-thanks" data-id="${esc(r.id)}">ありがとう</button>` : ''}
+          </li>`).join('')}</ul>
+      </div>` : ''}
+      <div class="card">
+        <h2>💌 ${esc(name(other(me)))}へのありがとう</h2>
         <form class="add" data-form="thanks">
           <textarea name="text" placeholder="例: 今日ご飯を作ってくれてありがとう。すごくおいしかった！" required maxlength="300"></textarea>
-          <button class="btn">残す</button>
+          <button class="btn">送る</button>
         </form>
-        <p class="muted">言葉にしにくい感謝も、ここに書いておけば相手が後から読めます。</p>
       </div>
       <div class="card">
         <h2>これまでのありがとう</h2>
-        <p class="muted">${esc(name('a'))} → ${count('a')}件 / ${esc(name('b'))} → ${count('b')}件</p>
-        ${list.length ? `<ul class="list">${list.map(t => `
-          <li>
-            <span class="tag ${esc(t.from)}">${esc(name(t.from))}</span>
-            <div class="grow"><div class="note">${esc(t.text)}</div><div class="muted">${fmtDate(t.at)}</div></div>
-            <button class="icon-btn" data-act="del-thanks" data-id="${esc(t.id)}" aria-label="削除">🗑</button>
-          </li>`).join('')}</ul>` : '<p class="empty">まだありません</p>'}
+        ${thanks.length ? `<ul class="list">${thanks.slice(0, ui.thanksAll ? undefined : 20).map(thanksItem).join('')}</ul>` : '<p class="empty">まだありません</p>'}
+        ${thanks.length > 20 && !ui.thanksAll ? '<button class="btn small ghost" data-act="thanks-all">もっと見る</button>' : ''}
       </div>`;
   },
 
+  more() {
+    const up = L.upcomingEvents(all('events'))[0];
+    const net = L.balance(all('expenses'));
+    const item = (t, icon, sub) => `
+      <li><button class="menu-item" data-goto="${t}"><span class="menu-icon">${icon}</span>
+        <span class="grow"><span class="title">${titles[t]}</span><span class="muted">${sub}</span></span><span class="muted">›</span></button></li>`;
+    return `
+      <div class="card"><ul class="list menu">
+        ${item('events', '📅', up ? esc(`${up.ev.title} ${L.eventLabel(up).when}`) : '結婚記念日や誕生日のカウントダウン')}
+        ${item('budget', '💰', net ? esc(`${name(net > 0 ? 'b' : 'a')} → ${name(net > 0 ? 'a' : 'b')} ${fmtYen(Math.abs(net))}`) : 'ふたりの支出と立て替えの精算')}
+        ${item('notes', '📝', `${all('notes').length}件 · Wi-Fi、ゴミの分別ルールなど`)}
+        ${item('settings', '⚙️', '同期・通知・名前・バックアップ')}
+      </ul></div>`;
+  },
+
   events() {
-    const up = upcomingEvents();
+    const up = L.upcomingEvents(all('events'));
     const past = all('events').filter(ev => !up.some(u => u.ev.id === ev.id));
     return `
       <div class="card">
@@ -513,16 +695,15 @@ const screens = {
           <input name="title" placeholder="例: 結婚記念日 / 誕生日 / 旅行" required maxlength="40">
           <div class="row">
             <input name="date" type="date" required>
-            <label class="field" style="flex-direction:row;display:flex;align-items:center;gap:6px">
-              <input type="checkbox" name="yearly" checked style="width:auto"> 毎年
-            </label>
+            <label class="field inline"><input type="checkbox" name="yearly" checked> 毎年</label>
           </div>
           <button class="btn">追加</button>
         </form>
+        <p class="muted">通知をオンにすると、7日前・3日前・当日の朝にお知らせします。</p>
       </div>
       <div class="card">
         <h2>これから</h2>
-        ${up.length ? `<ul class="list">${up.map(x => { const l = eventLabel(x); return `
+        ${up.length ? `<ul class="list">${up.map(x => { const l = L.eventLabel(x); return `
           <li>
             <div class="grow"><div class="title">${esc(x.ev.title)}${esc(l.extra)}</div><div class="muted">${l.dateText}${x.ev.yearly ? ' · 毎年' : ''}</div></div>
             <strong>${esc(l.when)}</strong>
@@ -534,13 +715,100 @@ const screens = {
           <button class="icon-btn" data-act="del-event" data-id="${esc(ev.id)}" aria-label="削除">🗑</button></li>`).join('')}</ul></div>` : ''}`;
   },
 
+  budget() {
+    const me = device.me;
+    const base = new Date();
+    const month = new Date(base.getFullYear(), base.getMonth() + (ui.month || 0), 1);
+    const prefix = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
+    const expenses = all('expenses');
+    const inMonth = expenses.filter(e => String(e.date || '').startsWith(prefix)).sort((x, y) => (y.date || '').localeCompare(x.date || '') || byNewest(x, y));
+    const spend = inMonth.filter(e => e.kind !== 'settle');
+    const total = spend.reduce((n, e) => n + (Number(e.amount) || 0), 0);
+    const paid = w => spend.filter(e => e.paidBy === w).reduce((n, e) => n + (Number(e.amount) || 0), 0);
+    const net = L.balance(expenses);
+    const debtor = net > 0 ? 'b' : 'a';
+    const SPLIT = { half: 'ふたりの分', other: '立て替え', self: '自分の分' };
+    return `
+      <div class="card">
+        <h2>精算</h2>
+        ${net ? `<div class="big">${esc(name(debtor))} → ${esc(name(other(debtor)))} ${fmtYen(Math.abs(net))}</div>
+          <p class="muted">これまでの立て替えをまとめた金額です。</p>
+          <button class="btn small" data-act="settle">精算した</button>` : '<p>貸し借りはありません 👍</p>'}
+      </div>
+      <div class="card">
+        <h2>支出を記録</h2>
+        <form class="add" data-form="expense">
+          <input name="title" placeholder="例: スーパー / 電気代" required maxlength="40">
+          <div class="row">
+            <input name="amount" type="number" inputmode="numeric" min="1" max="10000000" placeholder="金額（円）" required>
+            <input name="date" type="date" value="${today()}" required>
+          </div>
+          <div class="row">
+            <label class="field">払った人
+              <select name="paidBy"><option value="a" ${me === 'a' ? 'selected' : ''}>${esc(name('a'))}</option><option value="b" ${me === 'b' ? 'selected' : ''}>${esc(name('b'))}</option></select>
+            </label>
+            <label class="field">だれの分
+              <select name="split"><option value="half">ふたりの分（半分ずつ）</option><option value="other">相手の分（立て替え）</option><option value="self">自分の分（精算しない）</option></select>
+            </label>
+          </div>
+          <button class="btn">記録</button>
+        </form>
+      </div>
+      <div class="card">
+        <div class="month-nav">
+          <button class="icon-btn" data-act="month" data-id="-1" aria-label="前の月">‹</button>
+          <h2>${month.getFullYear()}年${month.getMonth() + 1}月</h2>
+          <button class="icon-btn" data-act="month" data-id="1" aria-label="次の月" ${ui.month >= 0 || !ui.month ? 'disabled' : ''}>›</button>
+        </div>
+        <div class="big">${fmtYen(total)}</div>
+        <p class="muted">${esc(name('a'))} ${fmtYen(paid('a'))} / ${esc(name('b'))} ${fmtYen(paid('b'))}</p>
+        ${inMonth.length ? `<ul class="list">${inMonth.map(e => e.kind === 'settle' ? `
+          <li class="done"><div class="grow"><div class="title">精算 ${esc(name(e.from))} → ${esc(name(e.to))}</div><div class="muted">${esc(e.date)}</div></div>
+            <strong>${fmtYen(e.amount)}</strong><button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">🗑</button></li>` : `
+          <li>
+            <span class="tag ${esc(e.paidBy)}">${esc(name(e.paidBy))}</span>
+            <div class="grow"><div class="title">${esc(e.title)}</div><div class="muted">${esc(e.date)} · ${SPLIT[e.split] || ''}</div></div>
+            <strong>${fmtYen(e.amount)}</strong>
+            <button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">🗑</button>
+          </li>`).join('')}</ul>` : '<p class="empty">この月の記録はありません</p>'}
+      </div>`;
+  },
+
+  notes() {
+    const notes = all('notes').sort((x, y) => (!!y.pinned - !!x.pinned) || (y.updatedAt - x.updatedAt));
+    return `
+      <div class="card">
+        <h2>メモを追加</h2>
+        <form class="add" data-form="note">
+          <input name="title" placeholder="例: Wi-Fi のパスワード / ゴミの分別" required maxlength="40">
+          <textarea name="body" placeholder="内容" maxlength="2000"></textarea>
+          <button class="btn">追加</button>
+        </form>
+      </div>
+      <div class="card">
+        ${notes.length ? notes.map(n => `
+          <details class="note-item" data-id="${esc(n.id)}" ${ui.openNote === n.id ? 'open' : ''}>
+            <summary>${n.pinned ? '📌 ' : ''}${esc(n.title)}</summary>
+            <form class="add" data-form="note" data-id="${esc(n.id)}">
+              <input name="title" value="${esc(n.title)}" required maxlength="40">
+              <textarea name="body" maxlength="2000">${esc(n.body)}</textarea>
+              <div class="btn-row">
+                <button class="btn small">保存</button>
+                <button type="button" class="btn small ghost" data-act="pin-note" data-id="${esc(n.id)}">${n.pinned ? 'ピンを外す' : '📌 ピン留め'}</button>
+                <button type="button" class="btn small ghost danger" data-act="del-note" data-id="${esc(n.id)}">削除</button>
+              </div>
+            </form>
+          </details>`).join('') : '<p class="empty">ふたりで覚えておきたいことを書いておけます</p>'}
+      </div>`;
+  },
+
   settings() {
     const n = names();
     const defaultServer = /^https?:$/.test(location.protocol) ? location.origin : '';
     const syncCard = sync.enabled ? `
       <div class="card">
         <h2>ふたりの同期 <span class="sync-label">${esc({ ok: '同期済み', syncing: '同期中…', offline: 'オフライン', local: '' }[sync.status])}</span></h2>
-        <p class="muted">相手のスマホでこのアプリを開き、「設定 → コードで参加」にこのコードを入力してください。</p>
+        <p class="muted">相手のスマホでこのアプリを開き、「その他 → 設定 → コードで参加」にこのコードを入力してください。</p>
         <div class="code">${esc(device.sync.room.replace(/(.{5})/, '$1-'))}</div>
         <div class="btn-row">
           <button class="btn small" data-act="copy-code">コードをコピー</button>
@@ -563,8 +831,37 @@ const screens = {
           <input id="server-url" value="${esc(device.lastServer || defaultServer)}" placeholder="https://example.com" style="margin-top:8px">
         </details>
       </div>`;
+
+    let pushBody;
+    const p = device.push?.prefs || DEFAULT_PUSH_PREFS;
+    const tog = (k, label) => `<label class="toggle"><input type="checkbox" name="${k}" ${p[k] ? 'checked' : ''}> ${label}</label>`;
+    if (isIos && !isStandalone()) {
+      pushBody = '<p class="muted">iPhone では、ホーム画面に追加したアプリから開くと通知をオンにできます（iOS 16.4 以降）。Safari の共有ボタン →「ホーム画面に追加」で追加してください。</p>';
+    } else if (!pushSupported()) {
+      pushBody = '<p class="muted">この端末・ブラウザは通知に対応していません。</p>';
+    } else if (!sync.enabled) {
+      pushBody = '<p class="muted">通知を使うには、先に上の「ふたりの同期」をつないでください。</p>';
+    } else if (!device.push) {
+      pushBody = `<p class="muted">朝の家事リマインド、記念日、買い物リストの追加、ありがとう・お願いが届いたときにお知らせします。</p>
+        <button class="btn" data-act="enable-push">通知をオンにする</button>`;
+    } else {
+      pushBody = `
+        <form class="add" data-form="push-prefs">
+          <div class="toggle-row">${tog('morning', '朝の家事リマインド')}<input type="time" name="time" value="${esc(p.time)}" class="time"></div>
+          ${tog('events', '記念日（7日前・3日前・当日）')}
+          ${tog('shopping', '買い物リストに追加されたとき')}
+          ${tog('partner', 'ありがとう・お願い・代わりにやったとき')}
+          ${tog('weekly', '日曜夜のふりかえり')}
+        </form>
+        <div class="btn-row" style="margin-top:10px">
+          <button class="btn small" data-act="test-push">テスト通知</button>
+          <button class="btn small ghost" data-act="disable-push">通知をオフ</button>
+        </div>`;
+    }
+
     return `
       ${syncCard}
+      <div class="card"><h2>🔔 通知</h2>${pushBody}</div>
       <div class="card">
         <h2>ふたりの名前</h2>
         <form class="add" data-form="names">
@@ -590,18 +887,30 @@ const screens = {
   },
 };
 
-// ---------- イベント ----------
+// ---------- 操作 ----------
 document.querySelector('.tabs').addEventListener('click', e => {
   const b = e.target.closest('button[data-tab]');
-  if (b) { tab = b.dataset.tab; render(); window.scrollTo(0, 0); }
+  if (b) go(b.dataset.tab);
 });
+document.getElementById('back').addEventListener('click', () => go('more'));
 
 document.getElementById('me-toggle').addEventListener('click', () => {
   device.me = other(device.me);
   persist();
+  pushUpdate();
   toast(`${name(device.me)}として操作中`);
   render();
 });
+
+window.addEventListener('hashchange', () => {
+  const t = location.hash.slice(1);
+  if (t !== tab && titles[t]) go(t);
+});
+
+// 通知をタップしたとき（サービスワーカーから）
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', e => { if (e.data?.tab) go(e.data.tab); });
+}
 
 function serverUrl() {
   const v = (document.getElementById('server-url')?.value || '').trim();
@@ -612,26 +921,109 @@ function serverUrl() {
 
 const normalizeCode = s => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
+function setStock(s, low) {
+  put('stock', { ...s, low });
+  const open = all('shopping').filter(x => x.stockId === s.id && !x.done);
+  if (low && !open.length) {
+    put('shopping', { id: uid(), name: s.name, done: false, by: device.me, at: Date.now(), stockId: s.id });
+    toast(`「${s.name}」を買い物リストに入れました`);
+  }
+  if (!low) open.forEach(x => remove('shopping', x.id));
+}
+
 view.addEventListener('click', async e => {
-  const go = e.target.closest('[data-goto]');
-  if (go) { tab = go.dataset.goto; render(); return; }
+  const goEl = e.target.closest('[data-goto]');
+  if (goEl) { go(goEl.dataset.goto); return; }
   const el = e.target.closest('button[data-act]');
   if (!el) return;
   const id = el.dataset.id;
+  const me = device.me;
   switch (el.dataset.act) {
+    // 家事
     case 'done-chore': completeChore(id); break;
+    case 'edit-chore': ui.editChore = id; render(); window.scrollTo(0, 0); return;
+    case 'cancel-edit': ui.editChore = null; break;
     case 'del-chore':
       if (!confirm('この家事を削除しますか？')) return;
-      remove('chores', id); break;
+      remove('chores', id); ui.editChore = null; break;
     case 'undo-log': remove('log', id); break;
-    case 'toggle-shop': { const s = get('shopping', id); if (s) put('shopping', { ...s, done: !s.done }); break; }
+    case 'preset-cat': ui.presetCat = Number(id); break;
+    case 'add-preset': {
+      const p = L.PRESETS[ui.presetCat ?? 0].items[Number(id)];
+      put('chores', { id: uid(), title: p.title, assignee: 'both', every: p.every || 0, ...(p.days ? { days: p.days } : {}), points: p.points });
+      toast(`「${p.title}」を追加しました`);
+      break;
+    }
+    case 'thank-cover': {
+      const l = get('log', id);
+      if (!l) return;
+      sendThanks(`代わりに「${l.title}」をやってくれてありがとう！`);
+      put('log', { ...l, thanked: true });
+      toast('ありがとうを送りました 💌');
+      break;
+    }
+    // 買い物・在庫
+    case 'toggle-shop': {
+      const s = get('shopping', id);
+      if (!s) return;
+      put('shopping', { ...s, done: !s.done });
+      const st = s.stockId && get('stock', s.stockId);
+      if (!s.done && st && st.low) put('stock', { ...st, low: false });
+      break;
+    }
     case 'del-shop': remove('shopping', id); break;
     case 'clear-shop': all('shopping').filter(s => s.done).forEach(s => remove('shopping', s.id)); break;
+    case 'toggle-stock': { const s = get('stock', id); if (s) setStock(s, !s.low); break; }
+    case 'del-stock': remove('stock', id); break;
+    case 'stock-presets': L.STOCK_PRESETS.forEach(n => put('stock', { id: uid(), name: n, low: false })); break;
+    // ふたり
+    case 'react': {
+      const t = get('thanks', id);
+      if (!t) return;
+      put('thanks', { ...t, reaction: t.reaction === el.dataset.r ? null : el.dataset.r });
+      break;
+    }
     case 'del-thanks':
       if (!confirm('削除しますか？')) return;
       remove('thanks', id); break;
+    case 'thanks-all': ui.thanksAll = true; break;
+    case 'req-accept': case 'req-decline': case 'req-done': {
+      const r = get('requests', id);
+      if (!r) return;
+      const status = { 'req-accept': 'accepted', 'req-decline': 'declined', 'req-done': 'done' }[el.dataset.act];
+      put('requests', { ...r, status, ...(status === 'done' ? { doneAt: Date.now() } : {}) });
+      if (status === 'done') toast('おつかれさま！伝えておきます');
+      break;
+    }
+    case 'req-cancel': remove('requests', id); break;
+    case 'req-thanks': {
+      const r = get('requests', id);
+      if (!r) return;
+      sendThanks(`「${r.text}」をやってくれてありがとう！`);
+      put('requests', { ...r, thanked: true });
+      toast('ありがとうを送りました 💌');
+      break;
+    }
+    // 記念日・家計簿・メモ
     case 'del-event': remove('events', id); break;
-    case 'set-me': device.me = id; persist(); break;
+    case 'month': ui.month = Math.min(0, (ui.month || 0) + Number(id)); break;
+    case 'del-expense':
+      if (!confirm('この記録を削除しますか？')) return;
+      remove('expenses', id); break;
+    case 'settle': {
+      const net = L.balance(all('expenses'));
+      if (!net) return;
+      const from = net > 0 ? 'b' : 'a';
+      if (!confirm(`${name(from)} → ${name(other(from))} ${fmtYen(Math.abs(net))} を精算済みにしますか？`)) return;
+      put('expenses', { id: uid(), kind: 'settle', from, to: other(from), amount: Math.abs(net), date: today(), at: Date.now() });
+      break;
+    }
+    case 'pin-note': { const n = get('notes', id); if (n) put('notes', { ...n, pinned: !n.pinned }); ui.openNote = id; break; }
+    case 'del-note':
+      if (!confirm('このメモを削除しますか？')) return;
+      remove('notes', id); break;
+    // 設定
+    case 'set-me': device.me = id; persist(); pushUpdate(); break;
     case 'export': exportData(); return;
     case 'reset':
       if (!confirm('この端末のデータをすべて消して初期状態に戻しますか？')) return;
@@ -655,58 +1047,50 @@ view.addEventListener('click', async e => {
       return;
     case 'leave':
       if (!confirm('同期を解除しますか？（この端末のデータは残ります）')) return;
+      await disablePush();
       leaveRoom(); break;
+    case 'enable-push':
+      el.disabled = true;
+      try { await enablePush(); } catch (err) { toast('通知をオンにできませんでした'); }
+      break;
+    case 'push-hint-off': device.pushHintOff = true; persist(); break;
+    case 'disable-push': await disablePush(); toast('通知をオフにしました'); break;
+    case 'test-push':
+      try { await postPush('test', { endpoint: device.push.endpoint }); toast('テスト通知を送りました'); }
+      catch (err) { toast('送れませんでした。通知をオフ→オンにしてみてください'); }
+      return;
     default: return;
   }
   render();
 });
 
-view.addEventListener('submit', async e => {
-  e.preventDefault();
-  const f = new FormData(e.target);
-  const me = device.me;
-  switch (e.target.dataset.form) {
-    case 'chore':
-      put('chores', {
-        id: uid(), title: f.get('title').trim(), assignee: f.get('assignee'),
-        every: Number(f.get('every')), points: Number(f.get('points')),
-      });
-      break;
-    case 'shop':
-      put('shopping', { id: uid(), name: f.get('name').trim(), done: false, by: me, at: Date.now() });
-      break;
-    case 'thanks':
-      put('thanks', { id: uid(), from: me, text: f.get('text').trim(), at: Date.now() });
-      toast('ありがとうを残しました 💌');
-      break;
-    case 'event':
-      put('events', { id: uid(), title: f.get('title').trim(), date: f.get('date'), yearly: f.get('yearly') === 'on' });
-      break;
-    case 'names':
-      put('settings', { id: 'names', a: f.get('a').trim(), b: f.get('b').trim() });
-      toast('保存しました');
-      break;
-    case 'join': {
-      const code = normalizeCode(f.get('room'));
-      if (code.length !== 10) { toast('コードは10文字です'); return; }
-      const server = serverUrl();
-      if (!server) return;
-      try {
-        await joinRoom(server, code, 'b');
-        toast('つながりました！');
-      } catch (err) {
-        toast(err.message.startsWith('共有') ? err.message : 'サーバーにつながりません');
-        return;
-      }
-      break;
-    }
+// メモの開閉を覚えておく（toggle はバブリングしないのでキャプチャで拾う）
+view.addEventListener('toggle', e => {
+  if (e.target.matches('details.note-item')) {
+    if (e.target.open) ui.openNote = e.target.dataset.id;
+    else if (ui.openNote === e.target.dataset.id) ui.openNote = null;
   }
-  render();
-});
+}, true);
 
 view.addEventListener('change', e => {
-  if (e.target.dataset.act !== 'import') return;
-  const file = e.target.files[0];
+  const t = e.target;
+  if (t.name === 'schedule') {
+    t.closest('form').querySelector('.days-row').hidden = t.value !== 'days';
+    return;
+  }
+  if (t.closest('form[data-form=push-prefs]')) {
+    const f = new FormData(t.closest('form'));
+    device.push.prefs = {
+      morning: f.has('morning'), events: f.has('events'), shopping: f.has('shopping'),
+      partner: f.has('partner'), weekly: f.has('weekly'), time: f.get('time') || '08:00',
+    };
+    persist();
+    pushUpdate();
+    toast('通知の設定を保存しました');
+    return;
+  }
+  if (t.dataset.act !== 'import') return;
+  const file = t.files[0];
   if (!file) return;
   file.text().then(txt => {
     const parsed = JSON.parse(txt);
@@ -727,11 +1111,86 @@ view.addEventListener('change', e => {
   }).catch(() => toast('読み込めないファイルです'));
 });
 
+view.addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target;
+  const f = new FormData(form);
+  const me = device.me;
+  const text = k => String(f.get(k) || '').trim();
+  switch (form.dataset.form) {
+    case 'chore': {
+      const schedule = f.get('schedule');
+      const days = f.getAll('days').map(Number);
+      if (schedule === 'days' && !days.length) { toast('曜日を選んでください'); return; }
+      const prev = form.dataset.id ? get('chores', form.dataset.id) : null;
+      const rec = {
+        id: prev ? prev.id : uid(), title: text('title'), assignee: f.get('assignee'), points: Number(f.get('points')),
+        every: schedule === 'days' ? 0 : Number(schedule),
+      };
+      if (schedule === 'days') rec.days = days.sort();
+      if (f.get('rotate')) rec.rotate = f.get('rotate');
+      put('chores', rec);
+      if (prev) { ui.editChore = null; toast('保存しました'); }
+      break;
+    }
+    case 'shop':
+      put('shopping', { id: uid(), name: text('name'), done: false, by: me, at: Date.now() });
+      break;
+    case 'stock':
+      put('stock', { id: uid(), name: text('name'), low: false });
+      break;
+    case 'thanks':
+      sendThanks(text('text'));
+      toast('ありがとうを送りました 💌');
+      break;
+    case 'request':
+      put('requests', { id: uid(), from: me, to: other(me), text: text('text'), due: f.get('due') || '', status: 'open', at: Date.now() });
+      toast(`${name(other(me))}にお願いしました`);
+      break;
+    case 'event':
+      put('events', { id: uid(), title: text('title'), date: f.get('date'), yearly: f.get('yearly') === 'on' });
+      break;
+    case 'expense': {
+      const amount = Math.round(Number(f.get('amount')));
+      if (!(amount > 0)) { toast('金額を入力してください'); return; }
+      put('expenses', { id: uid(), title: text('title'), amount, date: f.get('date') || today(), paidBy: f.get('paidBy'), split: f.get('split'), at: Date.now() });
+      toast('記録しました');
+      break;
+    }
+    case 'note': {
+      const prev = form.dataset.id ? get('notes', form.dataset.id) : null;
+      put('notes', { ...(prev || { id: uid() }), title: text('title'), body: String(f.get('body') || '') });
+      if (prev) { ui.openNote = prev.id; toast('保存しました'); }
+      break;
+    }
+    case 'names':
+      put('settings', { id: 'names', a: text('a'), b: text('b') });
+      toast('保存しました');
+      break;
+    case 'join': {
+      const code = normalizeCode(f.get('room'));
+      if (code.length !== 10) { toast('コードは10文字です'); return; }
+      const server = serverUrl();
+      if (!server) return;
+      try {
+        await joinRoom(server, code, 'b');
+        toast('つながりました！');
+      } catch (err) {
+        toast(err.message.startsWith('共有') ? err.message : 'サーバーにつながりません');
+        return;
+      }
+      break;
+    }
+    default: return;
+  }
+  render();
+});
+
 function exportData() {
   const blob = new Blob([JSON.stringify({ version: 2, records: store.records }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `futari-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = `futari-${today()}.json`;
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -742,3 +1201,4 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 
 render();
 sync.connect();
+pushUpdate();

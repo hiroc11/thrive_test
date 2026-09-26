@@ -1,20 +1,22 @@
 'use strict';
 
-// ふたりの暮らし 同期サーバー（依存パッケージなし）
+// ふたりの暮らし 同期サーバー
 // - app/ の静的ファイルを配信
 // - 共有コード（ルーム）ごとにレコードを保存し、差分を同期
 // - SSE で相手の端末に変更を即時通知
+// - プッシュ通知（push.js）
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const push = require('./push');
 
 const PORT = Number(process.env.PORT) || 8080;
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', 'data'));
 const STATIC_DIR = path.resolve(__dirname, '..', 'app');
 
-const COLLECTIONS = new Set(['settings', 'chores', 'log', 'shopping', 'thanks', 'events']);
+const COLLECTIONS = new Set(['settings', 'chores', 'log', 'shopping', 'thanks', 'events', 'requests', 'expenses', 'stock', 'notes']);
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CODE_RE = /^[A-HJ-NP-Z2-9]{10}$/;
 const MAX_BODY = 1024 * 1024;
@@ -25,9 +27,10 @@ const CREATE_LIMIT_PER_HOUR = 20;
 const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
+push.init(DATA_DIR);
 
 // ---------- ルームの保存 ----------
-const rooms = new Map(); // code -> { rev, count, records: { col: { id: rec } }, listeners: Set, saveTimer }
+const rooms = new Map(); // code -> { rev, count, records: { col: { id: rec } }, subs: { endpoint: sub }, listeners: Set, saveTimer }
 
 function roomFile(code) { return path.join(DATA_DIR, `${code}.json`); }
 
@@ -36,7 +39,7 @@ function getRoom(code) {
   if (rooms.has(code)) return rooms.get(code);
   let stored;
   try { stored = JSON.parse(fs.readFileSync(roomFile(code), 'utf8')); } catch (e) { return null; }
-  const room = { rev: stored.rev || 0, records: stored.records || {}, listeners: new Set(), saveTimer: null };
+  const room = { rev: stored.rev || 0, records: stored.records || {}, subs: stored.subs || {}, listeners: new Set(), saveTimer: null };
   room.count = Object.values(room.records).reduce((n, col) => n + Object.keys(col).length, 0);
   rooms.set(code, room);
   return room;
@@ -47,7 +50,7 @@ function createRoom() {
   do {
     code = Array.from({ length: 10 }, () => CODE_ALPHABET[crypto.randomInt(CODE_ALPHABET.length)]).join('');
   } while (fs.existsSync(roomFile(code)));
-  const room = { rev: 0, count: 0, records: {}, listeners: new Set(), saveTimer: null };
+  const room = { rev: 0, count: 0, records: {}, subs: {}, listeners: new Set(), saveTimer: null };
   rooms.set(code, room);
   writeRoom(code, room);
   return code;
@@ -55,7 +58,7 @@ function createRoom() {
 
 function writeRoom(code, room) {
   const tmp = roomFile(code) + '.tmp';
-  fs.writeFileSync(tmp, JSON.stringify({ rev: room.rev, records: room.records }));
+  fs.writeFileSync(tmp, JSON.stringify({ rev: room.rev, records: room.records, subs: room.subs }));
   fs.renameSync(tmp, roomFile(code));
 }
 
@@ -65,6 +68,14 @@ function scheduleSave(code, room) {
     room.saveTimer = null;
     try { writeRoom(code, room); } catch (e) { console.error('save failed', code, e); }
   }, 300);
+}
+
+// 定時通知のために、保存済みのルームをすべて読み込んでおく
+function loadAllRooms() {
+  for (const f of fs.readdirSync(DATA_DIR)) {
+    const m = /^([A-HJ-NP-Z2-9]{10})\.json$/.exec(f);
+    if (m) getRoom(m[1]);
+  }
 }
 
 function flushAll() {
@@ -82,8 +93,9 @@ function validRecord(rec) {
 }
 
 // changes: [{ col, rec }]。updatedAt が新しいものだけ採用（Last-Write-Wins）
+// 戻り値: 採用した変更 [{ col, cur（以前の値）, rec }]
 function applyChanges(room, changes) {
-  let accepted = 0;
+  const accepted = [];
   for (const ch of changes) {
     if (!ch || !COLLECTIONS.has(ch.col) || !validRecord(ch.rec)) continue;
     const col = room.records[ch.col] || (room.records[ch.col] = {});
@@ -95,7 +107,7 @@ function applyChanges(room, changes) {
     }
     const { _rev, ...clean } = ch.rec;
     col[ch.rec.id] = { ...clean, _rev: ++room.rev };
-    accepted++;
+    accepted.push({ col: ch.col, cur, rec: clean });
   }
   return accepted;
 }
@@ -190,6 +202,18 @@ async function handleApi(req, res, url) {
 
   if (parts[1] === 'health') return send(res, 200, { ok: true });
 
+  if (parts[1] === 'push' && parts[2] === 'key') return send(res, 200, { key: push.getPublicKey() });
+
+  // テスト用（PUSH_DRY_RUN=1 のときだけ）
+  if (push.DRY_RUN && parts[1] === 'debug') {
+    if (parts[2] === 'pushes') return send(res, 200, push.sentLog);
+    if (parts[2] === 'tick' && req.method === 'POST') {
+      const body = await readJson(req).catch(() => ({}));
+      const sent = await push.tick(rooms, new Date(body.now || Date.now()), scheduleSave);
+      return send(res, 200, { sent });
+    }
+  }
+
   if (parts[1] !== 'rooms') return send(res, 404, { error: 'not found' });
 
   if (parts.length === 2 && req.method === 'POST') {
@@ -208,8 +232,34 @@ async function handleApi(req, res, url) {
     let since = Number(body.since) || 0;
     if (since > room.rev) since = 0; // サーバー側が巻き戻った場合は全件を返す
     const accepted = applyChanges(room, changes);
-    if (accepted) { scheduleSave(code, room); notify(room, body.client); }
+    if (accepted.length) {
+      scheduleSave(code, room);
+      notify(room, body.client);
+      push.onChanges(room, accepted);
+    }
     return send(res, 200, { rev: room.rev, changes: changesSince(room, since) });
+  }
+
+  if (parts[3] === 'push' && req.method === 'POST') {
+    let body;
+    try { body = await readJson(req); } catch (e) { return send(res, 400, { error: 'bad request' }); }
+    const action = parts[4] || 'subscribe';
+    if (action === 'subscribe') {
+      if (!push.validSubscription(body.subscription)) return send(res, 400, { error: 'bad subscription' });
+      if (!push.upsert(room, body.subscription, body.who, body.prefs)) return send(res, 429, { error: 'too many devices' });
+      scheduleSave(code, room);
+      return send(res, 200, { ok: true });
+    }
+    if (action === 'delete') {
+      if (push.removeSub(room, String(body.endpoint || ''))) scheduleSave(code, room);
+      return send(res, 200, { ok: true });
+    }
+    if (action === 'test') {
+      const sub = (room.subs || {})[String(body.endpoint || '')];
+      if (!sub) return send(res, 404, { error: 'not subscribed' });
+      const ok = await push.sendTo(room, sub, { title: 'ふたりの暮らし', body: '通知が届きました 🎉', tab: 'settings', tag: 'test' });
+      return send(res, ok ? 200 : 502, { ok });
+    }
   }
 
   if (parts[3] === 'events' && req.method === 'GET') {
@@ -238,6 +288,12 @@ const server = http.createServer((req, res) => {
 
 for (const sig of ['SIGINT', 'SIGTERM']) {
   process.on(sig, () => { flushAll(); process.exit(0); });
+}
+
+loadAllRooms();
+// 定時通知（テスト時は /api/debug/tick で動かす）
+if (!push.DRY_RUN) {
+  setInterval(() => { push.tick(rooms, new Date(), scheduleSave).catch(e => console.error('tick failed', e)); }, 60000);
 }
 
 server.listen(PORT, () => console.log(`ふたりの暮らし: http://localhost:${PORT} (data: ${DATA_DIR})`));

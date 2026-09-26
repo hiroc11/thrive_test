@@ -9,6 +9,7 @@ primary_region = "nrt" # 東京
   PORT = "8080"
   DATA_DIR = "/data"
   TRUST_PROXY = "1"
+  TZ = "Asia/Tokyo" # 朝の通知などの時刻は日本時間
 
 # ふたりのデータを保存する永続ディスク
 [[mounts]]
@@ -18,10 +19,10 @@ primary_region = "nrt" # 東京
 [http_service]
   internal_port = 8080
   force_https = true
-  # 使っていないときは止めて料金を抑える（アクセスがあれば自動で起動）
-  auto_stop_machines = "stop"
+  # 朝の通知などを決まった時刻に送るため、常に1台動かしておく
+  auto_stop_machines = "off"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
 
   [[http_service.checks]]
     method = "GET"

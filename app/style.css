@@ -127,3 +127,54 @@ label.field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
 }
 .card.hint { border-color: var(--accent); }
 summary { cursor: pointer; }
+
+/* ---------- v3: 機能追加 ---------- */
+.tabs { grid-template-columns: repeat(5, 1fr); }
+.tabs button { font-size: 11px; }
+.back { font-size: 26px; line-height: 1; padding: 0 6px 0 0; color: var(--text); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.days-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.day input { display: none; }
+.day span {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--bg); font-size: 14px;
+}
+.day input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+.btn.danger { color: #c0392b; }
+.btn:disabled { opacity: .5; }
+.badge { font-size: 11px; padding: 1px 6px; border-radius: 99px; background: var(--both); color: #fff; vertical-align: 1px; }
+.reactions { display: flex; gap: 4px; margin-top: 6px; }
+.react { border: 1px solid var(--line); background: var(--bg); border-radius: 99px; padding: 2px 8px; font-size: 16px; }
+.react.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, var(--card)); }
+.stock-btn {
+  border: 1px solid var(--line); background: var(--bg); color: var(--muted); border-radius: 99px;
+  padding: 6px 12px; font-size: 13px; min-width: 64px;
+}
+.stock-btn.low { background: #c0392b; border-color: #c0392b; color: #fff; font-weight: 700; }
+.btn-col { display: flex; flex-direction: column; gap: 6px; }
+table.summary { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.summary th { text-align: left; font-weight: 400; color: var(--muted); padding: 6px 0; }
+table.summary td { text-align: center; padding: 6px 0; font-weight: 700; }
+table.summary tr + tr { border-top: 1px solid var(--line); }
+ul.menu li { padding: 0; }
+.menu-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 0;
+  background: none; border: 0; color: var(--text); text-align: left;
+}
+.menu-item .grow { display: flex; flex-direction: column; gap: 2px; }
+.menu-icon { font-size: 24px; }
+.month-nav { display: flex; align-items: center; justify-content: space-between; }
+.month-nav h2 { margin: 0; }
+.month-nav .icon-btn { font-size: 24px; }
+.month-nav .icon-btn:disabled { opacity: .3; }
+details.note-item { border-bottom: 1px solid var(--line); padding: 10px 0; }
+details.note-item:last-child { border-bottom: 0; }
+details.note-item summary { font-weight: 600; padding: 4px 0; }
+details.note-item form { margin-top: 8px; }
+details.note-item textarea { min-height: 120px; }
+.toggle { display: flex; align-items: center; gap: 8px; font-size: 14px; padding: 4px 0; }
+.toggle input { width: 20px; height: 20px; accent-color: var(--accent); }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.toggle-row .time { width: auto; padding: 6px 8px; }
+label.field.inline { display: flex; flex-direction: row; align-items: center; gap: 6px; flex: 0 0 auto; }
+label.field.inline input { width: auto; }

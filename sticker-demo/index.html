@@ -114,6 +114,16 @@
   .chip.srare { background: var(--chip-srare); color: var(--chip-srare-ink); }
   .chip.secret { background: linear-gradient(90deg, #f6d77a, #fff3c4, #e2ac3f); color: #5a3c05; }
 
+  .series { display: grid; gap: 8px; }
+  .series-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+  .series-head h2 { margin: 0; font-size: 18px; font-weight: 900; }
+  .series-head span { font-size: 12px; color: var(--muted); }
+  .series-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; padding: 10px 4px 6px; border-radius: 16px;
+    background: radial-gradient(circle at 50% 120%, color-mix(in srgb, #c8a064 22%, var(--page)), var(--page) 70%); }
+  .series-row .cell { gap: 2px; padding-bottom: 4px; }
+  .series-row .name { font-size: 11px; }
+  .series-row .chip { white-space: nowrap; font-size: 9px; padding: 2px 6px; }
+  .rank { font-size: 10px; font-weight: 900; letter-spacing: .1em; color: var(--muted); }
   .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .legend div { display: grid; gap: 2px; font-size: 12px; line-height: 1.5; color: var(--muted); }
   .legend b { color: var(--ink); font-size: 13px; }
@@ -185,6 +195,8 @@
     background: rgba(255,255,255,.95); transform: rotate(-32deg); filter: blur(.6px);
   }
   .kao { position: absolute; inset: 0; display: block !important; }
+  .face > i.art { display: block; }
+  .art svg { display: block; width: 100%; height: 100%; }
   .kao::before, .kao::after {
     content: ""; position: absolute; top: 46%; width: 9%; height: 11%; border-radius: 50%; background: #4a2140;
   }
@@ -416,6 +428,11 @@
 
   <section class="book" id="book" aria-label="シール帳 1ページ目"></section>
 
+  <section class="series" aria-labelledby="sumoTitle">
+    <div class="series-head"><h2 id="sumoTitle">おすもうシリーズ</h2><span>パックから出るよ。タップで見本を見る</span></div>
+    <div class="series-row" id="sumoRow"></div>
+  </section>
+
   <section class="legend" aria-label="シールの種類">
     <div><b>ホロ</b>虹色が角度で流れる</div>
     <div><b>ぷっくり</b>ツヤの点が動く</div>
@@ -536,7 +553,9 @@
     heart: '<path d="M50 90C19 67 5 51 5 32 5 17 17 7 30 7c9 0 16 5 20 12 4-7 11-12 20-12 13 0 25 10 25 25 0 19-14 35-45 58Z"/>',
     star: '<path d="M50 4c3 0 4 2 5 4l9 20 22 3c5 1 7 6 3 9L73 56l4 22c1 5-4 8-8 6L50 73 31 84c-4 2-9-1-8-6l4-22L11 40c-4-3-2-8 3-9l22-3 9-20c1-2 2-4 5-4Z"/>',
     circle: '<circle cx="50" cy="50" r="46"/>',
-    cloud: '<path d="M26 80C11 80 4 67 10 56 3 43 15 29 29 34c4-17 29-21 37-5 14-8 31 3 26 19 10 7 6 32-12 32Z"/>'
+    cloud: '<path d="M26 80C11 80 4 67 10 56 3 43 15 29 29 34c4-17 29-21 37-5 14-8 31 3 26 19 10 7 6 32-12 32Z"/>',
+    // 力士：まげ・頭・まんまるのおなか・足
+    rikishi: '<path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/>'
   };
   const maskURI = shape =>
     `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>${SHAPES[shape]}</svg>`)}")`;
@@ -579,6 +598,30 @@
     document.documentElement.style.setProperty('--glitter', `url(${c.toDataURL()})`);
   })();
 
+  // 力士の絵（顔・まげ・まわし）。横綱は綱と紙垂つき
+  function rikishiArt(s) {
+    const ink = '#3a2530', mw = s.mw, skin = '#d9876c';
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M31 31a19 19 0 0 1 38 0c-6-5-12-7-19-7s-13 2-19 7Z" fill="${ink}"/>
+      ${s.yokozuna
+        ? `<path d="M38 13c4-10 20-10 24 0l-4 6H42Z" fill="${ink}"/>`
+        : `<ellipse cx="50" cy="13" rx="7" ry="5" fill="${ink}"/>`}
+      <rect x="46.5" y="16" width="7" height="6" rx="2.5" fill="${ink}"/>
+      <path d="M39 34q3.5-3.5 7 0M54 34q3.5-3.5 7 0" stroke="${ink}" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="37" cy="39.5" rx="4.2" ry="2.4" fill="#ff6f96" opacity=".5"/>
+      <ellipse cx="63" cy="39.5" rx="4.2" ry="2.4" fill="#ff6f96" opacity=".5"/>
+      <path d="M46.5 41q1.75 2 3.5 0q1.75 2 3.5 0" stroke="${ink}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M21 56q-4 9 1 17M79 56q4 9-1 17" stroke="${skin}" stroke-width="1.6" fill="none" opacity=".5" stroke-linecap="round"/>
+      <ellipse cx="50" cy="61" rx="1.6" ry="2.3" fill="${skin}" opacity=".75"/>
+      <path d="M14 71q36 13 72 0l-1.5 10q-34.5 12-69 0Z" fill="${mw}"/>
+      <path d="M44 80h12l-1.5 13h-9Z" fill="${mw}"/>
+      <path d="M37.5 82v9M41 83v10M59 83v10M62.5 82v9" stroke="${mw}" stroke-width="1.7" stroke-linecap="round" opacity=".85"/>
+      ${s.yokozuna ? `<path d="M16 66q34 12 68 0" stroke="#fffdf4" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+      <path d="M16 66q34 12 68 0" stroke="#e8dcc0" stroke-width="5.5" fill="none" stroke-dasharray="2 3" opacity=".6"/>
+      <path d="M39 72.5l-2.5 4 3 1.2-2.5 4.3M61 72.5l2.5 4-3 1.2 2.5 4.3" stroke="#fff" stroke-width="2" fill="none" stroke-linejoin="round"/>` : ''}
+    </svg>`;
+  }
+
   function makeSticker(s) {
     const el = document.createElement('div');
     el.className = `st ${s.kind}`;
@@ -587,6 +630,7 @@
     el.seed = Math.random() * 6;
     el.innerHTML = `<div class="tilt"><div class="edge"></div><div class="face">
       <i class="base"></i><i class="rainbow"></i><i class="foil"></i><i class="g1"></i><i class="g2"></i>
+      ${s.art === 'rikishi' ? `<i class="art">${rikishiArt(s)}</i>` : ''}
       <i class="rim"></i><i class="glare"></i><i class="gloss"></i><i class="dot"></i>
       ${s.kao ? '<i class="kao"><em></em><b></b><em></em></i>' : ''}
     </div></div>`;
@@ -628,6 +672,16 @@
     ...STICKERS.map(s => ({ ...s })),
     { name: 'みかんまる', code: 'mikan', shape: 'circle', kind: 'puffy', rarity: 'normal', no: 2210, of: 5000, rate: 1, kao: true,
       base: 'radial-gradient(circle at 45% 40%,#ffe7c2,#ffb45c 60%,#f08a2c 100%)' },
+    { name: 'もちの山', code: 'mochiyama', rank: '前頭', shape: 'rikishi', art: 'rikishi', kind: 'puffy', rarity: 'normal', no: 402, of: 3000, rate: 1,
+      mw: '#7a4fd0', base: 'radial-gradient(circle at 45% 40%,#fff1e8,#ffd2bd 60%,#f2a58a 100%)' },
+    { name: 'あんこ丸', code: 'anko', rank: '前頭', shape: 'rikishi', art: 'rikishi', kind: 'puffy', rarity: 'normal', no: 377, of: 3000, rate: 1,
+      mw: '#3b8f6a', base: 'radial-gradient(circle at 45% 40%,#fff3ea,#ffd8c4 60%,#eea88e 100%)' },
+    { name: 'ぷく錦', code: 'pukuni', rank: '関脇', shape: 'rikishi', art: 'rikishi', kind: 'glitter', rarity: 'rare', no: 58, of: 600, rate: 3,
+      mw: '#2f6fd6', base: 'linear-gradient(160deg,#ffe3d4,#f7b89f)' },
+    { name: 'さくら海', code: 'sakura', rank: '大関', shape: 'rikishi', art: 'rikishi', kind: 'holo', rarity: 'srare', no: 21, of: 200, rate: 4,
+      mw: '#e2508a', base: 'linear-gradient(135deg,#ffe6da,#f2b59c 50%,#ffe9df)' },
+    { name: 'きらら嶽', code: 'kirara', rank: '横綱', shape: 'rikishi', art: 'rikishi', kind: 'secret', rarity: 'secret', no: 3, of: 50, rate: 5, yokozuna: true,
+      mw: '#8a5a12', base: 'linear-gradient(135deg,#fff0c9,#f3c98a 45%,#fff3d6 70%,#e0a867)' },
     { name: 'ミントぐも', code: 'mint', shape: 'cloud', kind: 'glitter', rarity: 'normal', no: 1873, of: 5000, rate: 1,
       base: 'linear-gradient(160deg,#c6f5e6,#7fd8bd)' }
   ];
@@ -658,6 +712,22 @@
   const POOL = [
     ...DESIGNS.map(s => ({ ...s, issued: s.no }))
   ];
+
+  // おすもうシリーズの見本
+  const sumoRow = document.getElementById('sumoRow');
+  DESIGNS.filter(d => d.art === 'rikishi').forEach(d => {
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'cell';
+    cell.setAttribute('aria-label', `${d.rank} ${d.name}（${RARITY[d.rarity][0]}）の見本を見る`);
+    const st = makeSticker(d);
+    st.idx = live.length;
+    live.push(st);
+    cell.append(st);
+    cell.insertAdjacentHTML('beforeend', `<span class="rank">${d.rank}</span><span class="name">${d.name}</span><span class="chip ${RARITY[d.rarity][1]}">${RARITY[d.rarity][0]}</span>`);
+    cell.addEventListener('click', () => { if (!dragged) open(d, true); });
+    sumoRow.append(cell);
+  });
   const ODDS = [['normal', 60], ['rare', 28], ['srare', 10], ['secret', 2]];
   function draw() {
     let roll = Math.random() * 100, rarity = 'normal';
@@ -1490,7 +1560,7 @@
   // ---------- 拡大表示 ----------
   const dlg = document.getElementById('dlg');
   let big = null;
-  function open(s) {
+  function open(s, preview) {
     const holder = document.getElementById('dSticker');
     holder.innerHTML = '';
     big = makeSticker(s);
@@ -1500,11 +1570,12 @@
     const chip = document.getElementById('dChip');
     chip.className = `chip ${RARITY[s.rarity][1]}`;
     chip.textContent = RARITY[s.rarity][0];
-    document.getElementById('dSerial').textContent = fmt(s);
+    document.getElementById('dSerial').textContent = preview ? `全${s.of.toLocaleString()}枚` : fmt(s);
     document.getElementById('dRate').innerHTML =
       Array.from({ length: 5 }, (_, k) => `<i class="${k < s.rate ? 'on' : ''}"></i>`).join('');
-    document.getElementById('dNote').textContent =
-      `このシールは世界に${s.of.toLocaleString()}枚だけ。あなたのは${s.no}番目です。交換レートは点の数が多いほど高めです。`;
+    document.getElementById('dNote').textContent = (s.rank ? `番付は${s.rank}。` : '') + (preview
+      ? `パックから出るかも。世界に${s.of.toLocaleString()}枚だけです。`
+      : `このシールは世界に${s.of.toLocaleString()}枚だけ。あなたのは${s.no}番目です。交換レートは点の数が多いほど高めです。`);
     dlg.showModal();
   }
   document.getElementById('dClose').addEventListener('click', () => dlg.close());

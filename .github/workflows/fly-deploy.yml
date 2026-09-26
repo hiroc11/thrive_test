@@ -34,6 +34,22 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: steps.token.outputs.ok == 'true'
 
+      - name: Verify token
+        if: steps.token.outputs.ok == 'true'
+        run: |
+          # 形式だけを表示（トークンの中身は表示しない）
+          case "$FLY_API_TOKEN" in
+            "FlyV1 "*) echo "token format: FlyV1 (OK)";;
+            fm1*|fm2*) echo "token format: macaroon without 'FlyV1 ' prefix";;
+            *) echo "token format: unknown (length ${#FLY_API_TOKEN})";;
+          esac
+          if printf '%s' "$FLY_API_TOKEN" | grep -q '[[:space:]]$'; then echo "::warning::トークンの末尾に空白/改行があります"; fi
+          if ! flyctl auth whoami; then
+            echo "::error::Fly.io がトークンを受け付けませんでした。Organization トークンを作り直して FLY_API_TOKEN を更新してください"
+            exit 1
+          fi
+          flyctl orgs list
+
       - name: Create app (first time only)
         if: steps.token.outputs.ok == 'true'
         run: |

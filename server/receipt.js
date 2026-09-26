@@ -4,6 +4,7 @@
 // 環境変数 ANTHROPIC_API_KEY が設定されていないときは使えない。
 
 const Anthropic = require('@anthropic-ai/sdk');
+const Logic = require('../app/logic.js');
 
 const MODEL = process.env.RECEIPT_MODEL || 'claude-opus-5';
 const MEDIA_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
@@ -18,6 +19,10 @@ const SCHEMA = {
     store: { type: 'string', description: '店名・サービス名。わからなければ空文字' },
     date: { type: 'string', description: '支払った日付 YYYY-MM-DD。わからなければ空文字' },
     total: { type: 'integer', description: '支払った合計金額（税込・円）。わからなければ 0' },
+    category: {
+      type: 'string', enum: Logic.EXPENSE_CATS.map(([k]) => k),
+      description: 'food=食費（スーパー等） eatout=外食 daily=日用品 home=住まい・光熱 comm=通信・サブスク transport=交通 kids=子ども medical=医療 fun=娯楽・趣味 other=その他',
+    },
     items: {
       type: 'array',
       items: {
@@ -28,7 +33,7 @@ const SCHEMA = {
       },
     },
   },
-  required: ['is_receipt', 'store', 'date', 'total', 'items'],
+  required: ['is_receipt', 'store', 'date', 'total', 'category', 'items'],
 };
 
 const PROMPT = `この画像は、お店のレシート・領収書、またはネットショッピングやキャッシュレス決済の支払い画面のスクリーンショットです。
@@ -36,6 +41,7 @@ const PROMPT = `この画像は、お店のレシート・領収書、または�
 - store: 店名やサービス名（例: イオン、Amazon、PayPay で支払った相手）
 - date: 支払った日付（YYYY-MM-DD）。年が書かれていなければ、今日（{today}）に近い年を補ってください
 - total: 実際に支払った合計金額（税込、円）。ポイント利用や値引きがあれば、それを引いた後の金額
+- category: 支出のカテゴリ（スーパーの食材なら food、飲食店なら eatout など）
 - items: 品目と金額（最大20件。読み取れなければ空の配列）
 支払いに関係のない画像なら is_receipt を false にしてください。読み取れない項目は推測で埋めず、空文字や 0 にしてください。`;
 
@@ -71,6 +77,7 @@ function sanitize(r) {
     store: String(r.store || '').slice(0, 40),
     date: /^\d{4}-\d{2}-\d{2}$/.test(r.date) ? r.date : '',
     total: int(r.total),
+    category: Logic.EXPENSE_CATS.some(([k]) => k === r.category) ? r.category : Logic.expenseCategory(r.store),
     items: (Array.isArray(r.items) ? r.items : []).slice(0, 20)
       .map(i => ({ name: String(i.name || '').slice(0, 40), price: int(i.price) })),
   };

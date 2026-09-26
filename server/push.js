@@ -121,6 +121,29 @@ function describeChange(room, col, cur, rec) {
       }
       return null;
     }
+    case 'pings':
+      if (isNew && rec.kind === 'home' && (rec.from === 'a' || rec.from === 'b')) {
+        const left = list(room, 'shopping').filter(s => !s.done).length;
+        return {
+          to: Logic.other(rec.from), pref: 'partner', title: `🏠 ${n[rec.from]}が今から帰ります`,
+          body: `${rec.eta ? `${cut(rec.eta, 10)}ごろ着` : 'もうすぐ着きます'}${left ? ` · 買い物リスト ${left}件` : ''}`,
+          tab: left ? 'shopping' : 'home', tag: 'home',
+        };
+      }
+      return null;
+    case 'moods': {
+      if (!(rec.who === 'a' || rec.who === 'b') || (cur && !cur.deleted && cur.mood === rec.mood)) return null;
+      const msg = { tired: ['☁️', 'ちょっと疲れているみたい'], bad: ['🌧', '今日はしんどいみたい'] }[rec.mood];
+      if (!msg) return null;
+      return { to: Logic.other(rec.who), pref: 'partner', title: `${msg[0]} ${n[rec.who]}は${msg[1]}`, body: 'やさしく声をかけてみませんか', tab: 'home', tag: 'mood' };
+    }
+    case 'dinner': {
+      if (!isNew || !(rec.who === 'a' || rec.who === 'b')) return null;
+      // 相手も同じものを選んでいたら「決まり」
+      const both = list(room, 'dinner').some(v => v.who === Logic.other(rec.who) && v.date === rec.date && v.name === rec.name);
+      if (!both) return null;
+      return { to: Logic.other(rec.who), pref: 'partner', title: `🍽 今夜は「${cut(rec.name, 20)}」に決まり！`, body: `${n[rec.who]}も同じ気分でした`, tab: 'home', tag: 'dinner' };
+    }
     case 'log':
       if (isNew && rec.cover && (rec.for === 'a' || rec.for === 'b') && (rec.by === 'a' || rec.by === 'b')) {
         return { to: rec.for, pref: 'partner', title: '🧹 代わりにやってくれました', body: `${n[rec.by]}が「${cut(rec.title, 30)}」をやってくれました`, tab: 'home' };

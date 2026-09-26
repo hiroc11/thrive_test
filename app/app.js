@@ -8,7 +8,10 @@ const PENDING_KEY = 'futari-pending-v2'; // ["col/id", ...]  まだサーバー�
 const DEVICE_KEY = 'futari-device-v2';   // { me, clientId, sync: { server, room } | null, push: { endpoint, prefs } | null }  この端末だけの設定
 const LEGACY_KEY = 'futari-data-v1';
 
-const COLLECTIONS = ['settings', 'chores', 'log', 'shopping', 'thanks', 'events', 'requests', 'expenses', 'stock', 'notes'];
+const COLLECTIONS = [
+  'settings', 'chores', 'log', 'shopping', 'thanks', 'events', 'requests', 'expenses', 'stock', 'notes',
+  'pings', 'moods', 'wishes', 'dinner', 'recurring', 'shopfreq',
+];
 // 初期データは updatedAt: 1 にしておき、どちらかの端末で編集されればそちらが勝つようにする
 const SEED = {
   settings: [{ id: 'names', a: 'わたし', b: '奥さん', updatedAt: 1 }],
@@ -146,9 +149,11 @@ const sync = {
       sent.forEach(({ col, rec }) => {
         if (store.records[col][rec.id]?.updatedAt === rec.updatedAt) pending.delete(`${col}/${rec.id}`);
       });
-      const changed = mergeRemote(body.changes || []);
+      let changed = mergeRemote(body.changes || []);
       store.rev = body.rev;
       persist();
+      this.synced = true;
+      if (applyRecurring()) changed = true;
       this.retryDelay = 2000;
       this.setStatus(pending.size ? 'syncing' : 'ok');
       if (changed) renderSoon();
@@ -250,13 +255,50 @@ function fmtDate(ts) {
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-function toast(msg) {
+// action: { label, fn } を渡すと「元に戻す」などのボタンが付く
+function toast(msg, action) {
   document.querySelectorAll('.toast').forEach(t => t.remove());
   const el = document.createElement('div');
   el.className = 'toast';
-  el.textContent = msg;
+  const span = document.createElement('span');
+  span.textContent = msg;
+  el.appendChild(span);
+  if (action) {
+    const b = document.createElement('button');
+    b.className = 'toast-btn';
+    b.textContent = action.label;
+    b.addEventListener('click', () => { el.remove(); action.fn(); });
+    el.appendChild(b);
+  }
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2200);
+  setTimeout(() => el.remove(), action ? 5000 : 2200);
+}
+
+// 削除は確認ダイアログを出さずに消して、「元に戻す」で戻せるようにする
+function removeWithUndo(col, id, label) {
+  const prev = store.records[col][id];
+  if (!prev || prev.deleted) return;
+  const { updatedAt, ...rest } = prev;
+  remove(col, id);
+  toast(`${label}を削除しました`, { label: '元に戻す', fn: () => { put(col, rest); render(); } });
+}
+
+// 買い物リストに追加（「いつもの」の回数も数える）
+function addShopping(nm, extra = {}) {
+  const n = String(nm || '').trim();
+  if (!n) return;
+  put('shopping', { id: uid(), name: n, done: false, by: device.me, at: Date.now(), ...extra });
+  const fid = `f-${L.hashId(n)}`;
+  const f = get('shopfreq', fid);
+  put('shopfreq', { id: fid, name: n, count: (f?.count || 0) + 1, lastAt: Date.now() });
+}
+
+// 毎月の固定費を家計簿に記録する（同期がまだのときは、相手が消した記録を復活させないよう待つ）
+function applyRecurring() {
+  if (sync.enabled && !sync.synced) return 0;
+  const due = L.recurringDue(all('recurring'), new Set(Object.keys(store.records.expenses)));
+  due.forEach(r => put('expenses', r));
+  return due.length;
 }
 
 function sendThanks(text) {
@@ -455,7 +497,10 @@ const onboardEl = document.getElementById('onboard');
 const TABS = ['home', 'chores', 'shopping', 'budget', 'futari'];
 const TAB_ICONS = { home: 'home', chores: 'chores', shopping: 'shopping', budget: 'budget', futari: 'futari' };
 const titles = { home: '今日', chores: '家事', shopping: '買い物', budget: '家計簿', futari: 'ふたり', settings: '設定' };
-const FUTARI_SEGS = { thanks: 'ありがとう', requests: 'お願い', events: '記念日', notes: 'メモ' };
+const FUTARI_SEGS = { thanks: 'ありがとう', requests: 'お願い', events: '記念日', wishes: '行きたい', notes: 'メモ' };
+const MOODS = [['great', '元気', 'mood-great'], ['ok', 'ふつう', 'mood-ok'], ['tired', '疲れた', 'mood-tired'], ['bad', 'しんどい', 'mood-bad']];
+const WISH_KINDS = [['food', 'お店', 'dinner'], ['trip', 'おでかけ・旅行', 'trip'], ['movie', '映画・本', 'movie'], ['other', 'やりたいこと', 'star']];
+const catLabel = k => (L.EXPENSE_CATS.find(([c]) => c === k) || L.EXPENSE_CATS.at(-1))[1];
 let tab = 'home';
 let futariSeg = 'thanks';
 let prevTab = 'home';
@@ -565,7 +610,7 @@ const ROTATE_LABEL = { each: '毎回交代', weekly: '毎週交代' };
 
 function choreItem({ c, st, who }, withMenu) {
   return `
-    <li>
+    <li ${withMenu ? 'data-swipe="right:done-chore"' : ''}>
       <button class="check" data-act="done-chore" data-id="${esc(c.id)}" aria-label="完了にする">${ic('check')}</button>
       <div class="grow">
         <div class="title">${esc(c.title)}</div>
@@ -685,8 +730,25 @@ function expenseForm(r) {
           <select name="split"><option value="half">ふたりの分（半分ずつ）</option><option value="other">相手の分（立て替え）</option><option value="self">自分の分（精算しない）</option></select>
         </label>
       </div>
+      <label class="field">カテゴリ
+        <select name="category"><option value="">自動で分ける</option>${L.EXPENSE_CATS.map(([k, l]) => `<option value="${k}" ${r?.category === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      </label>
       <button class="btn">記録</button>
     </form>`;
+}
+
+function moodCard() {
+  const me = device.me, p = other(me), t = today();
+  const mine = get('moods', `m-${me}-${t}`);
+  const theirs = get('moods', `m-${p}-${t}`);
+  const pm = theirs && MOODS.find(([k]) => k === theirs.mood);
+  return `<div class="card mood-card">
+    <div class="mood-head">${ic('sun')} 今日の気分</div>
+    <div class="moods">${MOODS.map(([k, label, icn]) => `<button class="mood ${mine?.mood === k ? 'on' : ''} m-${k}" data-act="mood" data-id="${k}">${ic(icn)}<span>${label}</span></button>`).join('')}</div>
+    <div class="partner-mood">${pm
+      ? `${ic(pm[2], 'sm')} ${esc(name(p))}は「${pm[1]}」${theirs.mood === 'tired' || theirs.mood === 'bad' ? '<span class="muted"> — 今日は家事を代わってみては？</span>' : ''}`
+      : `<span class="muted">${esc(name(p))}はまだ今日の気分を選んでいません</span>`}</div>
+  </div>`;
 }
 
 const REQUEST_STATUS = { open: 'お返事待ち', accepted: '引き受け済み', done: '完了', declined: 'むずかしい' };
@@ -705,7 +767,7 @@ function inviteCard() {
 // ---------- 各画面 ----------
 const screens = {
   home() {
-    const me = device.me;
+    const me = device.me, p = other(me), t = today();
     const due = L.choresWithStatus(all('chores'), all('log')).filter(x => x.st.due);
     const mine = due.filter(x => x.who === me || x.who === 'both');
     const up = L.upcomingEvents(all('events'))[0];
@@ -714,33 +776,45 @@ const screens = {
     const covered = all('log').filter(l => l.cover && l.for === me && !l.thanked && Date.now() - l.at < 3 * DAY).sort(byNewest);
     const requests = all('requests').filter(r => r.to === me && (r.status === 'open' || r.status === 'accepted'));
     const lowStock = all('stock').filter(s => s.low).length;
+    const ping = all('pings').filter(x => x.from === p && x.kind === 'home' && Date.now() - x.at < 3 * 3600e3).sort(byNewest)[0];
+    const dinner = L.dinnerState(all('dinner'), t);
+    const net = L.balance(all('expenses'));
     const showPushHint = sync.enabled && pushSupported() && (!isIos || isStandalone()) && !device.push && !device.pushHintOff;
+    const todo = mine.length + requests.length + covered.length;
     return `
       ${!sync.enabled ? inviteCard() : ''}
+      ${ping ? `<div class="card banner">
+        ${ic('coming-home')}
+        <div class="grow"><strong>${esc(name(p))}が今から帰ってきます</strong><div class="muted">${ping.eta ? `${esc(ping.eta)}ごろ着 · ` : ''}${fmtDate(ping.at)}に連絡</div></div>
+        ${shopLeft ? `<button class="btn small ghost" data-goto="shopping">買い物 ${shopLeft}件</button>` : ''}
+      </div>` : ''}
+      ${moodCard()}
       ${showPushHint ? `<div class="card hint">
         <h2>${ic('bell')} 通知をオンにしませんか？</h2>
         <p class="muted">朝の家事リマインド、買い物リストの追加、ありがとうやお願いが届いたときにお知らせします。</p>
         <div class="btn-row"><button class="btn small" data-act="enable-push">オンにする</button><button class="btn small ghost" data-act="push-hint-off">あとで</button></div>
       </div>` : ''}
-      ${covered.map(l => `<div class="card hint">
-        <h2>${ic('sparkles')} ${esc(name(l.by))}が代わりにやってくれました</h2>
-        <p>「${esc(l.title)}」 <span class="muted">${fmtDate(l.at)}</span></p>
-        <button class="btn small" data-act="thank-cover" data-id="${esc(l.id)}">ありがとうを送る</button>
-      </div>`).join('')}
-      ${requests.length ? `<div class="card">
-        <h2>${ic('request')} ${esc(name(other(me)))}からのお願い ${requests.length}件</h2>
-        <ul class="list">${requests.slice(0, 3).map(r => `<li><div class="grow">${esc(r.text)}</div><span class="muted">${REQUEST_STATUS[r.status]}</span></li>`).join('')}</ul>
-        <button class="btn small ghost" data-goto="futari/requests">見る</button>
-      </div>` : ''}
       <div class="card">
         <h2>${ic('list')} 今日やること（${esc(name(me))}）</h2>
-        ${mine.length ? `<ul class="list">${mine.map(x => choreItem(x, false)).join('')}</ul>`
-          : `<div class="empty-illust">${illustration('relax', 'small')}<p class="empty">今日の担当家事はありません</p></div>`}
-        ${due.length > mine.length ? `<p class="muted">${esc(name(other(me)))}の担当で残っている家事: ${due.length - mine.length}件（代わりにやると伝わります）</p>` : ''}
+        ${todo ? `<ul class="list">
+          ${covered.map(l => `<li class="todo-thanks">
+            <span class="todo-ic">${ic('sparkles')}</span>
+            <div class="grow"><div class="title">${esc(name(l.by))}が代わりに「${esc(l.title)}」をやってくれました</div><div class="muted">${fmtDate(l.at)}</div></div>
+            <button class="btn small" data-act="thank-cover" data-id="${esc(l.id)}">ありがとう</button>
+          </li>`).join('')}
+          ${requests.map(r => `<li>
+            <span class="todo-ic">${ic('request')}</span>
+            <div class="grow"><div class="title">${esc(r.text)}</div><div class="muted">${esc(name(p))}からのお願い · ${REQUEST_STATUS[r.status]}${r.due ? ` · ${esc(r.due)}まで` : ''}</div></div>
+            <button class="btn small ghost" data-goto="futari/requests">見る</button>
+          </li>`).join('')}
+          ${mine.map(x => choreItem(x, false)).join('')}
+        </ul>` : `<div class="empty-illust">${illustration('relax', 'small')}<p class="empty">今日やることはありません</p></div>`}
+        ${due.length > mine.length ? `<p class="muted">${esc(name(p))}の担当で残っている家事: ${due.length - mine.length}件（代わりにやると伝わります）</p>` : ''}
       </div>
-      ${balanceCard()}
       <div class="tiles">
         <button class="tile" data-goto="shopping">${ic('shopping')}<span class="tile-num">${shopLeft}</span><span class="tile-label">買うもの${lowStock ? `・残りわずか${lowStock}` : ''}</span></button>
+        <button class="tile" data-act="sheet" data-id="dinner">${ic('dinner')}<span class="tile-num">${dinner.match.length ? '決定' : dinner.a.size + dinner.b.size ? `${dinner.a.size + dinner.b.size}票` : '―'}</span><span class="tile-label">${dinner.match.length ? `今夜は「${esc(dinner.match[0])}」` : '晩ごはん相談'}</span></button>
+        <button class="tile" data-goto="budget">${ic('scale')}<span class="tile-num">${net ? fmtYen(Math.abs(net)) : '0'}</span><span class="tile-label">${net ? `精算 ${esc(name(net > 0 ? 'b' : 'a'))}→${esc(name(net > 0 ? 'a' : 'b'))}` : '精算なし'}</span></button>
         <button class="tile" data-goto="futari/events">${ic('calendar')}<span class="tile-num">${up ? esc(L.eventLabel(up).when) : '―'}</span><span class="tile-label">${up ? esc(up.ev.title) : '記念日を登録'}</span></button>
       </div>
       <div class="card">
@@ -791,6 +865,16 @@ const screens = {
 
   shopping() {
     const items = all('shopping').sort((x, y) => (x.done - y.done) || (x.at || 0) - (y.at || 0));
+    const open = items.filter(x => !x.done);
+    const done = items.filter(x => x.done);
+    const openNames = new Set(open.map(x => x.name));
+    const freq = all('shopfreq').filter(f => !openNames.has(f.name)).sort((x, y) => (y.count - x.count) || (y.lastAt - x.lastAt)).slice(0, 12);
+    const shopItem = x => `
+      <li class="${x.done ? 'done' : ''}" data-swipe="right:toggle-shop left:del-shop">
+        <button class="check ${x.done ? 'on' : ''}" data-act="toggle-shop" data-id="${esc(x.id)}" aria-label="購入済みにする">${ic('check')}</button>
+        <div class="grow"><div class="title">${esc(x.name)}</div><div class="muted">${esc(name(x.by))}が追加${x.stockId ? ' · 在庫から' : ''}</div></div>
+        <button class="icon-btn" data-act="del-shop" data-id="${esc(x.id)}" aria-label="削除">${ic('trash')}</button>
+      </li>`;
     const stock = all('stock').sort((x, y) => (y.low - x.low) || x.name.localeCompare(y.name, 'ja'));
     return `
       <div class="card">
@@ -798,14 +882,16 @@ const screens = {
           <div class="row"><input name="name" placeholder="例: 牛乳" required maxlength="40"><button class="btn" style="flex:0 0 auto">追加</button></div>
         </form>
       </div>
+      ${freq.length ? `<div class="card">
+        <h2>${ic('history')} いつもの</h2>
+        <div class="chips">${freq.map(f => `<button class="chip" data-act="shop-suggest" data-id="${esc(f.id)}">${ic('plus', 'sm')} ${esc(f.name)}</button>`).join('')}</div>
+      </div>` : ''}
       <div class="card">
-        ${items.length ? `<ul class="list">${items.map(s => `
-          <li class="${s.done ? 'done' : ''}">
-            <button class="check ${s.done ? 'on' : ''}" data-act="toggle-shop" data-id="${esc(s.id)}" aria-label="購入済みにする">${ic('check')}</button>
-            <div class="grow"><div class="title">${esc(s.name)}</div><div class="muted">${esc(name(s.by))}が追加${s.stockId ? ' · 在庫から' : ''}</div></div>
-            <button class="icon-btn" data-act="del-shop" data-id="${esc(s.id)}" aria-label="削除">${ic('trash')}</button>
-          </li>`).join('')}</ul>` : '<p class="empty">買うものはありません</p>'}
-        ${items.some(s => s.done) ? '<p><button class="btn small ghost" data-act="clear-shop">購入済みを消す</button></p>' : ''}
+        ${open.length ? L.SHOP_CATS.map(c => [c, open.filter(x => L.shopCategory(x.name) === c)]).filter(([, l]) => l.length).map(([c, l]) => `
+          <div class="group-label">${esc(c)}</div><ul class="list">${l.map(shopItem).join('')}</ul>`).join('') : '<p class="empty">買うものはありません</p>'}
+        ${done.length ? `<div class="group-label">購入済み</div><ul class="list">${done.map(shopItem).join('')}</ul>
+          <p><button class="btn small ghost" data-act="clear-shop">購入済みを消す</button></p>` : ''}
+        ${items.length ? '<p class="muted swipe-hint">右にスワイプで購入済み、左にスワイプで削除</p>' : ''}
       </div>
       <div class="card">
         <h2>${ic('package')} 在庫チェック</h2>
@@ -834,6 +920,12 @@ const screens = {
     const net = L.balance(expenses);
     const debtor = net > 0 ? 'b' : 'a';
     const SPLIT = { half: 'ふたりの分', other: '立て替え', self: '自分の分' };
+    // カテゴリ別の合計（多い順）。1色の横棒で大きさを比べる
+    const byCat = {};
+    spend.forEach(e => { const c = e.category || L.expenseCategory(e.title); byCat[c] = (byCat[c] || 0) + (Number(e.amount) || 0); });
+    const cats = Object.entries(byCat).sort((x, y) => y[1] - x[1]);
+    const maxCat = cats.length ? cats[0][1] : 0;
+    const recurring = all('recurring').sort((x, y) => (x.day - y.day) || x.title.localeCompare(y.title, 'ja'));
     return `
       <div class="card">
         <h2>${ic('scale')} 精算</h2>
@@ -858,15 +950,54 @@ const screens = {
         </div>
         <div class="big">${fmtYen(total)}</div>
         <p class="muted">${esc(name('a'))} ${fmtYen(paid('a'))} / ${esc(name('b'))} ${fmtYen(paid('b'))}</p>
+        ${cats.length ? `<div class="cat-bars" role="table" aria-label="カテゴリ別の支出">${cats.map(([c, v]) => `
+          <div class="cat-row" role="row" title="${esc(catLabel(c))} ${fmtYen(v)}（${Math.round(v / total * 100)}%）">
+            <span class="cat-name" role="cell">${esc(catLabel(c))}</span>
+            <span class="cat-track" aria-hidden="true"><span class="cat-bar" style="width:${Math.max(2, Math.round(v / maxCat * 100))}%"></span></span>
+            <span class="cat-val" role="cell">${fmtYen(v)}<small>${Math.round(v / total * 100)}%</small></span>
+          </div>`).join('')}</div>` : ''}
         ${inMonth.length ? `<ul class="list">${inMonth.map(e => e.kind === 'settle' ? `
-          <li class="done"><div class="grow"><div class="title">精算 ${esc(name(e.from))} → ${esc(name(e.to))}</div><div class="muted">${esc(e.date)}</div></div>
+          <li class="done" data-swipe="left:del-expense"><div class="grow"><div class="title">精算 ${esc(name(e.from))} → ${esc(name(e.to))}</div><div class="muted">${esc(e.date)}</div></div>
             <strong>${fmtYen(e.amount)}</strong><button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">${ic('trash')}</button></li>` : `
-          <li>
+          <li data-swipe="left:del-expense">
             <span class="tag ${esc(e.paidBy)}">${esc(name(e.paidBy))}</span>
-            <div class="grow"><div class="title">${esc(e.title)}</div><div class="muted">${esc(e.date)} · ${SPLIT[e.split] || ''}</div></div>
+            <div class="grow"><div class="title">${esc(e.title)}${e.recurringId ? ` ${ic('recurring', 'sm')}` : ''}</div><div class="muted">${esc(e.date)} · ${esc(catLabel(e.category || L.expenseCategory(e.title)))} · ${SPLIT[e.split] || ''}</div></div>
             <strong>${fmtYen(e.amount)}</strong>
             <button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">${ic('trash')}</button>
           </li>`).join('')}</ul>` : '<p class="empty">この月の記録はありません</p>'}
+      </div>
+      <div class="card">
+        <h2>${ic('recurring')} 毎月の固定費</h2>
+        <p class="muted">家賃やサブスクなど。登録した月から、毎月その日に家計簿へ自動で記録します。</p>
+        ${recurring.length ? `<ul class="list">${recurring.map(r => `
+          <li data-swipe="left:del-recurring">
+            <span class="tag ${esc(r.paidBy)}">${esc(name(r.paidBy))}</span>
+            <div class="grow"><div class="title">${esc(r.title)}</div><div class="muted">毎月${r.day}日 · ${esc(catLabel(r.category))} · ${SPLIT[r.split] || ''}</div></div>
+            <strong>${fmtYen(r.amount)}</strong>
+            <button class="icon-btn" data-act="del-recurring" data-id="${esc(r.id)}" aria-label="削除">${ic('trash')}</button>
+          </li>`).join('')}</ul>` : ''}
+        <details class="add-details" ${recurring.length ? '' : 'open'}>
+          <summary>${ic('plus', 'sm')} 固定費を追加</summary>
+          <form class="add" data-form="recurring">
+            <input name="title" placeholder="例: 家賃 / Netflix" required maxlength="40">
+            <div class="row">
+              <input name="amount" type="number" inputmode="numeric" min="1" max="10000000" placeholder="金額（円）" required>
+              <label class="field inline">毎月<input name="day" type="number" min="1" max="28" value="${new Date().getDate() > 28 ? 28 : new Date().getDate()}" required style="width:64px">日</label>
+            </div>
+            <div class="row">
+              <label class="field">払う人
+                <select name="paidBy"><option value="a" ${device.me === 'a' ? 'selected' : ''}>${esc(name('a'))}</option><option value="b" ${device.me === 'b' ? 'selected' : ''}>${esc(name('b'))}</option></select>
+              </label>
+              <label class="field">だれの分
+                <select name="split"><option value="half">ふたりの分</option><option value="other">相手の分</option><option value="self">自分の分</option></select>
+              </label>
+            </div>
+            <label class="field">カテゴリ
+              <select name="category"><option value="">自動で分ける</option>${L.EXPENSE_CATS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select>
+            </label>
+            <button class="btn">登録</button>
+          </form>
+        </details>
       </div>`;
   },
 
@@ -1041,7 +1172,15 @@ const futariScreens = {
   events() {
     const up = L.upcomingEvents(all('events'));
     const past = all('events').filter(ev => !up.some(u => u.ev.id === ev.id));
+    const soon = up.find(x => L.eventLabel(x).days <= 30);
+    const ideas = all('wishes').filter(w => !w.done).sort(byNewest).slice(0, 3);
     return `
+      ${soon && ideas.length ? `<div class="card hint">
+        <h2>${ic('gift')} ${L.eventLabel(soon).days === 0 ? `今日は${esc(soon.ev.title)}` : `${esc(soon.ev.title)}まであと${L.eventLabel(soon).days}日`}</h2>
+        <p class="muted">「行きたい」リストから選んでみませんか？</p>
+        <ul class="list">${ideas.map(w => `<li><span class="todo-ic">${ic((WISH_KINDS.find(([k]) => k === w.kind) || WISH_KINDS[3])[2])}</span><div class="grow">${esc(w.title)}</div></li>`).join('')}</ul>
+        <button class="btn small ghost" data-goto="futari/wishes">リストを見る</button>
+      </div>` : ''}
       <div class="card">
         <h2>${ic('calendar')} 記念日・予定を追加</h2>
         <form class="add" data-form="event">
@@ -1067,6 +1206,39 @@ const futariScreens = {
           <li class="done"><div class="grow"><div class="title">${esc(ev.title)}</div><div class="muted">${esc(ev.date)}</div></div>
           <button class="icon-btn" data-act="del-event" data-id="${esc(ev.id)}" aria-label="削除">${ic('trash')}</button></li>`).join('')}</ul></div>` : ''}
       ${calendarCard()}`;
+  },
+
+  wishes() {
+    const list = all('wishes').sort(byNewest);
+    const open = list.filter(w => !w.done);
+    const done = list.filter(w => w.done);
+    const item = w => {
+      const kind = WISH_KINDS.find(([k]) => k === w.kind) || WISH_KINDS[3];
+      const url = /^https?:\/\//.test(w.note || '') ? w.note : '';
+      return `<li class="${w.done ? 'done' : ''}" data-swipe="right:wish-done left:del-wish">
+        <span class="todo-ic">${ic(kind[2])}</span>
+        <div class="grow"><div class="title">${esc(w.title)}</div>
+          <div class="muted">${esc(kind[1])} · ${esc(name(w.by))}${w.note ? ` · ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">リンク</a>` : esc(w.note)}` : ''}</div></div>
+        <button class="check ${w.done ? 'on' : ''}" data-act="wish-done" data-id="${esc(w.id)}" aria-label="行った・やった">${ic('check')}</button>
+        <button class="icon-btn" data-act="del-wish" data-id="${esc(w.id)}" aria-label="削除">${ic('trash')}</button>
+      </li>`;
+    };
+    return `
+      <div class="card">
+        <h2>${ic('place')} 行きたいところ・やりたいこと</h2>
+        <form class="add" data-form="wish">
+          <div class="chips kind-chips">${WISH_KINDS.map(([k, l, icn], i) => `<label class="chip-radio"><input type="radio" name="kind" value="${k}" ${i === 0 ? 'checked' : ''}><span>${ic(icn, 'sm')} ${l}</span></label>`).join('')}</div>
+          <input name="title" placeholder="例: 駅前のイタリアン / 箱根温泉 / 〇〇の映画" required maxlength="40">
+          <input name="note" placeholder="メモやURL（任意）" maxlength="200">
+          <button class="btn">追加</button>
+        </form>
+      </div>
+      <div class="card">
+        ${open.length ? WISH_KINDS.map(([k, l]) => [l, open.filter(w => (w.kind || 'other') === k)]).filter(([, x]) => x.length)
+          .map(([l, x]) => `<div class="group-label">${esc(l)}</div><ul class="list">${x.map(item).join('')}</ul>`).join('')
+          : '<p class="empty">ふたりで行きたいお店や旅行先をためておきましょう</p>'}
+        ${done.length ? `<details><summary class="muted">行った・やった（${done.length}）</summary><ul class="list">${done.map(item).join('')}</ul></details>` : ''}
+      </div>`;
   },
 
   notes() {
@@ -1117,9 +1289,10 @@ const sheet = {
         ${body}
       </div>`;
     const first = sheetEl.querySelector('input:not([type=file]):not([type=checkbox]), textarea');
-    if (first && this.name !== 'menu' && this.name !== 'chore') setTimeout(() => first.focus(), 50);
+    // 文字を入れるための画面だけ、入力欄にすぐカーソルを置く（晩ごはん相談などは相手の選択がすぐ見えるように置かない）
+    if (first && ['shop', 'expense', 'thanks', 'request'].includes(this.name)) setTimeout(() => first.focus(), 50);
   },
-  titles: { menu: '記録する', chore: '家事をやった', shop: '買い物に追加', expense: '支出を記録', thanks: 'ありがとう', request: 'お願い' },
+  titles: { menu: '記録する', chore: '家事をやった', shop: '買い物に追加', expense: '支出を記録', thanks: 'ありがとう', request: 'お願い', home: '今から帰る', dinner: '晩ごはん相談' },
   views: {
     menu() {
       const item = (id, icn, label, cls = '') => `<button class="sheet-item ${cls}" data-act="sheet" data-id="${id}">${ic(icn)}<span>${label}</span></button>`;
@@ -1128,6 +1301,8 @@ const sheet = {
         ${item('shop', 'shopping', '買い物に追加', 'c-shop')}
         ${receiptAvailable() ? `<label class="sheet-item c-budget">${ic('camera')}<span>レシートを読む</span><input type="file" accept="image/*" data-act="receipt" hidden></label>` : ''}
         ${item('expense', 'budget', '支出を記録', 'c-budget')}
+        ${item('home', 'coming-home', '今から帰る', 'c-home')}
+        ${item('dinner', 'dinner', '晩ごはん相談', 'c-dinner')}
         ${item('thanks', 'thanks', 'ありがとう', 'c-thanks')}
         ${item('request', 'request', 'お願い', 'c-request')}
       </div>`;
@@ -1140,6 +1315,23 @@ const sheet = {
       return `<form class="add" data-form="shop"><div class="row"><input name="name" placeholder="例: 牛乳" required maxlength="40"><button class="btn" style="flex:0 0 auto">追加</button></div></form>`;
     },
     expense() { return expenseForm(null); },
+    home() {
+      const left = all('shopping').filter(x => !x.done).length;
+      return `<p class="muted">${esc(name(other(device.me)))}に通知でお知らせします。${left ? `（買い物リストが${left}件あります）` : ''}</p>
+        <div class="eta-grid">${[10, 20, 30, 60].map(m => `<button class="chip big" data-act="ping" data-id="${m}">${m === 60 ? '1時間' : `${m}分`}で着く</button>`).join('')}</div>
+        <form class="add" data-form="ping"><div class="row"><label class="field">到着時刻を指定<input type="time" name="eta" required></label><button class="btn" style="align-self:flex-end">伝える</button></div></form>`;
+    },
+    dinner() {
+      const t = today(), me = device.me, p = other(me);
+      const st = L.dinnerState(all('dinner'), t);
+      const cands = [...new Set([...st.match, ...st[p], ...st[me], ...L.dinnerSuggestions(t)])];
+      return `${st.match.length
+          ? `<div class="match">${ic('party')} 今夜は「${esc(st.match[0])}」に決まり！</div>`
+          : `<p class="muted">食べたいものを、いくつでも選んでください。ふたりが同じものを選ぶと決まります。</p>`}
+        <div class="dish-grid">${cands.map(n => `<button class="dish ${st[me].has(n) ? 'on' : ''} ${st.match.includes(n) ? 'match' : ''}" data-act="dinner-vote" data-name="${esc(n)}">
+          <span>${esc(n)}</span>${st[p].has(n) ? `<span class="p-mark">${esc(name(p))}</span>` : ''}</button>`).join('')}</div>
+        <form class="add" data-form="dinner" style="margin-top:12px"><div class="row"><input name="name" placeholder="ほかの料理を追加" maxlength="20" required><button class="btn" style="flex:0 0 auto">追加</button></div></form>`;
+    },
     thanks() {
       return `<form class="add" data-form="thanks">
         <textarea name="text" placeholder="${esc(name(other(device.me)))}へ。例: 今日ご飯を作ってくれてありがとう！" required maxlength="300"></textarea>
@@ -1257,7 +1449,7 @@ function setStock(s, low) {
   put('stock', { ...s, low });
   const open = all('shopping').filter(x => x.stockId === s.id && !x.done);
   if (low && !open.length) {
-    put('shopping', { id: uid(), name: s.name, done: false, by: device.me, at: Date.now(), stockId: s.id });
+    addShopping(s.name, { stockId: s.id });
     toast(`「${s.name}」を買い物リストに入れました`);
   }
   if (!low) open.forEach(x => remove('shopping', x.id));
@@ -1303,10 +1495,8 @@ async function onClick(e) {
     case 'done-chore': completeChore(id); if (inSheet) sheet.close(); break;
     case 'edit-chore': ui.editChore = id; render(); window.scrollTo(0, 0); return;
     case 'cancel-edit': ui.editChore = null; break;
-    case 'del-chore':
-      if (!confirm('この家事を削除しますか？')) return;
-      remove('chores', id); ui.editChore = null; break;
-    case 'undo-log': remove('log', id); break;
+    case 'del-chore': removeWithUndo('chores', id, '家事'); ui.editChore = null; break;
+    case 'undo-log': removeWithUndo('log', id, '記録'); break;
     case 'preset-cat': ui.presetCat = Number(id); break;
     case 'add-preset': {
       const p = L.PRESETS[ui.presetCat ?? 0].items[Number(id)];
@@ -1331,10 +1521,15 @@ async function onClick(e) {
       if (!s.done && st && st.low) put('stock', { ...st, low: false });
       break;
     }
-    case 'del-shop': remove('shopping', id); break;
+    case 'del-shop': removeWithUndo('shopping', id, get('shopping', id) ? `「${get('shopping', id).name}」` : '項目'); break;
+    case 'shop-suggest': {
+      const f = get('shopfreq', id);
+      if (f) { addShopping(f.name); toast(`「${f.name}」を追加しました`); }
+      break;
+    }
     case 'clear-shop': all('shopping').filter(s => s.done).forEach(s => remove('shopping', s.id)); break;
     case 'toggle-stock': { const s = get('stock', id); if (s) setStock(s, !s.low); break; }
-    case 'del-stock': remove('stock', id); break;
+    case 'del-stock': removeWithUndo('stock', id, '在庫の項目'); break;
     case 'stock-presets': L.STOCK_PRESETS.forEach(n => put('stock', { id: uid(), name: n, low: false })); break;
     // ふたり
     case 'react': {
@@ -1343,9 +1538,7 @@ async function onClick(e) {
       put('thanks', { ...t, reaction: t.reaction === el.dataset.r ? null : el.dataset.r });
       break;
     }
-    case 'del-thanks':
-      if (!confirm('削除しますか？')) return;
-      remove('thanks', id); break;
+    case 'del-thanks': removeWithUndo('thanks', id, 'ありがとう'); break;
     case 'thanks-all': ui.thanksAll = true; break;
     case 'req-accept': case 'req-decline': case 'req-done': {
       const r = get('requests', id);
@@ -1355,7 +1548,7 @@ async function onClick(e) {
       if (status === 'done') toast('おつかれさま！伝えておきます');
       break;
     }
-    case 'req-cancel': remove('requests', id); break;
+    case 'req-cancel': removeWithUndo('requests', id, 'お願い'); break;
     case 'req-thanks': {
       const r = get('requests', id);
       if (!r) return;
@@ -1365,11 +1558,36 @@ async function onClick(e) {
       break;
     }
     // 記念日・家計簿・メモ
-    case 'del-event': remove('events', id); break;
+    case 'del-event': removeWithUndo('events', id, '記念日'); break;
+    case 'wish-done': { const w = get('wishes', id); if (w) put('wishes', { ...w, done: !w.done, doneAt: Date.now() }); if (w && !w.done) toast('いい思い出になりましたね'); break; }
+    case 'del-wish': removeWithUndo('wishes', id, '項目'); break;
+    case 'del-recurring': removeWithUndo('recurring', id, '固定費'); break;
+    case 'mood': {
+      const t = today();
+      const cur = get('moods', `m-${device.me}-${t}`);
+      if (cur?.mood === id) remove('moods', cur.id);
+      else put('moods', { id: `m-${device.me}-${t}`, who: device.me, date: t, mood: id, at: Date.now() });
+      break;
+    }
+    case 'ping': {
+      const d = new Date(Date.now() + Number(id) * 60000);
+      put('pings', { id: uid(), from: device.me, kind: 'home', eta: `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`, at: Date.now() });
+      toast(`${name(other(device.me))}に伝えました`);
+      sheet.close();
+      break;
+    }
+    case 'dinner-vote': {
+      const t = today(), dish = el.dataset.name;
+      const vid = `dv-${t}-${device.me}-${L.hashId(dish)}`;
+      if (get('dinner', vid)) remove('dinner', vid);
+      else {
+        put('dinner', { id: vid, who: device.me, date: t, name: dish });
+        if (L.dinnerState(all('dinner'), t).match.includes(dish)) toast(`今夜は「${dish}」に決まり！`);
+      }
+      break;
+    }
     case 'month': ui.month = Math.min(0, (ui.month || 0) + Number(id)); break;
-    case 'del-expense':
-      if (!confirm('この記録を削除しますか？')) return;
-      remove('expenses', id); break;
+    case 'del-expense': removeWithUndo('expenses', id, '支出'); break;
     case 'settle': {
       const net = L.balance(all('expenses'));
       if (!net) return;
@@ -1387,9 +1605,7 @@ async function onClick(e) {
       catch (err) { toast('コピーできませんでした'); }
       return;
     case 'pin-note': { const n = get('notes', id); if (n) put('notes', { ...n, pinned: !n.pinned }); ui.openNote = id; break; }
-    case 'del-note':
-      if (!confirm('このメモを削除しますか？')) return;
-      remove('notes', id); break;
+    case 'del-note': removeWithUndo('notes', id, 'メモ'); break;
     // 設定
     case 'set-me': device.me = id; persist(); pushUpdate(); break;
     case 'export': exportData(); return;
@@ -1500,7 +1716,7 @@ async function onSubmit(e) {
       break;
     }
     case 'shop':
-      put('shopping', { id: uid(), name: text('name'), done: false, by: me, at: Date.now() });
+      addShopping(text('name'));
       if (inSheet) toast(`「${text('name')}」を追加しました`);
       break;
     case 'stock':
@@ -1523,6 +1739,7 @@ async function onSubmit(e) {
       const r = inSheet ? null : ui.receipt;
       put('expenses', {
         id: uid(), title: text('title'), amount, date: f.get('date') || today(), paidBy: f.get('paidBy'), split: f.get('split'), at: Date.now(),
+        category: f.get('category') || (r?.category) || L.expenseCategory(text('title')),
         ...(r?.items.length ? { items: r.items.slice(0, 20) } : {}),
       });
       if (!inSheet) ui.receipt = null;
@@ -1533,6 +1750,34 @@ async function onSubmit(e) {
       const prev = form.dataset.id ? get('notes', form.dataset.id) : null;
       put('notes', { ...(prev || { id: uid() }), title: text('title'), body: String(f.get('body') || '') });
       if (prev) { ui.openNote = prev.id; toast('保存しました'); }
+      break;
+    }
+    case 'ping':
+      put('pings', { id: uid(), from: me, kind: 'home', eta: f.get('eta'), at: Date.now() });
+      toast(`${name(other(me))}に伝えました`);
+      break;
+    case 'dinner': {
+      const t = today(), dish = text('name');
+      put('dinner', { id: `dv-${t}-${me}-${L.hashId(dish)}`, who: me, date: t, name: dish });
+      form.reset();
+      sheet.render();
+      return;
+    }
+    case 'wish':
+      put('wishes', { id: uid(), kind: f.get('kind') || 'other', title: text('title'), note: text('note'), by: me, at: Date.now(), done: false });
+      toast('追加しました');
+      break;
+    case 'recurring': {
+      const amount = Math.round(Number(f.get('amount')));
+      const day = Math.min(28, Math.max(1, Math.round(Number(f.get('day')) || 1)));
+      if (!(amount > 0)) { toast('金額を入力してください'); return; }
+      const n = new Date();
+      put('recurring', {
+        id: uid(), title: text('title'), amount, day, paidBy: f.get('paidBy'), split: f.get('split'),
+        category: f.get('category') || L.expenseCategory(text('title')), startYm: `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}`,
+      });
+      const added = applyRecurring();
+      toast(added ? '登録して、今月の分を記録しました' : `登録しました。毎月${day}日に記録します`);
       break;
     }
     case 'names':
@@ -1564,6 +1809,48 @@ async function onSubmit(e) {
   if (inSheet) sheet.close();
   render();
 }
+
+// ---------- スワイプ（行を右へ: 完了、左へ: 削除） ----------
+// li に data-swipe="right:toggle-shop left:del-shop" のように、行の中のボタンの data-act を書いておく
+let swipe = null;
+let swipeClickBlock = false;
+view.addEventListener('pointerdown', e => {
+  const li = e.target.closest('li[data-swipe]');
+  if (!li || e.target.closest('input, select, textarea, a')) return;
+  const acts = Object.fromEntries(li.dataset.swipe.split(' ').map(x => x.split(':')));
+  swipe = { li, acts, x: e.clientX, y: e.clientY, dx: 0, on: false, pid: e.pointerId };
+});
+view.addEventListener('pointermove', e => {
+  if (!swipe || e.pointerId !== swipe.pid) return;
+  const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+  if (!swipe.on) {
+    if (Math.abs(dy) > 12 && Math.abs(dy) > Math.abs(dx)) { swipe = null; return; }
+    if (Math.abs(dx) < 12) return;
+    swipe.on = true;
+    swipe.li.classList.add('swiping');
+  }
+  const allowed = (dx > 0 && swipe.acts.right) || (dx < 0 && swipe.acts.left);
+  swipe.dx = allowed ? dx : 0;
+  swipe.li.style.transform = `translateX(${swipe.dx}px)`;
+  swipe.li.classList.toggle('sw-right', swipe.dx > 30);
+  swipe.li.classList.toggle('sw-left', swipe.dx < -30);
+});
+function endSwipe() {
+  if (!swipe) return;
+  const { li, dx, on, acts } = swipe;
+  swipe = null;
+  li.style.transform = '';
+  li.classList.remove('swiping', 'sw-right', 'sw-left');
+  if (!on) return;
+  swipeClickBlock = true; // スワイプ後のクリックは無視する
+  setTimeout(() => { swipeClickBlock = false; }, 350);
+  const act = dx > 90 ? acts.right : dx < -90 ? acts.left : null;
+  const btn = act && li.querySelector(`[data-act="${act}"]`);
+  if (btn) { swipeClickBlock = false; btn.click(); }
+}
+view.addEventListener('pointerup', endSwipe);
+view.addEventListener('pointercancel', endSwipe);
+view.addEventListener('click', e => { if (swipeClickBlock) { e.stopImmediatePropagation(); e.preventDefault(); } }, true);
 
 for (const root of [view, sheetEl, onboardEl]) {
   root.addEventListener('click', onClick);
@@ -1610,6 +1897,7 @@ document.getElementById('settings-btn').innerHTML = ic('settings');
 document.getElementById('back').innerHTML = ic('back');
 document.getElementById('fab').innerHTML = ic('plus');
 
+applyRecurring();
 render();
 sync.connect();
 pushUpdate();

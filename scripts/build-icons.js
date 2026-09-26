@@ -14,7 +14,9 @@ const USE = {
   share: 'share-2', copy: 'copy', phone: 'smartphone', scale: 'scale', sun: 'sun', heart: 'heart', smile: 'smile',
   laugh: 'laugh', 'hand-heart': 'hand-heart', 'thumbs-up': 'thumbs-up', list: 'list-checks', done: 'circle-check',
   sparkles: 'sparkles', review: 'clipboard-list', days: 'calendar-days', package: 'package', repeat: 'repeat',
-  arrow: 'arrow-right',
+  arrow: 'arrow-right', 'mood-great': 'sun', 'mood-ok': 'cloud-sun', 'mood-tired': 'cloud', 'mood-bad': 'cloud-rain',
+  dinner: 'utensils', trip: 'plane', movie: 'film', place: 'map-pin', chart: 'chart-bar', recurring: 'calendar-clock',
+  clock: 'clock', history: 'history', star: 'star', 'coming-home': 'house-heart', soup: 'soup',
 };
 
 const dir = path.join(__dirname, '..', 'node_modules', 'lucide-static', 'icons');

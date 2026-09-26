@@ -19,7 +19,10 @@ const PORT = Number(process.env.PORT) || 8080;
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', 'data'));
 const STATIC_DIR = path.resolve(__dirname, '..', 'app');
 
-const COLLECTIONS = new Set(['settings', 'chores', 'log', 'shopping', 'thanks', 'events', 'requests', 'expenses', 'stock', 'notes']);
+const COLLECTIONS = new Set([
+  'settings', 'chores', 'log', 'shopping', 'thanks', 'events', 'requests', 'expenses', 'stock', 'notes',
+  'pings', 'moods', 'wishes', 'dinner', 'recurring', 'shopfreq',
+]);
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CODE_RE = /^[A-HJ-NP-Z2-9]{10}$/;
 const MAX_BODY = 1024 * 1024;

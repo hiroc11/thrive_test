@@ -315,3 +315,72 @@ ol.steps { text-align: left; display: inline-block; margin: 8px auto; }
 .tabs button .tab-label { font-size: 10px; line-height: 1.2; letter-spacing: .02em; }
 .tabs button .ic { width: 22px; height: 22px; }
 .tab-badge { top: 2px; }
+
+/* ---------- v5: 便利機能 ---------- */
+.segs { grid-template-columns: repeat(5, 1fr); }
+.seg { font-size: 12px; }
+
+/* 今日: 帰ってくる・気分 */
+.card.banner { display: flex; align-items: center; gap: 12px; border-color: var(--b); background: color-mix(in srgb, var(--b) 8%, var(--card)); }
+.card.banner > .ic { width: 32px; height: 32px; color: var(--b); }
+.mood-card { padding-bottom: 10px; }
+.mood-head { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+.mood-head .ic { color: var(--accent); }
+.moods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.mood {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 0; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 12px;
+}
+.mood .ic { width: 26px; height: 26px; }
+.mood.on { color: #fff; border-color: transparent; font-weight: 700; }
+.mood.on.m-great { background: #e0a526; } .mood.on.m-ok { background: var(--both); }
+.mood.on.m-tired { background: #8d99a6; } .mood.on.m-bad { background: #5a6f8c; }
+.partner-mood { margin-top: 10px; font-size: 13px; }
+.todo-ic { display: grid; place-items: center; width: 26px; height: 26px; color: var(--accent); flex-shrink: 0; }
+.todo-thanks .title { font-size: 14px; }
+.tiles .tile-num { font-size: 20px; }
+
+/* 買い物・行きたい: 見出し */
+.group-label { font-size: 12px; font-weight: 700; color: var(--muted); margin: 12px 0 2px; letter-spacing: .04em; }
+.group-label:first-child { margin-top: 0; }
+.swipe-hint { font-size: 12px; margin: 10px 0 0; }
+
+/* スワイプ */
+ul.list li[data-swipe] { touch-action: pan-y; background: var(--card); position: relative; transition: transform .18s ease-out, background .15s; }
+ul.list li.swiping { transition: none; }
+ul.list li.sw-right { background: color-mix(in srgb, var(--both) 22%, var(--card)); }
+ul.list li.sw-left { background: color-mix(in srgb, #e5484d 18%, var(--card)); }
+
+/* トースト（元に戻す） */
+.toast { display: flex; align-items: center; gap: 14px; }
+.toast-btn { background: none; border: 0; color: #f2cc8f; font-weight: 700; font-size: 14px; padding: 2px 4px; }
+
+/* 家計簿: カテゴリ別 */
+.cat-bars { display: grid; gap: 8px; margin: 12px 0 6px; }
+.cat-row { display: grid; grid-template-columns: 92px 1fr auto; align-items: center; gap: 8px; font-size: 13px; }
+.cat-name { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cat-track { height: 10px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.cat-bar { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
+.cat-val { font-variant-numeric: tabular-nums; text-align: right; min-width: 88px; }
+.cat-val small { color: var(--muted); margin-left: 6px; font-size: 11px; }
+.add-details summary { color: var(--accent); font-weight: 600; font-size: 14px; margin: 8px 0; display: flex; align-items: center; gap: 4px; }
+.add-details form { margin-top: 8px; }
+
+/* 行きたい: 種類 */
+.chip-radio input { display: none; }
+.chip-radio span { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 99px; padding: 6px 10px; font-size: 13px; background: var(--card); }
+.chip-radio input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* シート: 今から帰る・晩ごはん */
+.c-home .ic { color: var(--b); } .c-dinner .ic { color: #d97a3a; }
+.eta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0 14px; }
+.eta-grid .chip.big { padding: 14px 0; }
+.dish-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.dish {
+  position: relative; padding: 14px 4px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg);
+  color: var(--text); font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.dish.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--card)); font-weight: 700; }
+.dish.match { border-color: var(--both); background: color-mix(in srgb, var(--both) 22%, var(--card)); }
+.p-mark { font-size: 10px; color: #fff; background: var(--b); border-radius: 99px; padding: 0 6px; }
+.match { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; padding: 12px; border-radius: 12px; background: color-mix(in srgb, var(--both) 22%, var(--card)); margin-bottom: 12px; }

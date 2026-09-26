@@ -265,7 +265,8 @@ test('reads a receipt through the Claude API', async () => {
   mockReply = { is_receipt: true, store: 'スーパーふたり', date: '2026-09-26', total: 1234.4, items: [{ name: '牛乳', price: 198 }] };
   const res = await post(`/api/rooms/${code}/receipt`, { mediaType: 'image/jpeg', data: Buffer.from('fake-jpeg').toString('base64') });
   assert.strictEqual(res.status, 200);
-  assert.deepStrictEqual(await res.json(), { is_receipt: true, store: 'スーパーふたり', date: '2026-09-26', total: 1234, items: [{ name: '牛乳', price: 198 }] });
+  // カテゴリが返ってこなかったときは、店名から推測する（スーパー → 食費）
+  assert.deepStrictEqual(await res.json(), { is_receipt: true, store: 'スーパーふたり', date: '2026-09-26', total: 1234, category: 'food', items: [{ name: '牛乳', price: 198 }] });
 
   const sent = mockRequests.at(-1);
   assert.match(sent.url, /^\/v1\/messages/);
@@ -315,4 +316,30 @@ test('push payloads carry the badge count for the recipient', async () => {
   await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', seenThanks: 0 });
   await sync([{ col: 'shopping', rec: { id: 's2', name: 'パン', by: 'b', updatedAt: now + 2 } }]);
   assert.strictEqual((await mine()).at(-1).badge, 2);
+});
+
+test('notifies about coming home, mood and a dinner match', async () => {
+  const code = await newRoom();
+  const now = Date.now();
+  const sync = changes => post(`/api/rooms/${code}/sync`, { since: 0, changes });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('v5-a'), who: 'a' });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('v5-b'), who: 'b' });
+  const before = (await pushes()).length;
+  await sync([
+    { col: 'settings', rec: { id: 'names', a: 'ひろ', b: 'ゆき', updatedAt: now } },
+    { col: 'shopping', rec: { id: 's1', name: '牛乳', by: 'a', updatedAt: 1 } }, // 古いので通知なし、件数には入る
+    { col: 'pings', rec: { id: 'p1', from: 'b', kind: 'home', eta: '19:30', at: now, updatedAt: now } }, // → a
+    { col: 'moods', rec: { id: 'm-b-x', who: 'b', date: 'x', mood: 'ok', updatedAt: now } }, // ふつう → 通知なし
+  ]);
+  await sync([
+    { col: 'moods', rec: { id: 'm-b-x', who: 'b', date: 'x', mood: 'tired', updatedAt: now + 1 } }, // 疲れた → a
+    { col: 'dinner', rec: { id: 'dv-a', who: 'a', date: '2026-09-26', name: 'カレー', updatedAt: now } }, // まだ一致しない
+  ]);
+  await sync([{ col: 'dinner', rec: { id: 'dv-b', who: 'b', date: '2026-09-26', name: 'カレー', updatedAt: now + 2 } }]); // 一致 → a
+  const got = (await pushes()).slice(before).map(p => `${p.who}:${p.title}:${p.body}`);
+  assert.deepStrictEqual(got, [
+    'a:🏠 ゆきが今から帰ります:19:30ごろ着 · 買い物リスト 1件',
+    'a:☁️ ゆきはちょっと疲れているみたい:やさしく声をかけてみませんか',
+    'a:🍽 今夜は「カレー」に決まり！:ゆきも同じ気分でした',
+  ]);
 });

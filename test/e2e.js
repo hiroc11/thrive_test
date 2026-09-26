@@ -11,7 +11,16 @@ const PORT = 19000 + Math.floor(Math.random() * 1000);
 const URL = `http://localhost:${PORT}/`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
 // 画面の移動: タブ、設定（右上の歯車）、「ふたり」タブの中の切り替え
-const FUTARI = { futari: 'thanks', thanks: 'thanks', requests: 'requests', events: 'events', notes: 'notes' };
+const FUTARI = { futari: 'thanks', thanks: 'thanks', requests: 'requests', events: 'events', wishes: 'wishes', notes: 'notes' };
+// 行を横にスワイプする（dx > 0 で右）
+async function swipeRow(P, title, dx) {
+  const box = await P.locator('main li', { has: P.locator('.title', { hasText: title }) }).first().boundingBox();
+  const x = box.x + box.width / 2, y = box.y + box.height / 2;
+  await P.mouse.move(x, y); await P.mouse.down();
+  for (let i = 1; i <= 8; i++) await P.mouse.move(x + (dx * i) / 8, y);
+  await P.mouse.up();
+}
+const rowTitles = P => P.evaluate(() => [...document.querySelectorAll('main li .title')].map(t => t.innerText.trim()));
 async function nav(P, t) {
   if (t === 'settings') await P.click('#settings-btn');
   else if (FUTARI[t]) { await P.click('[data-tab=futari]'); await P.click(`[data-goto="futari/${FUTARI[t]}"]`); }
@@ -114,7 +123,9 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await B.click(`[data-act=toggle-shop][data-id="${eggId}"]`);
   await A.waitForSelector(`[data-act=toggle-shop][data-id="${eggId}"].on`, { timeout: 5000 });
   await A.click('[data-act=clear-shop]');
-  await B.waitForFunction(() => !document.querySelector('main').innerText.includes('たまご'), null, { timeout: 5000 });
+  await B.waitForFunction(() => ![...document.querySelectorAll('main li .title')].some(t => t.innerText === 'たまご'), null, { timeout: 5000 });
+  // 消したものは「いつもの」から1タップで戻せる
+  assert.ok(await B.locator('[data-act=shop-suggest]:has-text("たまご")').count());
   console.log('✓ toggle & delete');
 
   // ふたり同時に同じ家事を完了 → 両方の記録が残る
@@ -166,9 +177,9 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await nav(A, 'chores');
   await A.click('[data-act=done-chore][data-id=c3]'); // 洗濯（ゆきの担当）
   await nav(B, 'home');
-  await until(B, () => document.querySelector('main').innerText.includes('代わりにやってくれました'));
+  await until(B, () => document.querySelector('main').innerText.includes('代わりに「洗濯」をやってくれました'));
   await B.click('[data-act=thank-cover]');
-  assert.ok(!(await text(B)).includes('代わりにやってくれました'));
+  assert.ok(!(await text(B)).includes('代わりに「洗濯」をやってくれました'));
   await nav(A, 'thanks');
   await until(A, () => document.querySelector('main').innerText.includes('代わりに「洗濯」をやってくれてありがとう'));
   console.log('✓ cover + thanks');
@@ -184,7 +195,7 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await B.fill('form[data-form=request] input[name=text]', '電球を替えてほしい');
   await B.click('form[data-form=request] .btn');
   await nav(A, 'home');
-  await until(A, () => document.querySelector('main').innerText.includes('からのお願い 1件'));
+  await until(A, () => document.querySelector('main').innerText.includes('ゆきちゃんからのお願い'));
   assert.match(await A.locator('.tabs').innerText(), /ふたり/);
   await nav(A, 'requests');
   assert.strictEqual(await A.locator('.seg.on .dot-count').innerText(), '1');
@@ -286,6 +297,78 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await until(B, () => document.querySelector('form[data-form=expense] input[name=title]')?.value === 'ドラッグストア');
   assert.strictEqual(await B.locator('.tabs button.active').getAttribute('data-tab'), 'budget');
   console.log('✓ quick add (+)');
+
+  // ---------- v5: 便利機能 ----------
+  // 今から帰る → 相手の「今日」に表示
+  await nav(B, 'home');
+  await B.click('#fab'); await B.click('#sheet [data-act=sheet][data-id=home]');
+  await B.click('#sheet [data-act=ping][data-id="20"]');
+  assert.ok(await B.locator('#sheet').isHidden());
+  await nav(A, 'home');
+  await until(A, () => document.querySelector('main').innerText.includes('ゆきちゃんが今から帰ってきます'));
+  console.log('✓ coming home');
+
+  // 気分: 相手が「疲れた」→ 気づかいのひとこと
+  await B.click('main [data-act=mood][data-id=tired]');
+  await until(A, () => document.querySelector('.partner-mood')?.innerText.includes('疲れた'));
+  assert.match(await A.locator('.partner-mood').innerText(), /代わってみては/);
+  console.log('✓ mood');
+
+  // 晩ごはん: ふたりが同じものを選ぶと決まる
+  await A.click('main .tile[data-id=dinner]');
+  await A.fill('#sheet form[data-form=dinner] input[name=name]', 'カレー'); await A.press('#sheet form[data-form=dinner] input[name=name]', 'Enter');
+  await B.click('main .tile[data-id=dinner]');
+  await until(B, () => !!document.querySelector('#sheet .dish[data-name="カレー"] .p-mark'));
+  await B.click('#sheet [data-act=dinner-vote][data-name="カレー"]');
+  await until(A, () => document.querySelector('#sheet .match')?.innerText.includes('カレー'));
+  await A.click('#sheet .sheet-head [data-act=sheet-close]'); await B.click('#sheet .sheet-head [data-act=sheet-close]');
+  await until(A, () => document.querySelector('main').innerText.includes('今夜は「カレー」'));
+  console.log('✓ dinner');
+
+  // 買い物: 売り場ごと・スワイプ・元に戻す
+  await nav(A, 'shopping');
+  for (const n of ['豚こま', 'キャベツ']) { await A.fill('main form[data-form=shop] input', n); await A.press('main form[data-form=shop] input', 'Enter'); }
+  const labels = await A.locator('main .group-label').allInnerTexts();
+  assert.ok(labels.indexOf('野菜・果物') >= 0 && labels.indexOf('野菜・果物') < labels.indexOf('肉・魚'), labels.join(','));
+  await swipeRow(A, 'キャベツ', 160);
+  await until(A, () => [...document.querySelectorAll('main li.done .title')].some(t => t.innerText.trim() === 'キャベツ'));
+  await swipeRow(A, '豚こま', -160);
+  await A.waitForSelector('.toast-btn');
+  assert.ok(!(await rowTitles(A)).includes('豚こま'));
+  await A.click('.toast-btn');
+  await until(A, () => [...document.querySelectorAll('main li .title')].some(t => t.innerText.trim() === '豚こま'));
+  await nav(B, 'shopping');
+  await until(B, () => [...document.querySelectorAll('main li .title')].some(t => t.innerText.trim() === '豚こま'));
+  console.log('✓ shopping groups + swipe + undo');
+
+  // 家計簿: 毎月の固定費 → 今月分が自動で記録される（ふたりの端末でも1件だけ）・カテゴリ別
+  await nav(A, 'budget');
+  await A.fill('form[data-form=recurring] input[name=title]', '家賃');
+  await A.fill('form[data-form=recurring] input[name=amount]', '80000');
+  await A.fill('form[data-form=recurring] input[name=day]', '1');
+  await A.click('form[data-form=recurring] .btn');
+  await until(A, () => [...document.querySelectorAll('main li .title')].filter(t => t.innerText.trim() === '家賃').length === 2); // 固定費の一覧 + 今月の記録
+  await nav(B, 'budget');
+  await until(B, () => [...document.querySelectorAll('main li .title')].filter(t => t.innerText.trim() === '家賃').length === 2);
+  await wait(1000);
+  assert.strictEqual((await rowTitles(B)).filter(t => t === '家賃').length, 2);
+  assert.match(await A.locator('.cat-bars').innerText(), /住まい・光熱/);
+  console.log('✓ recurring + chart');
+
+  // 行きたい → 記念日が近いと提案
+  await nav(A, 'wishes');
+  await A.click('main .chip-radio:has-text("おでかけ")');
+  await A.fill('main form[data-form=wish] input[name=title]', '箱根温泉');
+  await A.click('main form[data-form=wish] .btn');
+  await nav(B, 'wishes');
+  await until(B, () => document.querySelector('main').innerText.includes('箱根温泉'));
+  await nav(A, 'events');
+  const soon = new Date(Date.now() + 5 * 864e5);
+  await A.fill('main form[data-form=event] input[name=title]', 'ゆきの誕生日');
+  await A.fill('main form[data-form=event] input[name=date]', `${soon.getFullYear()}-${String(soon.getMonth() + 1).padStart(2, '0')}-${String(soon.getDate()).padStart(2, '0')}`);
+  await A.click('main form[data-form=event] .btn');
+  assert.match(await A.locator('main .card.hint').first().innerText(), /箱根温泉/);
+  console.log('✓ wishes');
 
   // 「今日」タブの数字（対応することの数）: 家事を終えると減る
   await nav(A, 'home');

@@ -1605,7 +1605,7 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
 }
 
 // タブとヘッダーのアイコン
-document.querySelectorAll('.tabs button').forEach(b => { b.innerHTML = `${ic(TAB_ICONS[b.dataset.tab])}<span>${titles[b.dataset.tab]}</span>`; });
+document.querySelectorAll('.tabs button').forEach(b => { b.innerHTML = `${ic(TAB_ICONS[b.dataset.tab])}<span class="tab-label">${titles[b.dataset.tab]}</span>`; });
 document.getElementById('settings-btn').innerHTML = ic('settings');
 document.getElementById('back').innerHTML = ic('back');
 document.getElementById('fab').innerHTML = ic('plus');

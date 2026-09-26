@@ -290,6 +290,7 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await B.click('#fab');
   await B.click('#sheet [data-act=sheet][data-id=thanks]');
   await B.fill('#sheet textarea', 'ゴミ出しありがとう'); await B.click('#sheet .btn');
+  assert.strictEqual(await B.locator('.toast-btn').innerText(), 'LINEでも送る');
   await nav(A, 'thanks');
   await until(A, () => document.querySelector('main').innerText.includes('ゴミ出しありがとう'));
   await B.click('#fab');
@@ -303,6 +304,16 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await nav(B, 'home');
   await B.click('#fab'); await B.click('#sheet [data-act=sheet][data-id=home]');
   await B.click('#sheet [data-act=ping][data-id="20"]');
+  // 記録したあと、LINE の文面（買い物リスト付き）を用意して送れるようにする
+  const lineHref = await B.getAttribute('#sheet a.line-btn', 'href');
+  assert.match(lineHref, /^https:\/\/line\.me\/R\/share\?text=/);
+  const lineText = decodeURIComponent(lineHref.split('text=')[1]);
+  assert.match(lineText, /今から帰るね！\d+:\d\dごろ着く予定。/);
+  assert.match(lineText, /買うものある？/);
+  // 文面を直すと送る内容も変わる
+  await B.fill('#sheet textarea[data-line]', '今から帰るよ〜');
+  assert.strictEqual(decodeURIComponent((await B.getAttribute('#sheet a.line-btn', 'href')).split('text=')[1]), '今から帰るよ〜');
+  await B.click('#sheet .btn-col [data-act=sheet-close]');
   assert.ok(await B.locator('#sheet').isHidden());
   await nav(A, 'home');
   await until(A, () => document.querySelector('main').innerText.includes('ゆきちゃんが今から帰ってきます'));
@@ -312,6 +323,7 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await B.click('main [data-act=mood][data-id=tired]');
   await until(A, () => document.querySelector('.partner-mood')?.innerText.includes('疲れた'));
   assert.match(await A.locator('.partner-mood').innerText(), /代わってみては/);
+  assert.match(await A.getAttribute('.partner-mood a.line-btn', 'href'), /line\.me\/R\/share/); // LINE でひとこと
   console.log('✓ mood');
 
   // 晩ごはん: ふたりが同じものを選ぶと決まる
@@ -321,6 +333,7 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await until(B, () => !!document.querySelector('#sheet .dish[data-name="カレー"] .p-mark'));
   await B.click('#sheet [data-act=dinner-vote][data-name="カレー"]');
   await until(A, () => document.querySelector('#sheet .match')?.innerText.includes('カレー'));
+  assert.ok(await A.locator('#sheet .line-row a.line-btn').count());
   await A.click('#sheet .sheet-head [data-act=sheet-close]'); await B.click('#sheet .sheet-head [data-act=sheet-close]');
   await until(A, () => document.querySelector('main').innerText.includes('今夜は「カレー」'));
   console.log('✓ dinner');

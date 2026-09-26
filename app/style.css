@@ -384,3 +384,12 @@ ul.list li.sw-left { background: color-mix(in srgb, #e5484d 18%, var(--card)); }
 .dish.match { border-color: var(--both); background: color-mix(in srgb, var(--both) 22%, var(--card)); }
 .p-mark { font-size: 10px; color: #fff; background: var(--b); border-radius: 99px; padding: 0 6px; }
 .match { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; padding: 12px; border-radius: 12px; background: color-mix(in srgb, var(--both) 22%, var(--card)); margin-bottom: 12px; }
+
+/* LINE へ渡すボタン */
+.btn.line-btn { background: #06c755; color: #fff; text-decoration: none; }
+.btn.line-btn.ghost { background: transparent; color: #06a347; border: 1px solid #06c755; }
+.btn.line-btn.big { padding: 14px; font-size: 16px; }
+.line-row { margin-top: 8px; }
+.line-text { min-height: 110px; }
+.small-note { font-size: 12px; margin: 4px 0 0; }
+.card > .line-btn { margin-top: 8px; }

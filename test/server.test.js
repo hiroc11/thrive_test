@@ -157,8 +157,8 @@ test('rejects invalid subscriptions', async () => {
 test('notifies the partner about their actions', async () => {
   const code = await newRoom();
   const sync = changes => post(`/api/rooms/${code}/sync`, { since: 0, changes }).then(r => r.json());
-  await post(`/api/rooms/${code}/push`, { subscription: SUB('ev-a'), who: 'a' });
-  await post(`/api/rooms/${code}/push`, { subscription: SUB('ev-b'), who: 'b', prefs: { shopping: false } });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('ev-a'), who: 'a', prefs: { chat: true } });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('ev-b'), who: 'b', prefs: { shopping: false, chat: true } });
   const now = Date.now();
   const before = (await pushes()).length;
   await sync([
@@ -300,7 +300,7 @@ test('push payloads carry the badge count for the recipient', async () => {
     { col: 'chores', rec: { id: 'c1', title: '食器洗い', assignee: 'a', every: 1, points: 1, updatedAt: 1 } }, // a の今日の家事
     { col: 'requests', rec: { id: 'r1', from: 'b', to: 'a', text: '電球', status: 'open', updatedAt: 1 } },
   ]);
-  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a' });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', prefs: { chat: true } });
   const mine = async () => (await pushes()).filter(p => p.endpoint === SUB('badge-a').endpoint);
 
   // b からありがとう → a に届く通知のバッジは 家事1 + お願い1 + ありがとう1 = 3
@@ -308,12 +308,12 @@ test('push payloads carry the badge count for the recipient', async () => {
   assert.strictEqual((await mine()).at(-1).badge, 3);
 
   // a がありがとうを見た（seenThanks）あとは 2
-  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', seenThanks: now });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', prefs: { chat: true }, seenThanks: now });
   await sync([{ col: 'shopping', rec: { id: 's1', name: '牛乳', by: 'b', updatedAt: now + 1 } }]);
   assert.strictEqual((await mine()).at(-1).badge, 2);
 
   // 見た時刻は古い値で上書きされない
-  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', seenThanks: 0 });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', prefs: { chat: true }, seenThanks: 0 });
   await sync([{ col: 'shopping', rec: { id: 's2', name: 'パン', by: 'b', updatedAt: now + 2 } }]);
   assert.strictEqual((await mine()).at(-1).badge, 2);
 });
@@ -322,8 +322,8 @@ test('notifies about coming home, mood and a dinner match', async () => {
   const code = await newRoom();
   const now = Date.now();
   const sync = changes => post(`/api/rooms/${code}/sync`, { since: 0, changes });
-  await post(`/api/rooms/${code}/push`, { subscription: SUB('v5-a'), who: 'a' });
-  await post(`/api/rooms/${code}/push`, { subscription: SUB('v5-b'), who: 'b' });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('v5-a'), who: 'a', prefs: { chat: true } });
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('v5-b'), who: 'b', prefs: { chat: true } });
   const before = (await pushes()).length;
   await sync([
     { col: 'settings', rec: { id: 'names', a: 'ひろ', b: 'ゆき', updatedAt: now } },
@@ -342,4 +342,18 @@ test('notifies about coming home, mood and a dinner match', async () => {
     'a:☁️ ゆきはちょっと疲れているみたい:やさしく声をかけてみませんか',
     'a:🍽 今夜は「カレー」に決まり！:ゆきも同じ気分でした',
   ]);
+});
+
+test('chat-like pushes are off by default (LINE carries those)', async () => {
+  const code = await newRoom();
+  const now = Date.now();
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('quiet-a'), who: 'a' });
+  const before = (await pushes()).filter(p => p.endpoint === SUB('quiet-a').endpoint).length;
+  await post(`/api/rooms/${code}/sync`, { since: 0, changes: [
+    { col: 'thanks', rec: { id: 't', from: 'b', text: 'ありがとう', at: now, updatedAt: now } },
+    { col: 'pings', rec: { id: 'p', from: 'b', kind: 'home', eta: '19:00', at: now, updatedAt: now } },
+    { col: 'requests', rec: { id: 'r', from: 'b', to: 'a', text: '電球', status: 'open', updatedAt: now } }, // お願いは届く
+  ] });
+  const got = (await pushes()).filter(p => p.endpoint === SUB('quiet-a').endpoint).slice(before).map(p => p.title);
+  assert.deepStrictEqual(got, ['🙏 奥さんからお願い']); // 名前が未設定なので既定の「奥さん」
 });

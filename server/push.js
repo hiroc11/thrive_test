@@ -11,7 +11,8 @@ const DRY_RUN = process.env.PUSH_DRY_RUN === '1'; // テスト用: 実際には�
 const MAX_SUBS_PER_ROOM = 10;
 const MORNING_WINDOW_MIN = 180; // 再起動などで遅れても、この分数以内なら朝の通知を送る
 
-const DEFAULT_PREFS = { morning: true, time: '08:00', shopping: true, partner: true, events: true, weekly: true };
+// chat: LINE とかぶる通知（今から帰る・ありがとう・晩ごはん）。LINE で伝える前提なので初期設定はオフ
+const DEFAULT_PREFS = { morning: true, time: '08:00', shopping: true, partner: true, chat: false, events: true, weekly: true };
 
 let publicKey = null;
 const sentLog = []; // DRY_RUN のときに送った通知
@@ -37,7 +38,7 @@ function validSubscription(s) {
 
 function cleanPrefs(p = {}) {
   const out = { ...DEFAULT_PREFS };
-  for (const k of ['morning', 'shopping', 'partner', 'events', 'weekly']) if (typeof p[k] === 'boolean') out[k] = p[k];
+  for (const k of ['morning', 'shopping', 'partner', 'chat', 'events', 'weekly']) if (typeof p[k] === 'boolean') out[k] = p[k];
   if (typeof p.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(p.time)) out.time = p.time;
   return out;
 }
@@ -105,10 +106,10 @@ function describeChange(room, col, cur, rec) {
       return null;
     case 'thanks':
       if (isNew && (rec.from === 'a' || rec.from === 'b')) {
-        return { to: Logic.other(rec.from), pref: 'partner', title: `💌 ${n[rec.from]}からありがとう`, body: cut(rec.text, 100), tab: 'futari' };
+        return { to: Logic.other(rec.from), pref: 'chat', title: `💌 ${n[rec.from]}からありがとう`, body: cut(rec.text, 100), tab: 'futari' };
       }
       if (!isNew && rec.reaction && rec.reaction !== cur.reaction && (rec.from === 'a' || rec.from === 'b')) {
-        return { to: rec.from, pref: 'partner', title: `${rec.reaction} ${n[Logic.other(rec.from)]}からリアクション`, body: cut(rec.text, 60), tab: 'futari' };
+        return { to: rec.from, pref: 'chat', title: `${rec.reaction} ${n[Logic.other(rec.from)]}からリアクション`, body: cut(rec.text, 60), tab: 'futari' };
       }
       return null;
     case 'requests': {
@@ -125,7 +126,7 @@ function describeChange(room, col, cur, rec) {
       if (isNew && rec.kind === 'home' && (rec.from === 'a' || rec.from === 'b')) {
         const left = list(room, 'shopping').filter(s => !s.done).length;
         return {
-          to: Logic.other(rec.from), pref: 'partner', title: `🏠 ${n[rec.from]}が今から帰ります`,
+          to: Logic.other(rec.from), pref: 'chat', title: `🏠 ${n[rec.from]}が今から帰ります`,
           body: `${rec.eta ? `${cut(rec.eta, 10)}ごろ着` : 'もうすぐ着きます'}${left ? ` · 買い物リスト ${left}件` : ''}`,
           tab: left ? 'shopping' : 'home', tag: 'home',
         };
@@ -142,7 +143,7 @@ function describeChange(room, col, cur, rec) {
       // 相手も同じものを選んでいたら「決まり」
       const both = list(room, 'dinner').some(v => v.who === Logic.other(rec.who) && v.date === rec.date && v.name === rec.name);
       if (!both) return null;
-      return { to: Logic.other(rec.who), pref: 'partner', title: `🍽 今夜は「${cut(rec.name, 20)}」に決まり！`, body: `${n[rec.who]}も同じ気分でした`, tab: 'home', tag: 'dinner' };
+      return { to: Logic.other(rec.who), pref: 'chat', title: `🍽 今夜は「${cut(rec.name, 20)}」に決まり！`, body: `${n[rec.who]}も同じ気分でした`, tab: 'home', tag: 'dinner' };
     }
     case 'log':
       if (isNew && rec.cover && (rec.for === 'a' || rec.for === 'b') && (rec.by === 'a' || rec.by === 'b')) {

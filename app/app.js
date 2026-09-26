@@ -274,6 +274,13 @@ function toast(msg, action) {
   setTimeout(() => el.remove(), action ? 5000 : 2200);
 }
 
+// ---------- LINE ----------
+// アプリは記録と段取り、会話は LINE。LINE の共有画面を、文面を入れた状態で開く
+const lineUrl = text => `https://line.me/R/share?text=${encodeURIComponent(text)}`;
+const lineButton = (text, label = 'LINEで送る', cls = '') =>
+  `<a class="btn line-btn ${cls}" href="${esc(lineUrl(text))}" target="_blank" rel="noopener">${window.icon('chat')} ${esc(label)}</a>`;
+const lineToastAction = text => ({ label: 'LINEでも送る', fn: () => window.open(lineUrl(text), '_blank', 'noopener') });
+
 // 削除は確認ダイアログを出さずに消して、「元に戻す」で戻せるようにする
 function removeWithUndo(col, id, label) {
   const prev = store.records[col][id];
@@ -321,7 +328,8 @@ function weekPoints() {
 }
 
 // ---------- プッシュ通知 ----------
-const DEFAULT_PUSH_PREFS = { morning: true, time: '08:00', shopping: true, partner: true, events: true, weekly: true };
+// chat: LINE とかぶる通知（今から帰る・ありがとう・晩ごはん）。LINE で伝える前提なので初期設定はオフ
+const DEFAULT_PUSH_PREFS = { morning: true, time: '08:00', shopping: true, partner: true, chat: false, events: true, weekly: true };
 const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent);
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -746,7 +754,9 @@ function moodCard() {
     <div class="mood-head">${ic('sun')} 今日の気分</div>
     <div class="moods">${MOODS.map(([k, label, icn]) => `<button class="mood ${mine?.mood === k ? 'on' : ''} m-${k}" data-act="mood" data-id="${k}">${ic(icn)}<span>${label}</span></button>`).join('')}</div>
     <div class="partner-mood">${pm
-      ? `${ic(pm[2], 'sm')} ${esc(name(p))}は「${pm[1]}」${theirs.mood === 'tired' || theirs.mood === 'bad' ? '<span class="muted"> — 今日は家事を代わってみては？</span>' : ''}`
+      ? `${ic(pm[2], 'sm')} ${esc(name(p))}は「${pm[1]}」${theirs.mood === 'tired' || theirs.mood === 'bad'
+        ? `<span class="muted"> — 今日は家事を代わってみては？</span>
+           <div class="line-row">${lineButton('おつかれさま。今日は無理しないでね。家事はやっておくよ', 'LINEでひとこと送る', 'small')}</div>` : ''}`
       : `<span class="muted">${esc(name(p))}はまだ今日の気分を選んでいません</span>`}</div>
   </div>`;
 }
@@ -1057,7 +1067,9 @@ const screens = {
           <div class="toggle-row">${tog('morning', '朝の家事リマインド')}<input type="time" name="time" value="${esc(p.time)}" class="time"></div>
           ${tog('events', '記念日（7日前・3日前・当日）')}
           ${tog('shopping', '買い物リストに追加されたとき')}
-          ${tog('partner', 'ありがとう・お願い・代わりにやったとき')}
+          ${tog('partner', 'お願い・代わりにやった・相手が疲れているとき')}
+          ${tog('chat', '今から帰る・ありがとう・晩ごはん')}
+          <p class="muted small-note">「今から帰る・ありがとう・晩ごはん」は LINE で伝え合う前提なので、初期設定はオフです。</p>
           ${tog('weekly', '日曜夜のふりかえり')}
         </form>
         <div class="btn-row" style="margin-top:10px">
@@ -1117,6 +1129,7 @@ const futariScreens = {
           ${row('家事', 'chores', '回')}${row('ポイント', 'points', 'pt')}${row('ありがとう', 'thanks', '回')}${row('お願いに応えた', 'requestsDone', '回')}
         </table>
         <p class="muted">${covers ? `代わりにやった家事が${covers}回ありました。` : ''}${s.thanks.a + s.thanks.b ? 'ありがとうを伝え合えていますね。' : '今週はまだありがとうがありません。ひとこと送ってみませんか？'}</p>
+        ${lineButton(`今週もおつかれさま！家事はふたりで${s.chores.a + s.chores.b}回やったよ。来週もよろしくね`, 'LINEで「今週もおつかれさま」', 'small ghost')}
       </div>
       <div class="card">
         <h2>${ic('heart')} これまでのありがとう</h2>
@@ -1179,7 +1192,10 @@ const futariScreens = {
         <h2>${ic('gift')} ${L.eventLabel(soon).days === 0 ? `今日は${esc(soon.ev.title)}` : `${esc(soon.ev.title)}まであと${L.eventLabel(soon).days}日`}</h2>
         <p class="muted">「行きたい」リストから選んでみませんか？</p>
         <ul class="list">${ideas.map(w => `<li><span class="todo-ic">${ic((WISH_KINDS.find(([k]) => k === w.kind) || WISH_KINDS[3])[2])}</span><div class="grow">${esc(w.title)}</div></li>`).join('')}</ul>
-        <button class="btn small ghost" data-goto="futari/wishes">リストを見る</button>
+        <div class="btn-row">
+          ${lineButton(`${soon.ev.title}、どこ行こうか？ 候補: ${ideas.map(w => w.title).join('、')}`, 'LINEで相談', 'small')}
+          <button class="btn small ghost" data-goto="futari/wishes">リストを見る</button>
+        </div>
       </div>` : ''}
       <div class="card">
         <h2>${ic('calendar')} 記念日・予定を追加</h2>
@@ -1292,7 +1308,9 @@ const sheet = {
     // 文字を入れるための画面だけ、入力欄にすぐカーソルを置く（晩ごはん相談などは相手の選択がすぐ見えるように置かない）
     if (first && ['shop', 'expense', 'thanks', 'request'].includes(this.name)) setTimeout(() => first.focus(), 50);
   },
-  titles: { menu: '記録する', chore: '家事をやった', shop: '買い物に追加', expense: '支出を記録', thanks: 'ありがとう', request: 'お願い', home: '今から帰る', dinner: '晩ごはん相談' },
+  line: '',
+  openLine(text) { this.line = text; this.open('line'); },
+  titles: { line: 'LINEで送る', menu: '記録する', chore: '家事をやった', shop: '買い物に追加', expense: '支出を記録', thanks: 'ありがとう', request: 'お願い', home: '今から帰る', dinner: '晩ごはん相談' },
   views: {
     menu() {
       const item = (id, icn, label, cls = '') => `<button class="sheet-item ${cls}" data-act="sheet" data-id="${id}">${ic(icn)}<span>${label}</span></button>`;
@@ -1315,6 +1333,12 @@ const sheet = {
       return `<form class="add" data-form="shop"><div class="row"><input name="name" placeholder="例: 牛乳" required maxlength="40"><button class="btn" style="flex:0 0 auto">追加</button></div></form>`;
     },
     expense() { return expenseForm(null); },
+    line() {
+      return `<p class="muted">アプリにも記録しました。LINE でも伝えましょう（文面は直せます）。</p>
+        <textarea class="line-text" data-line maxlength="500">${esc(sheet.line)}</textarea>
+        <div class="btn-col" style="margin-top:10px">${lineButton(sheet.line, 'LINEで送る', 'big')}
+          <button class="btn ghost" data-act="sheet-close">閉じる</button></div>`;
+    },
     home() {
       const left = all('shopping').filter(x => !x.done).length;
       return `<p class="muted">${esc(name(other(device.me)))}に通知でお知らせします。${left ? `（買い物リストが${left}件あります）` : ''}</p>
@@ -1326,7 +1350,8 @@ const sheet = {
       const st = L.dinnerState(all('dinner'), t);
       const cands = [...new Set([...st.match, ...st[p], ...st[me], ...L.dinnerSuggestions(t)])];
       return `${st.match.length
-          ? `<div class="match">${ic('party')} 今夜は「${esc(st.match[0])}」に決まり！</div>`
+          ? `<div class="match">${ic('party')} 今夜は「${esc(st.match[0])}」に決まり！</div>
+             <div class="line-row">${lineButton(`今夜は「${st.match[0]}」に決まり！`, 'LINEで送る', 'small')}</div>`
           : `<p class="muted">食べたいものを、いくつでも選んでください。ふたりが同じものを選ぶと決まります。</p>`}
         <div class="dish-grid">${cands.map(n => `<button class="dish ${st[me].has(n) ? 'on' : ''} ${st.match.includes(n) ? 'match' : ''}" data-act="dinner-vote" data-name="${esc(n)}">
           <span>${esc(n)}</span>${st[p].has(n) ? `<span class="p-mark">${esc(name(p))}</span>` : ''}</button>`).join('')}</div>
@@ -1431,6 +1456,12 @@ function shouldOnboard() {
   return !COLLECTIONS.some(col => Object.values(store.records[col]).some(r => r.updatedAt > 1));
 }
 
+// 「今から帰る」の LINE の文面（買い物リストも添える）
+function homeMessage(eta) {
+  const left = all('shopping').filter(x => !x.done).map(x => x.name);
+  return `今から帰るね！${eta}ごろ着く予定。${left.length ? `\n買うものある？ リスト: ${left.slice(0, 6).join('、')}${left.length > 6 ? ` ほか${left.length - 6}件` : ''}` : ''}`;
+}
+
 // ---------- 操作 ----------
 function serverUrl() {
   const input = document.getElementById('server-url');
@@ -1509,7 +1540,7 @@ async function onClick(e) {
       if (!l) return;
       sendThanks(`代わりに「${l.title}」をやってくれてありがとう！`);
       put('log', { ...l, thanked: true });
-      toast('ありがとうを送りました');
+      toast('ありがとうを送りました', lineToastAction(`代わりに「${l.title}」をやってくれてありがとう！`));
       break;
     }
     // 買い物・在庫
@@ -1554,7 +1585,7 @@ async function onClick(e) {
       if (!r) return;
       sendThanks(`「${r.text}」をやってくれてありがとう！`);
       put('requests', { ...r, thanked: true });
-      toast('ありがとうを送りました');
+      toast('ありがとうを送りました', lineToastAction(`「${r.text}」をやってくれてありがとう！`));
       break;
     }
     // 記念日・家計簿・メモ
@@ -1571,10 +1602,10 @@ async function onClick(e) {
     }
     case 'ping': {
       const d = new Date(Date.now() + Number(id) * 60000);
-      put('pings', { id: uid(), from: device.me, kind: 'home', eta: `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`, at: Date.now() });
-      toast(`${name(other(device.me))}に伝えました`);
-      sheet.close();
-      break;
+      const eta = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+      put('pings', { id: uid(), from: device.me, kind: 'home', eta, at: Date.now() });
+      sheet.openLine(homeMessage(eta));
+      return;
     }
     case 'dinner-vote': {
       const t = today(), dish = el.dataset.name;
@@ -1643,6 +1674,13 @@ view.addEventListener('toggle', e => {
   }
 }, true);
 
+sheetEl.addEventListener('input', e => {
+  if (!e.target.matches('textarea[data-line]')) return;
+  sheet.line = e.target.value;
+  const a = sheetEl.querySelector('a.line-btn');
+  if (a) a.href = lineUrl(e.target.value);
+});
+
 function onChange(e) {
   const t = e.target;
   if (t.name === 'schedule') {
@@ -1653,7 +1691,7 @@ function onChange(e) {
     const f = new FormData(t.closest('form'));
     device.push.prefs = {
       morning: f.has('morning'), events: f.has('events'), shopping: f.has('shopping'),
-      partner: f.has('partner'), weekly: f.has('weekly'), time: f.get('time') || '08:00',
+      partner: f.has('partner'), chat: f.has('chat'), weekly: f.has('weekly'), time: f.get('time') || '08:00',
     };
     persist();
     pushUpdate();
@@ -1724,11 +1762,11 @@ async function onSubmit(e) {
       break;
     case 'thanks':
       sendThanks(text('text'));
-      toast('ありがとうを送りました');
+      toast('ありがとうを残しました', lineToastAction(text('text')));
       break;
     case 'request':
       put('requests', { id: uid(), from: me, to: other(me), text: text('text'), due: f.get('due') || '', status: 'open', at: Date.now() });
-      toast(`${name(other(me))}にお願いしました`);
+      toast(`${name(other(me))}にお願いしました`, lineToastAction(`お願いがあるんだけど、「${text('text')}」${f.get('due') ? `（${f.get('due')}までに）` : ''}お願いできる？ アプリにも入れておいたよ`));
       break;
     case 'event':
       put('events', { id: uid(), title: text('title'), date: f.get('date'), yearly: f.get('yearly') === 'on' });
@@ -1754,8 +1792,8 @@ async function onSubmit(e) {
     }
     case 'ping':
       put('pings', { id: uid(), from: me, kind: 'home', eta: f.get('eta'), at: Date.now() });
-      toast(`${name(other(me))}に伝えました`);
-      break;
+      sheet.openLine(homeMessage(f.get('eta')));
+      return;
     case 'dinner': {
       const t = today(), dish = text('name');
       put('dinner', { id: `dv-${t}-${me}-${L.hashId(dish)}`, who: me, date: t, name: dish });

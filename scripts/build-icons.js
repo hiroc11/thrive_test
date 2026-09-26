@@ -16,7 +16,7 @@ const USE = {
   sparkles: 'sparkles', review: 'clipboard-list', days: 'calendar-days', package: 'package', repeat: 'repeat',
   arrow: 'arrow-right', 'mood-great': 'sun', 'mood-ok': 'cloud-sun', 'mood-tired': 'cloud', 'mood-bad': 'cloud-rain',
   dinner: 'utensils', trip: 'plane', movie: 'film', place: 'map-pin', chart: 'chart-bar', recurring: 'calendar-clock',
-  clock: 'clock', history: 'history', star: 'star', 'coming-home': 'house-heart', soup: 'soup',
+  clock: 'clock', history: 'history', star: 'star', 'coming-home': 'house-heart', soup: 'soup', chat: 'message-circle',
 };
 
 const dir = path.join(__dirname, '..', 'node_modules', 'lucide-static', 'icons');

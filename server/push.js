@@ -43,7 +43,7 @@ function cleanPrefs(p = {}) {
 }
 
 // 登録・更新。戻り値 false = 上限
-function upsert(room, subscription, who, prefs) {
+function upsert(room, subscription, who, prefs, seenThanks) {
   room.subs = room.subs || {};
   const existing = room.subs[subscription.endpoint];
   if (!existing && Object.keys(room.subs).length >= MAX_SUBS_PER_ROOM) return false;
@@ -51,6 +51,8 @@ function upsert(room, subscription, who, prefs) {
     subscription: { endpoint: subscription.endpoint, keys: { p256dh: subscription.keys.p256dh, auth: subscription.keys.auth } },
     who: who === 'b' ? 'b' : 'a',
     prefs: cleanPrefs(prefs),
+    // この端末で最後に見たありがとうの時刻（バッジの数に使う）
+    seenThanks: Math.max(existing?.seenThanks || 0, Number.isFinite(seenThanks) ? seenThanks : 0),
     last: existing ? existing.last : {},
   };
   return true;
@@ -61,7 +63,15 @@ function removeSub(room, endpoint) {
   return false;
 }
 
-async function sendTo(room, sub, payload) {
+// 通知には、その人のアイコンに出す数（badge）を必ず付ける。アプリを閉じていても数字が更新される
+function badgeFor(room, sub, now = new Date()) {
+  return Logic.badgeCount(sub.who, {
+    chores: list(room, 'chores'), log: list(room, 'log'), requests: list(room, 'requests'), thanks: list(room, 'thanks'),
+  }, now, sub.seenThanks || 0);
+}
+
+async function sendTo(room, sub, payload, now = new Date()) {
+  payload = { ...payload, badge: badgeFor(room, sub, now) };
   if (DRY_RUN) { sentLog.push({ endpoint: sub.subscription.endpoint, who: sub.who, ...payload }); return true; }
   try {
     await webpush.sendNotification(sub.subscription, JSON.stringify(payload), { TTL: 12 * 3600 });
@@ -183,12 +193,12 @@ async function tick(allRooms, now = new Date(), onDirty = () => {}) {
         sub.last.morning = today;
         onDirty(code, room);
         const msg = morningMessage(room, sub.who, sub.prefs, now);
-        if (msg && await sendTo(room, sub, msg)) sent++;
+        if (msg && await sendTo(room, sub, msg, now)) sent++;
       }
       if (sub.prefs.weekly && now.getDay() === 0 && sub.last.weekly !== today && nowMin >= 20 * 60 && nowMin < 23 * 60) {
         sub.last.weekly = today;
         onDirty(code, room);
-        if (await sendTo(room, sub, weeklyMessage(room, now))) sent++;
+        if (await sendTo(room, sub, weeklyMessage(room, now), now)) sent++;
       }
     }
   }

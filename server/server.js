@@ -293,7 +293,7 @@ async function handleApi(req, res, url) {
     const action = parts[4] || 'subscribe';
     if (action === 'subscribe') {
       if (!push.validSubscription(body.subscription)) return send(res, 400, { error: 'bad subscription' });
-      if (!push.upsert(room, body.subscription, body.who, body.prefs)) return send(res, 429, { error: 'too many devices' });
+      if (!push.upsert(room, body.subscription, body.who, body.prefs, Number(body.seenThanks))) return send(res, 429, { error: 'too many devices' });
       scheduleSave(code, room);
       return send(res, 200, { ok: true });
     }

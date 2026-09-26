@@ -290,3 +290,29 @@ test('rejects bad receipt images and enforces the daily limit', async () => {
   // 形式エラーは回数に数えない（上限 3）
   assert.deepStrictEqual(statuses, [200, 200, 200, 429]);
 });
+
+test('push payloads carry the badge count for the recipient', async () => {
+  const code = await newRoom();
+  const now = Date.now();
+  const sync = changes => post(`/api/rooms/${code}/sync`, { since: 0, changes });
+  await sync([
+    { col: 'chores', rec: { id: 'c1', title: '食器洗い', assignee: 'a', every: 1, points: 1, updatedAt: 1 } }, // a の今日の家事
+    { col: 'requests', rec: { id: 'r1', from: 'b', to: 'a', text: '電球', status: 'open', updatedAt: 1 } },
+  ]);
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a' });
+  const mine = async () => (await pushes()).filter(p => p.endpoint === SUB('badge-a').endpoint);
+
+  // b からありがとう → a に届く通知のバッジは 家事1 + お願い1 + ありがとう1 = 3
+  await sync([{ col: 'thanks', rec: { id: 't1', from: 'b', text: 'ありがとう', at: now, updatedAt: now } }]);
+  assert.strictEqual((await mine()).at(-1).badge, 3);
+
+  // a がありがとうを見た（seenThanks）あとは 2
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', seenThanks: now });
+  await sync([{ col: 'shopping', rec: { id: 's1', name: '牛乳', by: 'b', updatedAt: now + 1 } }]);
+  assert.strictEqual((await mine()).at(-1).badge, 2);
+
+  // 見た時刻は古い値で上書きされない
+  await post(`/api/rooms/${code}/push`, { subscription: SUB('badge-a'), who: 'a', seenThanks: 0 });
+  await sync([{ col: 'shopping', rec: { id: 's2', name: 'パン', by: 'b', updatedAt: now + 2 } }]);
+  assert.strictEqual((await mine()).at(-1).badge, 2);
+});

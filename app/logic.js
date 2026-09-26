@@ -129,6 +129,18 @@
     return s;
   }
 
+  // ---------- アプリのアイコンに出す数（バッジ） ----------
+  // その人が対応すること: 今日の担当家事、自分宛てのお願い、まだ見ていないありがとう、
+  // 代わりにやってもらった家事へのお礼
+  function badgeCount(who, data, now = new Date(), seenThanks = 0) {
+    const t = now.getTime();
+    const chores = dueChoresFor(who, data.chores || [], data.log || [], now).length;
+    const requests = alive(data.requests || []).filter(r => r.to === who && (r.status === 'open' || r.status === 'accepted')).length;
+    const thanks = alive(data.thanks || []).filter(x => x.from === other(who) && x.at > seenThanks && t - x.at < 7 * DAY).length;
+    const covers = alive(data.log || []).filter(l => l.cover && l.for === who && !l.thanked && t - l.at < 3 * DAY).length;
+    return chores + requests + thanks + covers;
+  }
+
   // ---------- 家計簿 ----------
   // 戻り値: b が a に払うべき金額（マイナスなら a が b に払う）
   function balance(expenses) {
@@ -192,6 +204,6 @@
   return {
     DAY, WEEKDAYS, PRESETS, STOCK_PRESETS, other, startOfDay, daysBetween, ymd, alive,
     lastDoneMap, lastLogOf, assigneeOf, choreStatus, scheduleLabel, choresWithStatus, dueChoresFor,
-    nextOccurrence, upcomingEvents, eventLabel, weekSummary, balance,
+    nextOccurrence, upcomingEvents, eventLabel, weekSummary, balance, badgeCount,
   };
 });

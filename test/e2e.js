@@ -287,6 +287,16 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   assert.strictEqual(await B.locator('.tabs button.active').getAttribute('data-tab'), 'budget');
   console.log('✓ quick add (+)');
 
+  // 「今日」タブの数字（対応することの数）: 家事を終えると減る
+  await nav(A, 'home');
+  const badge = () => A.evaluate(() => Number(document.querySelector('.tabs .tab-badge')?.textContent || 0));
+  const before = await badge();
+  assert.ok(before > 0, `badge ${before}`);
+  const firstChore = await A.locator('main [data-act=done-chore]').first().getAttribute('data-id');
+  await A.click(`main [data-act=done-chore][data-id="${firstChore}"]`);
+  assert.strictEqual(await badge(), before - 1);
+  console.log('✓ badge', before, '→', before - 1);
+
   // はじめての案内（招待する側）: 名前 → 招待リンク作成 → 通知 → 完了
   const [, C] = await mk();
   await C.evaluate(() => localStorage.clear()); await C.reload();

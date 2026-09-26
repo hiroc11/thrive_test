@@ -312,7 +312,7 @@ async function enablePush() {
   }
   device.push = { endpoint: sub.endpoint, prefs: device.push?.prefs || { ...DEFAULT_PUSH_PREFS } };
   persist();
-  await postPush('', { subscription: sub.toJSON(), who: device.me, prefs: device.push.prefs });
+  await postPush('', { subscription: sub.toJSON(), who: device.me, prefs: device.push.prefs, seenThanks: device.seenThanks || 0 });
   toast('通知をオンにしました');
 }
 
@@ -325,7 +325,7 @@ async function pushUpdate() {
     if (!sub) { device.push = null; persist(); return; }
     device.push.endpoint = sub.endpoint;
     persist();
-    await postPush('', { subscription: sub.toJSON(), who: device.me, prefs: device.push.prefs });
+    await postPush('', { subscription: sub.toJSON(), who: device.me, prefs: device.push.prefs, seenThanks: device.seenThanks || 0 });
   } catch (e) { /* オフラインなど。次回起動時に再送 */ }
 }
 
@@ -495,9 +495,38 @@ function render() {
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.getElementById('fab').hidden = tab === 'settings';
   view.innerHTML = screens[tab]();
+  markThanksSeen();
+  updateBadge();
   if (sheet.name) sheet.render();
   if (onboard.step) onboard.render();
 }
+
+// アプリのアイコンと「今日」タブに、対応することの数を出す
+function badgeData() {
+  return { chores: all('chores'), log: all('log'), requests: all('requests'), thanks: all('thanks') };
+}
+function updateBadge() {
+  const n = L.badgeCount(device.me, badgeData(), new Date(), device.seenThanks || 0);
+  const tabBtn = document.querySelector('.tabs button[data-tab=home]');
+  let dot = tabBtn.querySelector('.tab-badge');
+  if (n > 0) {
+    if (!dot) { dot = document.createElement('span'); dot.className = 'tab-badge'; tabBtn.appendChild(dot); }
+    dot.textContent = n > 99 ? '99+' : String(n);
+  } else if (dot) dot.remove();
+  if ('setAppBadge' in navigator) (n > 0 ? navigator.setAppBadge(n) : navigator.clearAppBadge()).catch(() => {});
+}
+
+// 「ありがとう」の画面を開いたら、届いたありがとうを見たことにする（ほかの端末の通知のバッジにも反映）
+function markThanksSeen() {
+  if (tab !== 'futari' || futariSeg !== 'thanks' || document.visibilityState !== 'visible') return;
+  const latest = Math.max(0, ...all('thanks').filter(t => t.from === other(device.me)).map(t => t.at || 0));
+  if (latest > (device.seenThanks || 0)) {
+    device.seenThanks = latest;
+    persist();
+    pushUpdate();
+  }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { markThanksSeen(); updateBadge(); } });
 
 // 相手の変更で再描画するとき、入力中の文字が消えないようにする
 function renderSoon() {

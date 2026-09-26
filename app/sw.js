@@ -1,4 +1,4 @@
-const CACHE = 'futari-v5';
+const CACHE = 'futari-v6';
 const ASSETS = ['./', 'index.html', 'style.css', 'icons.js', 'illustrations.js', 'logic.js', 'app.js', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(
@@ -15,16 +15,27 @@ self.addEventListener('fetch', e => {
 });
 
 // ---------- プッシュ通知 ----------
+// アプリのアイコンの数字（バッジ）。アプリを閉じていても通知が届くたびに更新する
+function setBadge(n) {
+  const nav = self.navigator;
+  if (!nav || !('setAppBadge' in nav) || typeof n !== 'number') return Promise.resolve();
+  return (n > 0 ? nav.setAppBadge(n) : nav.clearAppBadge()).catch(() => {});
+}
+
 self.addEventListener('push', e => {
   let data = {};
   try { data = e.data ? e.data.json() : {}; } catch (err) { data = { body: e.data && e.data.text() }; }
-  e.waitUntil(self.registration.showNotification(data.title || 'ふたりの暮らし', {
-    body: data.body || '',
-    icon: 'icon-192.png',
-    badge: 'icon-192.png',
-    tag: data.tag || undefined,
-    data: { tab: data.tab || 'home' },
-  }));
+  e.waitUntil(Promise.all([
+    self.registration.showNotification(data.title || 'ふたりの暮らし', {
+      body: data.body || '',
+      icon: 'icon-192.png',
+      badge: 'icon-192.png',
+      tag: data.tag || undefined,
+      renotify: !!data.tag,
+      data: { tab: data.tab || 'home' },
+    }),
+    setBadge(data.badge),
+  ]));
 });
 
 self.addEventListener('notificationclick', e => {

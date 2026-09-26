@@ -1,0 +1,70 @@
+# Fly.io へ自動デプロイする。
+# 必要なもの: リポジトリの Secret「FLY_API_TOKEN」（Fly.io のトークン）
+# 任意: リポジトリの Variable「FLY_APP_NAME」（未設定なら futari-<GitHubユーザー名>）
+name: Deploy to Fly.io
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, claude/fervent-albattani-sw182i]
+
+concurrency: fly-deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      APP: ${{ vars.FLY_APP_NAME || format('futari-{0}', github.repository_owner) }}
+      REGION: nrt
+    steps:
+      - name: Check token
+        id: token
+        run: |
+          if [ -z "$FLY_API_TOKEN" ]; then
+            echo "::warning::FLY_API_TOKEN が未設定のためデプロイをスキップしました（Settings → Secrets and variables → Actions で登録してください）"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.ok == 'true'
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+        if: steps.token.outputs.ok == 'true'
+
+      - name: Create app (first time only)
+        if: steps.token.outputs.ok == 'true'
+        run: |
+          if flyctl status -a "$APP" >/dev/null 2>&1; then
+            echo "app $APP exists"
+          else
+            flyctl apps create "$APP" --org personal
+          fi
+
+      - name: Create volume (first time only)
+        if: steps.token.outputs.ok == 'true'
+        run: |
+          if flyctl volumes list -a "$APP" --json | grep -q '"name": *"futari_data"'; then
+            echo "volume exists"
+          else
+            flyctl volumes create futari_data -a "$APP" --region "$REGION" --size 1 --yes
+          fi
+
+      - name: Deploy
+        if: steps.token.outputs.ok == 'true'
+        run: flyctl deploy -a "$APP" --remote-only --ha=false --primary-region "$REGION"
+
+      - name: Health check
+        if: steps.token.outputs.ok == 'true'
+        run: |
+          for i in $(seq 1 10); do
+            if curl -fsS "https://$APP.fly.dev/api/health"; then
+              echo
+              echo "### ✅ 公開しました: https://$APP.fly.dev" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 6
+          done
+          echo "health check failed"; exit 1

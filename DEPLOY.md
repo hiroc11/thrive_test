@@ -8,6 +8,29 @@
 - アプリを使っていないときはマシンが自動で止まり、そのぶん安くなります
 - 登録にはクレジットカードが必要です。料金は Fly.io の料金ページで最新の情報を確認してください
 
+## 方法A: ブラウザだけでデプロイ（GitHub Actions）
+
+PC でのコマンド操作は不要です。GitHub がかわりにデプロイします。
+
+1. **Fly.io のアカウントを作る**: https://fly.io で登録し、クレジットカードを登録します
+2. **トークンを作る**: Fly.io のダッシュボード左メニューの **Tokens** を開き、**Organization** の種類でトークンを作ります（組織は `personal`）。表示された文字列をコピーします
+   - アプリ単位の「Deploy token」ではなく、組織（Organization）のトークンにしてください。最初のデプロイでアプリを作るためです
+3. **GitHub に登録する**: GitHub のリポジトリページで **Settings → Secrets and variables → Actions → New repository secret** を開きます
+   - Name: `FLY_API_TOKEN`
+   - Secret: コピーしたトークン
+4. **デプロイを動かす**: リポジトリの **Actions** タブ → **Deploy to Fly.io** → 最新の実行の **Re-run all jobs** を押します
+   - 以後は、このブランチに push するたびに自動でデプロイされます
+5. 数分で完了します。実行結果の画面（Summary）に `https://futari-<GitHubユーザー名>.fly.dev` が表示されます
+
+アプリ名（URL）を変えたいときは、同じ画面の **Variables** タブで `FLY_APP_NAME` を追加してください（英小文字・数字・ハイフンのみ）。
+最初のデプロイでは、アプリとデータ用ディスクが自動で作られます。
+
+そのあとは、下の「4. スマホで使う」へ進んでください。
+
+---
+
+## 方法B: PC からデプロイ（flyctl）
+
 ## 1. 準備（最初の1回だけ）
 
 1. https://fly.io でアカウントを作ります

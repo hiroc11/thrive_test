@@ -101,6 +101,9 @@ jobs:
             if curl -fsS "https://$APP.fly.dev/api/health"; then
               echo
               echo "### ✅ 公開しました: https://$APP.fly.dev" >> "$GITHUB_STEP_SUMMARY"
+              features=$(curl -fsS "https://$APP.fly.dev/api/features" || echo '{}')
+              echo "features: $features"
+              echo "使える機能: $features" >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
             sleep 6

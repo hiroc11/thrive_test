@@ -14,5 +14,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
     "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "lucide-static": "^1.48.0"
   }
 }

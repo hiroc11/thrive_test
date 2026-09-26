@@ -10,11 +10,14 @@ const path = require('path');
 const PORT = 19000 + Math.floor(Math.random() * 1000);
 const URL = `http://localhost:${PORT}/`;
 const wait = ms => new Promise(r => setTimeout(r, ms));
-const SUBPAGES = ['events', 'budget', 'notes', 'settings'];
+// 画面の移動: タブ、設定（右上の歯車）、「ふたり」タブの中の切り替え
+const FUTARI = { futari: 'thanks', thanks: 'thanks', requests: 'requests', events: 'events', notes: 'notes' };
 async function nav(P, t) {
-  if (SUBPAGES.includes(t)) { await P.click('[data-tab=more]'); await P.click(`[data-goto=${t}]`); }
+  if (t === 'settings') await P.click('#settings-btn');
+  else if (FUTARI[t]) { await P.click('[data-tab=futari]'); await P.click(`[data-goto="futari/${FUTARI[t]}"]`); }
   else await P.click(`[data-tab=${t}]`);
 }
+const me = P => P.evaluate(() => JSON.parse(localStorage.getItem('futari-device-v2')).me);
 const text = P => P.locator('main').innerText();
 const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
 
@@ -53,33 +56,41 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
     log: [{ id: 'l1', choreId: 'c1', title: '食器洗い', by: 'a', at: Date.now() - 3600e3, points: 1 }],
     shopping: [], thanks: [], events: [{ id: 'e1', title: '結婚記念日', date: '2020-10-10', yearly: true }] })); });
   await A.reload();
-  assert.match(await A.locator('#me-toggle').innerText(), /ひろ/);
+  // 使っていたデータがあるので、はじめての案内は出ない
+  assert.ok(await A.locator('#onboard').isHidden());
+  assert.strictEqual(await me(A), 'a');
 
   const [cb, B] = await mk();
   await B.evaluate(() => localStorage.clear()); await B.reload();
+  // 新しい端末では案内が出る → スキップ
+  await B.waitForSelector('#onboard .ob-panel');
+  await B.click('#onboard [data-act=ob-skip]');
+  assert.ok(await B.locator('#onboard').isHidden());
   // B はつなぐ前に買い物を追加しておく
   await nav(B, 'shopping');
   await B.fill('input[name=name]', 'たまご'); await B.press('input[name=name]', 'Enter');
 
-  // A がコードを作る
+  // A が設定から招待リンクを作る
   await nav(A, 'settings');
-  await A.click('[data-act=create-room]');
+  await A.click('main [data-act=share-invite]');
   await A.waitForSelector('.code');
-  const code = (await A.locator('.code').innerText()).trim();
+  const code = (await A.locator('.code').innerText()).trim().replace('-', '');
   console.log('code', code);
 
-  // B が参加（小文字・ハイフン付きでも OK）
-  await nav(B, 'settings');
-  await B.fill('input[name=room]', code.toLowerCase());
-  await B.click('form[data-form=join] button');
-  await B.waitForSelector('.code');
-  await wait(800);
-  assert.match(await B.locator('#me-toggle').innerText(), /ゆき/);
+  // B が招待リンクを開く → 自動で参加 → 「あなたはどちら？」
+  await B.goto(`${URL}#join=${code}`);
+  await B.waitForSelector('#onboard .who');
+  await until(B, () => document.querySelector('#onboard').innerText.includes('ゆき'));
+  assert.match(await B.locator('#onboard .chip.on').innerText(), /ゆき/);
+  await B.click('#onboard [data-act=ob-step][data-id=notify]');
+  await B.click('#onboard [data-act=ob-step][data-id=done]');
+  await B.click('#onboard [data-act=ob-done]');
+  assert.strictEqual(await me(B), 'b');
   await nav(B, 'events');
   assert.match(await B.locator('main').innerText(), /結婚記念日/);
   await nav(A, 'shopping');
   await A.waitForFunction(() => document.querySelector('main').innerText.includes('たまご'), null, { timeout: 5000 });
-  console.log('✓ pairing merge');
+  console.log('✓ invite link + pairing merge');
 
   // リアルタイム
   await nav(B, 'shopping');
@@ -158,26 +169,30 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await until(B, () => document.querySelector('main').innerText.includes('代わりにやってくれました'));
   await B.click('[data-act=thank-cover]');
   assert.ok(!(await text(B)).includes('代わりにやってくれました'));
-  await nav(A, 'futari');
+  await nav(A, 'thanks');
   await until(A, () => document.querySelector('main').innerText.includes('代わりに「洗濯」をやってくれてありがとう'));
   console.log('✓ cover + thanks');
 
   // リアクション
   await A.click('li:has-text("代わりに「洗濯」") [data-act=react][data-r="❤️"]');
-  await nav(B, 'futari');
-  await until(B, () => document.querySelector('main').innerText.includes('から ❤️'));
+  await nav(B, 'thanks');
+  await until(B, () => !!document.querySelector('main li .muted .react-ic'));
   console.log('✓ reaction');
 
   // お願い: B → A、A が引き受けて完了、B がありがとう
+  await nav(B, 'requests');
   await B.fill('form[data-form=request] input[name=text]', '電球を替えてほしい');
   await B.click('form[data-form=request] .btn');
   await nav(A, 'home');
   await until(A, () => document.querySelector('main').innerText.includes('からのお願い 1件'));
-  await nav(A, 'futari');
+  assert.match(await A.locator('.tabs').innerText(), /ふたり/);
+  await nav(A, 'requests');
+  assert.strictEqual(await A.locator('.seg.on .dot-count').innerText(), '1');
   await A.click('[data-act=req-accept]');
   await A.click('[data-act=req-done]');
   await until(B, () => !!document.querySelector('[data-act=req-thanks]'));
   await B.click('[data-act=req-thanks]');
+  await nav(A, 'thanks');
   await until(A, () => document.querySelector('main').innerText.includes('「電球を替えてほしい」をやってくれてありがとう'));
   const summary = await A.locator('table.summary').innerText();
   assert.match(summary, /お願いに応えた\s+1回\s+0回/, summary);
@@ -247,6 +262,49 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await A.click('summary:has-text("Wi-Fi")');
   await until(A, () => document.querySelector('details textarea')?.value.includes('456'));
   console.log('✓ notes');
+
+  // ＋ボタン: 買い物・家事・ありがとう・レシート
+  await nav(B, 'home');
+  await B.click('#fab');
+  await B.click('#sheet [data-act=sheet][data-id=shop]');
+  await B.fill('#sheet input[name=name]', 'ヨーグルト'); await B.press('#sheet input[name=name]', 'Enter');
+  assert.ok(await B.locator('#sheet').isHidden());
+  await nav(A, 'shopping');
+  await until(A, () => document.querySelector('main').innerText.includes('ヨーグルト'));
+  await B.click('#fab');
+  await B.click('#sheet [data-act=sheet][data-id=chore]');
+  await B.click('#sheet [data-act=done-chore][data-id=c1]');
+  await nav(A, 'chores');
+  await until(A, () => [...document.querySelectorAll('main li')].some(li => /食器洗い/.test(li.innerText) && /ゆきちゃん/.test(li.innerText) && li.querySelector('[data-act=undo-log]')));
+  await B.click('#fab');
+  await B.click('#sheet [data-act=sheet][data-id=thanks]');
+  await B.fill('#sheet textarea', 'ゴミ出しありがとう'); await B.click('#sheet .btn');
+  await nav(A, 'thanks');
+  await until(A, () => document.querySelector('main').innerText.includes('ゴミ出しありがとう'));
+  await B.click('#fab');
+  await B.setInputFiles('#sheet input[data-act=receipt]', path.join(__dirname, '..', 'app', 'icon-192.png'));
+  await until(B, () => document.querySelector('form[data-form=expense] input[name=title]')?.value === 'ドラッグストア');
+  assert.strictEqual(await B.locator('.tabs button.active').getAttribute('data-tab'), 'budget');
+  console.log('✓ quick add (+)');
+
+  // はじめての案内（招待する側）: 名前 → 招待リンク作成 → 通知 → 完了
+  const [, C] = await mk();
+  await C.evaluate(() => localStorage.clear()); await C.reload();
+  await C.waitForSelector('#onboard form[data-form=ob-names]');
+  await C.fill('#onboard input[name=me]', 'けん'); await C.fill('#onboard input[name=partner]', 'さき');
+  await C.click('#onboard form[data-form=ob-names] .btn');
+  await until(C, () => document.querySelector('#onboard h1').innerText.includes('さきを招待'));
+  await C.click('#onboard [data-act=share-invite]');
+  await C.waitForSelector('#onboard .invite-url');
+  assert.match(await C.locator('#onboard .invite-url').innerText(), /#join=[A-Z2-9]{10}$/);
+  await C.click('#onboard [data-act=ob-step][data-id=notify]');
+  await C.click('#onboard [data-act=ob-step][data-id=done]');
+  await C.click('#onboard [data-act=ob-done]');
+  assert.match(await text(C), /今日やること（けん）/);
+  await C.reload();
+  assert.ok(await C.locator('#onboard').isHidden()); // 2回目は出ない
+  assert.deepStrictEqual(C.errs, []);
+  console.log('✓ onboarding');
 
   // 通知の設定カードが表示される（実際の購読はテスト環境ではできない）
   await nav(A, 'settings');

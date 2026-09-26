@@ -16,20 +16,26 @@
 </head>
 <body>
   <header class="top">
-    <div class="title-wrap"><button id="back" class="icon-btn back" aria-label="戻る" hidden>‹</button><h1 id="page-title">ホーム</h1><span id="sync-status" class="sync-dot" role="img"></span></div>
-    <button id="me-toggle" class="chip" aria-label="操作している人を切り替え"></button>
+    <div class="title-wrap"><button id="back" class="icon-btn back" aria-label="戻る" hidden></button><h1 id="page-title">今日</h1><span id="sync-status" class="sync-dot" role="img"></span></div>
+    <button id="settings-btn" class="icon-btn head-btn" aria-label="設定"></button>
   </header>
 
   <main id="view"></main>
 
+  <button id="fab" class="fab" aria-label="記録する"></button>
+  <div id="sheet" class="sheet" hidden></div>
+  <div id="onboard" class="onboard" hidden></div>
+
   <nav class="tabs">
-    <button data-tab="home"><span>🏠</span>ホーム</button>
-    <button data-tab="chores"><span>🧹</span>家事</button>
-    <button data-tab="shopping"><span>🛒</span>買い物</button>
-    <button data-tab="futari"><span>💞</span>ふたり</button>
-    <button data-tab="more"><span>☰</span>その他</button>
+    <button data-tab="home">今日</button>
+    <button data-tab="chores">家事</button>
+    <button data-tab="shopping">買い物</button>
+    <button data-tab="budget">家計簿</button>
+    <button data-tab="futari">ふたり</button>
   </nav>
 
+  <script src="icons.js"></script>
+  <script src="illustrations.js"></script>
   <script src="logic.js"></script>
   <script src="app.js"></script>
 </body>

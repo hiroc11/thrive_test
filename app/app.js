@@ -410,55 +410,116 @@ async function readReceipt(file) {
   return res.json();
 }
 
+// ---------- 招待リンク ----------
+const inviteUrl = () => `${serverBase()}/#join=${device.sync.room}`;
+const defaultServer = () => (/^https?:$/.test(location.protocol) ? location.origin : device.lastServer || '');
+
+// まだつないでいなければ共有コードを作ってから、招待リンクを LINE などで送る
+async function shareInvite() {
+  if (!sync.enabled) {
+    const server = defaultServer();
+    if (!server) { toast('同期サーバーのURLを設定してください'); return; }
+    const code = await createRoom(server);
+    await joinRoom(server, code, device.me);
+  }
+  const url = inviteUrl();
+  const text = `${name(device.me)}から「ふたりの暮らし」への招待です。リンクを開くと、ふたりの家事や買い物リストがつながります。`;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'ふたりの暮らし', text, url }); return; } catch (e) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  try { await navigator.clipboard.writeText(`${text}\n${url}`); toast('招待リンクをコピーしました。LINE などに貼り付けて送ってください'); }
+  catch (e) { toast('リンクをコピーできませんでした。表示されているリンクを長押しでコピーしてください'); }
+}
+
+// 招待リンク（#join=コード）で開かれたとき
+async function joinFromLink(code) {
+  try { history.replaceState(null, '', location.pathname); } catch (e) { /* 無視 */ }
+  if (device.sync?.room === code) return;
+  if (device.sync && !confirm('別のふたりの共有に参加しますか？今の同期は解除されます（この端末のデータは残ります）')) return;
+  if (device.sync) { await disablePush(); leaveRoom(); }
+  try {
+    await joinRoom(defaultServer(), code, 'b');
+    toast('つながりました！');
+    onboard.open('who');
+  } catch (e) {
+    toast(e.message.startsWith('共有') ? '招待リンクが無効です。もう一度送ってもらってください' : 'サーバーにつながりません');
+  }
+}
+
 // ---------- 画面 ----------
 const view = document.getElementById('view');
-const TABS = ['home', 'chores', 'shopping', 'futari', 'more'];
-const SUBPAGES = ['events', 'budget', 'notes', 'settings'];
-const titles = {
-  home: 'ホーム', chores: '家事', shopping: '買い物', futari: 'ふたり', more: 'その他',
-  events: '記念日', budget: '家計簿', notes: '共有メモ', settings: '設定',
-};
-let tab = TABS.includes(location.hash.slice(1)) || SUBPAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
+const sheetEl = document.getElementById('sheet');
+const onboardEl = document.getElementById('onboard');
+const TABS = ['home', 'chores', 'shopping', 'budget', 'futari'];
+const TAB_ICONS = { home: 'home', chores: 'chores', shopping: 'shopping', budget: 'budget', futari: 'futari' };
+const titles = { home: '今日', chores: '家事', shopping: '買い物', budget: '家計簿', futari: 'ふたり', settings: '設定' };
+const FUTARI_SEGS = { thanks: 'ありがとう', requests: 'お願い', events: '記念日', notes: 'メモ' };
+let tab = 'home';
+let futariSeg = 'thanks';
+let prevTab = 'home';
 let ui = {}; // 画面ごとの一時的な状態（編集中の家事、開いているメモなど）
 let renderDeferred = false;
 
-function go(t) {
-  if (!titles[t]) return;
-  tab = t;
+// #chores や #futari/events などの URL から画面を決める（昔の #events・#notes・#more にも対応）
+function route(hash) {
+  const [t, seg] = hash.replace(/^#/, '').split('/');
+  if (t === 'events' || t === 'notes') return { tab: 'futari', seg: t };
+  if (t === 'futari') return { tab: 'futari', seg: FUTARI_SEGS[seg] ? seg : null };
+  if (titles[t]) return { tab: t };
+  return { tab: 'home' };
+}
+{
+  const r = route(location.hash);
+  tab = r.tab;
+  if (r.seg) futariSeg = r.seg;
+}
+
+function go(t, seg) {
+  const r = route(seg ? `${t}/${seg}` : t);
+  if (r.tab === 'settings' && tab !== 'settings') prevTab = tab; // 設定から戻る先
+  tab = r.tab;
+  if (r.seg) futariSeg = r.seg;
   ui = {};
-  try { history.replaceState(null, '', `#${t}`); } catch (e) { /* 無視 */ }
+  try { history.replaceState(null, '', `#${tab}${tab === 'futari' ? '/' + futariSeg : ''}`); } catch (e) { /* 無視 */ }
   render();
   window.scrollTo(0, 0);
 }
 
 function render() {
   renderDeferred = false;
-  const sub = SUBPAGES.includes(tab);
   document.getElementById('page-title').textContent = titles[tab];
-  document.getElementById('back').hidden = !sub;
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === (sub ? 'more' : tab)));
-  document.getElementById('me-toggle').textContent = `👤 ${name(device.me)}`;
+  document.getElementById('back').hidden = tab !== 'settings';
+  document.getElementById('settings-btn').hidden = tab === 'settings';
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('fab').hidden = tab === 'settings';
   view.innerHTML = screens[tab]();
+  if (sheet.name) sheet.render();
+  if (onboard.step) onboard.render();
 }
 
 // 相手の変更で再描画するとき、入力中の文字が消えないようにする
 function renderSoon() {
   const a = document.activeElement;
-  if (a && view.contains(a) && a.matches('input, textarea, select')) renderDeferred = true;
+  if (a && a.matches('input, textarea, select') && (view.contains(a) || sheetEl.contains(a) || onboardEl.contains(a))) renderDeferred = true;
   else render();
 }
-view.addEventListener('focusout', () => setTimeout(() => {
-  if (renderDeferred && !view.contains(document.activeElement)) render();
+document.addEventListener('focusout', () => setTimeout(() => {
+  const a = document.activeElement;
+  if (renderDeferred && !(a && a.matches('input, textarea, select'))) render();
 }, 0));
 
 // ---------- 画面の部品 ----------
+const ic = (name, cls) => window.icon(name, cls);
+
 function balanceCard() {
   const p = weekPoints();
   const total = p.a + p.b;
   const pa = total ? Math.round((p.a / total) * 100) : 50;
   return `
     <div class="card">
-      <h2>この7日間の家事バランス</h2>
+      <h2>${ic('scale')} この7日間の家事バランス</h2>
       <div class="balance">
         <div style="width:${pa}%;background:var(--a)"></div>
         <div style="width:${100 - pa}%;background:var(--b)"></div>
@@ -471,18 +532,18 @@ function balanceCard() {
     </div>`;
 }
 
-const ROTATE_LABEL = { each: '🔁 毎回交代', weekly: '🔁 毎週交代' };
+const ROTATE_LABEL = { each: '毎回交代', weekly: '毎週交代' };
 
 function choreItem({ c, st, who }, withMenu) {
   return `
     <li>
-      <button class="check" data-act="done-chore" data-id="${esc(c.id)}" aria-label="完了にする"></button>
+      <button class="check" data-act="done-chore" data-id="${esc(c.id)}" aria-label="完了にする">${ic('check')}</button>
       <div class="grow">
         <div class="title">${esc(c.title)}</div>
-        <div class="muted">${esc(L.scheduleLabel(c))} · ${c.points}pt · ${esc(st.label)}${c.rotate && c.assignee !== 'both' ? ` · ${ROTATE_LABEL[c.rotate]}` : ''}</div>
+        <div class="muted">${esc(L.scheduleLabel(c))} · ${c.points}pt · ${esc(st.label)}${c.rotate && c.assignee !== 'both' ? ` · ${ic('repeat', 'sm')}${ROTATE_LABEL[c.rotate]}` : ''}</div>
       </div>
       <span class="tag ${esc(who)}">${esc(name(who))}</span>
-      ${withMenu ? `<button class="icon-btn" data-act="edit-chore" data-id="${esc(c.id)}" aria-label="編集">✏️</button>` : ''}
+      ${withMenu ? `<button class="icon-btn" data-act="edit-chore" data-id="${esc(c.id)}" aria-label="編集">${ic('edit')}</button>` : ''}
     </li>`;
 }
 
@@ -525,7 +586,9 @@ function choreForm(c) {
     </form>`;
 }
 
-const REACTIONS = ['❤️', '😊', '🙏', '😂'];
+// リアクションは保存・通知では絵文字のまま扱い、画面ではイラストのアイコンで表示する
+const REACTIONS = [['❤️', 'heart', 'すき'], ['😊', 'smile', 'うれしい'], ['🙏', 'hand-heart', 'たすかる'], ['😂', 'laugh', 'わらった']];
+const reactionIcon = r => { const x = REACTIONS.find(([e]) => e === r); return x ? ic(x[1], 'react-ic') : esc(r); };
 
 function thanksItem(t) {
   const me = device.me;
@@ -535,30 +598,31 @@ function thanksItem(t) {
       <span class="tag ${esc(t.from)}">${esc(name(t.from))}</span>
       <div class="grow">
         <div class="note">${esc(t.text)}</div>
-        <div class="muted">${fmtDate(t.at)}${mine && t.reaction ? ` · ${esc(name(other(t.from)))}から ${esc(t.reaction)}` : ''}</div>
-        ${mine ? '' : `<div class="reactions">${REACTIONS.map(r => `<button class="react ${t.reaction === r ? 'on' : ''}" data-act="react" data-id="${esc(t.id)}" data-r="${r}" aria-label="${r}">${r}</button>`).join('')}</div>`}
+        <div class="muted">${fmtDate(t.at)}${mine && t.reaction ? ` · ${esc(name(other(t.from)))}から ${reactionIcon(t.reaction)}` : ''}</div>
+        ${mine ? '' : `<div class="reactions">${REACTIONS.map(([r, icn, label]) => `<button class="react ${t.reaction === r ? 'on' : ''}" data-act="react" data-id="${esc(t.id)}" data-r="${r}" aria-label="${label}">${ic(icn, 'react-ic')}</button>`).join('')}</div>`}
       </div>
-      ${mine ? `<button class="icon-btn" data-act="del-thanks" data-id="${esc(t.id)}" aria-label="削除">🗑</button>` : ''}
+      ${mine ? `<button class="icon-btn" data-act="del-thanks" data-id="${esc(t.id)}" aria-label="削除">${ic('trash')}</button>` : ''}
     </li>`;
 }
 
 function calendarCard() {
+  const head = `<h2>${ic('days')} カレンダーに表示</h2>`;
   if (!sync.enabled) {
-    return `<div class="card"><h2>📆 カレンダーに表示</h2>
-      <p class="muted">ふたりの同期をつなぐと、記念日やお願いの期日を Google カレンダー・iPhone のカレンダーに表示できます。</p></div>`;
+    return `<div class="card">${head}
+      <p class="muted">パートナーとつなぐと、記念日やお願いの期日を Google カレンダー・iPhone のカレンダーに表示できます。</p></div>`;
   }
   if (!device.calToken) {
-    return `<div class="card"><h2>📆 カレンダーに表示</h2>
+    return `<div class="card">${head}
       <p class="muted">記念日・お願いの期日（・曜日で決めた家事）を、Google カレンダーや iPhone のカレンダーに表示できます。</p>
       <button class="btn" data-act="cal-create">カレンダー用のURLを作る</button></div>`;
   }
   const l = calendarLinks(device.calToken, device.calChores);
-  return `<div class="card"><h2>📆 カレンダーに表示</h2>
+  return `<div class="card">${head}
     <label class="toggle"><input type="checkbox" data-act="cal-chores" ${device.calChores ? 'checked' : ''}> 曜日で決めた家事も入れる</label>
     <div class="btn-col" style="margin-top:10px">
       <a class="btn" href="${esc(l.webcal)}">iPhone・Mac のカレンダーに追加</a>
       <a class="btn ghost" href="${esc(l.google)}" target="_blank" rel="noopener">Google カレンダーに追加</a>
-      <button class="btn small ghost" data-act="cal-copy">URLをコピー</button>
+      <button class="btn small ghost" data-act="cal-copy">${ic('copy')} URLをコピー</button>
     </div>
     <p class="muted">カレンダー側で定期的に読み込まれます（Google は反映まで数時間かかることがあります）。カレンダーからアプリへの書き込みはできません。</p>
     <p class="muted">Google カレンダーは、パソコンのブラウザで開いて「追加」を押すと確実です。</p>
@@ -566,7 +630,48 @@ function calendarCard() {
   </div>`;
 }
 
+const receiptAvailable = () => sync.enabled && features.receipt !== false;
+
+function receiptButton() {
+  if (!receiptAvailable()) return '';
+  return `<label class="btn ghost receipt-btn ${ui.reading ? 'disabled' : ''}">${ui.reading ? '読み取り中…' : `${ic('camera')} レシート・スクショから読み取る`}
+    <input type="file" accept="image/*" data-act="receipt" hidden ${ui.reading ? 'disabled' : ''}>
+  </label>`;
+}
+
+function expenseForm(r) {
+  const me = device.me;
+  return `
+    <form class="add" data-form="expense">
+      <input name="title" placeholder="例: スーパー / 電気代" required maxlength="40" value="${esc(r?.store || '')}">
+      <div class="row">
+        <input name="amount" type="number" inputmode="numeric" min="1" max="10000000" placeholder="金額（円）" required value="${r?.total || ''}">
+        <input name="date" type="date" value="${esc(r?.date || today())}" required>
+      </div>
+      <div class="row">
+        <label class="field">払った人
+          <select name="paidBy"><option value="a" ${me === 'a' ? 'selected' : ''}>${esc(name('a'))}</option><option value="b" ${me === 'b' ? 'selected' : ''}>${esc(name('b'))}</option></select>
+        </label>
+        <label class="field">だれの分
+          <select name="split"><option value="half">ふたりの分（半分ずつ）</option><option value="other">相手の分（立て替え）</option><option value="self">自分の分（精算しない）</option></select>
+        </label>
+      </div>
+      <button class="btn">記録</button>
+    </form>`;
+}
+
 const REQUEST_STATUS = { open: 'お返事待ち', accepted: '引き受け済み', done: '完了', declined: 'むずかしい' };
+
+function inviteCard() {
+  return `<div class="card hint invite-card">
+    ${illustration('invite', 'small')}
+    <div>
+      <h2>パートナーを招待しましょう</h2>
+      <p class="muted">招待リンクを LINE などで送るだけで、家事や買い物リストがふたりのスマホでつながります。</p>
+      <button class="btn small" data-act="share-invite">${ic('share')} 招待リンクを送る</button>
+    </div>
+  </div>`;
+}
 
 // ---------- 各画面 ----------
 const screens = {
@@ -582,46 +687,37 @@ const screens = {
     const lowStock = all('stock').filter(s => s.low).length;
     const showPushHint = sync.enabled && pushSupported() && (!isIos || isStandalone()) && !device.push && !device.pushHintOff;
     return `
-      ${!sync.enabled ? `<div class="card hint">
-        <h2>ふたりの端末をつなげましょう</h2>
-        <p class="muted">共有コードでつなぐと、家事や買い物リストがふたりのスマホで自動的に同期されます。</p>
-        <button class="btn small" data-goto="settings">つなぐ</button>
-      </div>` : ''}
+      ${!sync.enabled ? inviteCard() : ''}
       ${showPushHint ? `<div class="card hint">
-        <h2>🔔 通知をオンにしませんか？</h2>
+        <h2>${ic('bell')} 通知をオンにしませんか？</h2>
         <p class="muted">朝の家事リマインド、買い物リストの追加、ありがとうやお願いが届いたときにお知らせします。</p>
         <div class="btn-row"><button class="btn small" data-act="enable-push">オンにする</button><button class="btn small ghost" data-act="push-hint-off">あとで</button></div>
       </div>` : ''}
       ${covered.map(l => `<div class="card hint">
-        <h2>🧹 ${esc(name(l.by))}が代わりにやってくれました</h2>
+        <h2>${ic('sparkles')} ${esc(name(l.by))}が代わりにやってくれました</h2>
         <p>「${esc(l.title)}」 <span class="muted">${fmtDate(l.at)}</span></p>
         <button class="btn small" data-act="thank-cover" data-id="${esc(l.id)}">ありがとうを送る</button>
       </div>`).join('')}
       ${requests.length ? `<div class="card">
-        <h2>🙏 ${esc(name(other(me)))}からのお願い ${requests.length}件</h2>
+        <h2>${ic('request')} ${esc(name(other(me)))}からのお願い ${requests.length}件</h2>
         <ul class="list">${requests.slice(0, 3).map(r => `<li><div class="grow">${esc(r.text)}</div><span class="muted">${REQUEST_STATUS[r.status]}</span></li>`).join('')}</ul>
-        <button class="btn small ghost" data-goto="futari">見る</button>
+        <button class="btn small ghost" data-goto="futari/requests">見る</button>
       </div>` : ''}
       <div class="card">
-        <h2>今日やること（${esc(name(me))}）</h2>
-        ${mine.length ? `<ul class="list">${mine.map(x => choreItem(x, false)).join('')}</ul>` : '<p class="empty">今日の担当家事はありません 🎉</p>'}
+        <h2>${ic('list')} 今日やること（${esc(name(me))}）</h2>
+        ${mine.length ? `<ul class="list">${mine.map(x => choreItem(x, false)).join('')}</ul>`
+          : `<div class="empty-illust">${illustration('relax', 'small')}<p class="empty">今日の担当家事はありません</p></div>`}
         ${due.length > mine.length ? `<p class="muted">${esc(name(other(me)))}の担当で残っている家事: ${due.length - mine.length}件（代わりにやると伝わります）</p>` : ''}
       </div>
       ${balanceCard()}
-      <div class="card">
-        <h2>次の記念日</h2>
-        ${up ? (() => { const l = L.eventLabel(up); return `<div class="big">${esc(l.when)}</div><div>${esc(up.ev.title)}${esc(l.extra)} · ${l.dateText}</div>`; })()
-             : '<p class="empty">その他 → 記念日 から登録できます</p>'}
+      <div class="tiles">
+        <button class="tile" data-goto="shopping">${ic('shopping')}<span class="tile-num">${shopLeft}</span><span class="tile-label">買うもの${lowStock ? `・残りわずか${lowStock}` : ''}</span></button>
+        <button class="tile" data-goto="futari/events">${ic('calendar')}<span class="tile-num">${up ? esc(L.eventLabel(up).when) : '―'}</span><span class="tile-label">${up ? esc(up.ev.title) : '記念日を登録'}</span></button>
       </div>
       <div class="card">
-        <h2>最近のありがとう</h2>
+        <h2>${ic('thanks')} 最近のありがとう</h2>
         ${lastThanks ? `<ul class="list">${thanksItem(lastThanks)}</ul>` : '<p class="empty">小さなことでも「ありがとう」を残してみましょう</p>'}
-        <p><button class="btn small" data-goto="futari">ありがとうを書く</button></p>
-      </div>
-      <div class="card">
-        <h2>買い物リスト</h2>
-        <p>${shopLeft ? `未購入 ${shopLeft}件` : '買うものはありません'}${lowStock ? ` · 残りわずか ${lowStock}件` : ''}</p>
-        <button class="btn small ghost" data-goto="shopping">開く</button>
+        <p><button class="btn small" data-act="sheet" data-id="thanks">ありがとうを書く</button></p>
       </div>`;
   },
 
@@ -633,33 +729,33 @@ const screens = {
     const existing = new Set(all('chores').map(c => c.title));
     const cat = ui.presetCat ?? 0;
     return `
-      ${editing ? `<div class="card hint"><h2>家事を編集</h2>${choreForm(editing)}</div>` : ''}
+      ${editing ? `<div class="card hint"><h2>${ic('edit')} 家事を編集</h2>${choreForm(editing)}</div>` : ''}
       <div class="card">
-        <h2>家事リスト</h2>
+        <h2>${ic('chores')} 家事リスト</h2>
         ${list.length ? `<ul class="list">${list.map(x => choreItem(x, true)).join('')}</ul>` : '<p class="empty">家事を追加しましょう</p>'}
       </div>
       <div class="card">
-        <h2>よくある家事から選ぶ</h2>
+        <h2>${ic('sparkles')} よくある家事から選ぶ</h2>
         <div class="chips">${L.PRESETS.map((p, i) => `<button class="chip ${i === cat ? 'on' : ''}" data-act="preset-cat" data-id="${i}">${esc(p.cat)}</button>`).join('')}</div>
         <ul class="list">${L.PRESETS[cat].items.map((p, i) => `
           <li>
             <div class="grow"><div class="title">${esc(p.title)}</div><div class="muted">${esc(L.scheduleLabel(p))} · ${p.points}pt</div></div>
-            ${existing.has(p.title) ? '<span class="muted">✓ 追加済み</span>' : `<button class="btn small" data-act="add-preset" data-id="${i}">＋ 追加</button>`}
+            ${existing.has(p.title) ? `<span class="muted">${ic('check', 'sm')} 追加済み</span>` : `<button class="btn small" data-act="add-preset" data-id="${i}">${ic('plus', 'sm')} 追加</button>`}
           </li>`).join('')}</ul>
-        <p class="muted">追加した家事は、あとから ✏️ で担当や曜日を変えられます。</p>
+        <p class="muted">追加した家事は、あとから鉛筆のボタンで担当や曜日を変えられます。</p>
       </div>
       <div class="card">
-        <h2>自分で追加</h2>
+        <h2>${ic('plus')} 自分で追加</h2>
         ${choreForm(null)}
       </div>
       ${balanceCard()}
       <div class="card">
-        <h2>最近の記録</h2>
+        <h2>${ic('review')} 最近の記録</h2>
         ${log.length ? `<ul class="list">${log.map(l => `
           <li>
             <span class="tag ${esc(l.by)}">${esc(name(l.by))}</span>
             <div class="grow"><div class="title">${esc(l.title)}${l.cover ? ' <span class="badge">代わりに</span>' : ''}</div><div class="muted">${fmtDate(l.at)} · ${l.points}pt</div></div>
-            <button class="icon-btn" data-act="undo-log" data-id="${esc(l.id)}" aria-label="取り消し">↩︎</button>
+            <button class="icon-btn" data-act="undo-log" data-id="${esc(l.id)}" aria-label="取り消し">${ic('undo')}</button>
           </li>`).join('')}</ul>` : '<p class="empty">まだ記録がありません</p>'}
       </div>`;
   },
@@ -676,20 +772,20 @@ const screens = {
       <div class="card">
         ${items.length ? `<ul class="list">${items.map(s => `
           <li class="${s.done ? 'done' : ''}">
-            <button class="check ${s.done ? 'on' : ''}" data-act="toggle-shop" data-id="${esc(s.id)}" aria-label="購入済みにする">${s.done ? '✓' : ''}</button>
+            <button class="check ${s.done ? 'on' : ''}" data-act="toggle-shop" data-id="${esc(s.id)}" aria-label="購入済みにする">${ic('check')}</button>
             <div class="grow"><div class="title">${esc(s.name)}</div><div class="muted">${esc(name(s.by))}が追加${s.stockId ? ' · 在庫から' : ''}</div></div>
-            <button class="icon-btn" data-act="del-shop" data-id="${esc(s.id)}" aria-label="削除">🗑</button>
+            <button class="icon-btn" data-act="del-shop" data-id="${esc(s.id)}" aria-label="削除">${ic('trash')}</button>
           </li>`).join('')}</ul>` : '<p class="empty">買うものはありません</p>'}
         ${items.some(s => s.done) ? '<p><button class="btn small ghost" data-act="clear-shop">購入済みを消す</button></p>' : ''}
       </div>
       <div class="card">
-        <h2>在庫チェック</h2>
+        <h2>${ic('package')} 在庫チェック</h2>
         <p class="muted">「少ない」にすると買い物リストに自動で入ります。買ったら「ある」に戻ります。</p>
         ${stock.length ? `<ul class="list">${stock.map(s => `
           <li>
             <div class="grow"><div class="title">${esc(s.name)}</div></div>
             <button class="stock-btn ${s.low ? 'low' : ''}" data-act="toggle-stock" data-id="${esc(s.id)}">${s.low ? '少ない' : 'ある'}</button>
-            <button class="icon-btn" data-act="del-stock" data-id="${esc(s.id)}" aria-label="削除">🗑</button>
+            <button class="icon-btn" data-act="del-stock" data-id="${esc(s.id)}" aria-label="削除">${ic('trash')}</button>
           </li>`).join('')}</ul>` : `<p><button class="btn small ghost" data-act="stock-presets">よくある日用品を追加</button></p>`}
         <form class="add" data-form="stock" style="margin-top:10px">
           <div class="row"><input name="name" placeholder="例: 洗濯洗剤" required maxlength="40"><button class="btn ghost" style="flex:0 0 auto">追加</button></div>
@@ -697,122 +793,7 @@ const screens = {
       </div>`;
   },
 
-  futari() {
-    const me = device.me;
-    const s = L.weekSummary({ log: all('log'), thanks: all('thanks'), requests: all('requests') });
-    const reqs = all('requests').sort(byNewest);
-    const forMe = reqs.filter(r => r.to === me && (r.status === 'open' || r.status === 'accepted'));
-    const fromMe = reqs.filter(r => r.from === me && r.status !== 'done');
-    const done = reqs.filter(r => r.status === 'done' && Date.now() - (r.doneAt || 0) < 14 * DAY);
-    const thanks = all('thanks').sort(byNewest);
-    const row = (label, key, unit) => `<tr><th>${label}</th><td>${s[key].a}${unit}</td><td>${s[key].b}${unit}</td></tr>`;
-    const covers = s.cover.a + s.cover.b;
-    return `
-      <div class="card">
-        <h2>📝 この7日間のふりかえり</h2>
-        <table class="summary">
-          <tr><th></th><td><span class="tag a">${esc(name('a'))}</span></td><td><span class="tag b">${esc(name('b'))}</span></td></tr>
-          ${row('家事', 'chores', '回')}${row('ポイント', 'points', 'pt')}${row('ありがとう', 'thanks', '回')}${row('お願いに応えた', 'requestsDone', '回')}
-        </table>
-        <p class="muted">${covers ? `代わりにやった家事が${covers}回ありました。` : ''}${s.thanks.a + s.thanks.b ? 'ありがとうを伝え合えていますね。' : '今週はまだありがとうがありません。ひとこと送ってみませんか？'}</p>
-      </div>
-      <div class="card">
-        <h2>🙏 ${esc(name(other(me)))}へのお願い</h2>
-        <form class="add" data-form="request">
-          <input name="text" placeholder="例: 今度の休みに電球を替えてほしい" required maxlength="100">
-          <div class="row"><label class="field">いつまでに（任意）<input type="date" name="due"></label></div>
-          <button class="btn">お願いする</button>
-        </form>
-      </div>
-      ${forMe.length ? `<div class="card hint">
-        <h2>${esc(name(other(me)))}からのお願い</h2>
-        <ul class="list">${forMe.map(r => `
-          <li>
-            <div class="grow"><div class="title">${esc(r.text)}</div><div class="muted">${r.due ? `${esc(r.due)}まで · ` : ''}${REQUEST_STATUS[r.status]}</div></div>
-            <div class="btn-col">${r.status === 'open'
-              ? `<button class="btn small" data-act="req-accept" data-id="${esc(r.id)}">引き受ける</button><button class="btn small ghost" data-act="req-decline" data-id="${esc(r.id)}">むずかしい</button>`
-              : `<button class="btn small" data-act="req-done" data-id="${esc(r.id)}">やった！</button>`}</div>
-          </li>`).join('')}</ul>
-      </div>` : ''}
-      ${fromMe.length ? `<div class="card">
-        <h2>お願いしたこと</h2>
-        <ul class="list">${fromMe.map(r => `
-          <li>
-            <div class="grow"><div class="title">${esc(r.text)}</div><div class="muted">${r.due ? `${esc(r.due)}まで · ` : ''}${REQUEST_STATUS[r.status]}</div></div>
-            <button class="icon-btn" data-act="req-cancel" data-id="${esc(r.id)}" aria-label="取り消し">🗑</button>
-          </li>`).join('')}</ul>
-      </div>` : ''}
-      ${done.length ? `<div class="card">
-        <h2>かなったお願い</h2>
-        <ul class="list">${done.map(r => `
-          <li class="done">
-            <span class="tag ${esc(r.to)}">${esc(name(r.to))}</span>
-            <div class="grow"><div class="title">${esc(r.text)}</div></div>
-            ${r.from === me && !r.thanked ? `<button class="btn small" data-act="req-thanks" data-id="${esc(r.id)}">ありがとう</button>` : ''}
-          </li>`).join('')}</ul>
-      </div>` : ''}
-      <div class="card">
-        <h2>💌 ${esc(name(other(me)))}へのありがとう</h2>
-        <form class="add" data-form="thanks">
-          <textarea name="text" placeholder="例: 今日ご飯を作ってくれてありがとう。すごくおいしかった！" required maxlength="300"></textarea>
-          <button class="btn">送る</button>
-        </form>
-      </div>
-      <div class="card">
-        <h2>これまでのありがとう</h2>
-        ${thanks.length ? `<ul class="list">${thanks.slice(0, ui.thanksAll ? undefined : 20).map(thanksItem).join('')}</ul>` : '<p class="empty">まだありません</p>'}
-        ${thanks.length > 20 && !ui.thanksAll ? '<button class="btn small ghost" data-act="thanks-all">もっと見る</button>' : ''}
-      </div>`;
-  },
-
-  more() {
-    const up = L.upcomingEvents(all('events'))[0];
-    const net = L.balance(all('expenses'));
-    const item = (t, icon, sub) => `
-      <li><button class="menu-item" data-goto="${t}"><span class="menu-icon">${icon}</span>
-        <span class="grow"><span class="title">${titles[t]}</span><span class="muted">${sub}</span></span><span class="muted">›</span></button></li>`;
-    return `
-      <div class="card"><ul class="list menu">
-        ${item('events', '📅', up ? esc(`${up.ev.title} ${L.eventLabel(up).when}`) : '結婚記念日や誕生日のカウントダウン')}
-        ${item('budget', '💰', net ? esc(`${name(net > 0 ? 'b' : 'a')} → ${name(net > 0 ? 'a' : 'b')} ${fmtYen(Math.abs(net))}`) : 'ふたりの支出と立て替えの精算')}
-        ${item('notes', '📝', `${all('notes').length}件 · Wi-Fi、ゴミの分別ルールなど`)}
-        ${item('settings', '⚙️', '同期・通知・名前・バックアップ')}
-      </ul></div>`;
-  },
-
-  events() {
-    const up = L.upcomingEvents(all('events'));
-    const past = all('events').filter(ev => !up.some(u => u.ev.id === ev.id));
-    return `
-      <div class="card">
-        <h2>記念日・予定を追加</h2>
-        <form class="add" data-form="event">
-          <input name="title" placeholder="例: 結婚記念日 / 誕生日 / 旅行" required maxlength="40">
-          <div class="row">
-            <input name="date" type="date" required>
-            <label class="field inline"><input type="checkbox" name="yearly" checked> 毎年</label>
-          </div>
-          <button class="btn">追加</button>
-        </form>
-        <p class="muted">通知をオンにすると、7日前・3日前・当日の朝にお知らせします。</p>
-      </div>
-      <div class="card">
-        <h2>これから</h2>
-        ${up.length ? `<ul class="list">${up.map(x => { const l = L.eventLabel(x); return `
-          <li>
-            <div class="grow"><div class="title">${esc(x.ev.title)}${esc(l.extra)}</div><div class="muted">${l.dateText}${x.ev.yearly ? ' · 毎年' : ''}</div></div>
-            <strong>${esc(l.when)}</strong>
-            <button class="icon-btn" data-act="del-event" data-id="${esc(x.ev.id)}" aria-label="削除">🗑</button>
-          </li>`; }).join('')}</ul>` : '<p class="empty">登録された記念日はありません</p>'}
-      </div>
-      ${past.length ? `<div class="card"><h2>過ぎた予定</h2><ul class="list">${past.map(ev => `
-          <li class="done"><div class="grow"><div class="title">${esc(ev.title)}</div><div class="muted">${esc(ev.date)}</div></div>
-          <button class="icon-btn" data-act="del-event" data-id="${esc(ev.id)}" aria-label="削除">🗑</button></li>`).join('')}</ul></div>` : ''}
-      ${calendarCard()}`;
-  },
-
   budget() {
-    const me = device.me;
     const base = new Date();
     const month = new Date(base.getFullYear(), base.getMonth() + (ui.month || 0), 1);
     const prefix = `${month.getFullYear()}-${String(month.getMonth() + 1).padStart(2, '0')}`;
@@ -826,113 +807,75 @@ const screens = {
     const SPLIT = { half: 'ふたりの分', other: '立て替え', self: '自分の分' };
     return `
       <div class="card">
-        <h2>精算</h2>
+        <h2>${ic('scale')} 精算</h2>
         ${net ? `<div class="big">${esc(name(debtor))} → ${esc(name(other(debtor)))} ${fmtYen(Math.abs(net))}</div>
           <p class="muted">これまでの立て替えをまとめた金額です。</p>
-          <button class="btn small" data-act="settle">精算した</button>` : '<p>貸し借りはありません 👍</p>'}
+          <button class="btn small" data-act="settle">精算した</button>` : `<p>${ic('thumbs-up')} 貸し借りはありません</p>`}
       </div>
       <div class="card">
-        <h2>支出を記録</h2>
-        ${sync.enabled && features.receipt !== false ? `
-          <label class="btn ghost receipt-btn ${ui.reading ? 'disabled' : ''}">${ui.reading ? '読み取り中…' : '📷 レシート・スクショから読み取る'}
-            <input type="file" accept="image/*" data-act="receipt" hidden ${ui.reading ? 'disabled' : ''}>
-          </label>` : ''}
+        <h2>${ic('receipt')} 支出を記録</h2>
+        ${receiptButton()}
         ${ui.receipt ? `<div class="receipt-result">
           <div class="muted">読み取り結果（まちがっていたら直してから「記録」を押してください）</div>
           ${ui.receipt.items.length ? `<ul class="list compact">${ui.receipt.items.map(i => `<li><span class="grow">${esc(i.name)}</span><span>${fmtYen(i.price)}</span></li>`).join('')}</ul>` : ''}
         </div>` : ''}
-        <form class="add" data-form="expense">
-          <input name="title" placeholder="例: スーパー / 電気代" required maxlength="40" value="${esc(ui.receipt?.store || '')}">
-          <div class="row">
-            <input name="amount" type="number" inputmode="numeric" min="1" max="10000000" placeholder="金額（円）" required value="${ui.receipt?.total || ''}">
-            <input name="date" type="date" value="${esc(ui.receipt?.date || today())}" required>
-          </div>
-          <div class="row">
-            <label class="field">払った人
-              <select name="paidBy"><option value="a" ${me === 'a' ? 'selected' : ''}>${esc(name('a'))}</option><option value="b" ${me === 'b' ? 'selected' : ''}>${esc(name('b'))}</option></select>
-            </label>
-            <label class="field">だれの分
-              <select name="split"><option value="half">ふたりの分（半分ずつ）</option><option value="other">相手の分（立て替え）</option><option value="self">自分の分（精算しない）</option></select>
-            </label>
-          </div>
-          <button class="btn">記録</button>
-        </form>
+        ${expenseForm(ui.receipt)}
       </div>
       <div class="card">
         <div class="month-nav">
-          <button class="icon-btn" data-act="month" data-id="-1" aria-label="前の月">‹</button>
+          <button class="icon-btn" data-act="month" data-id="-1" aria-label="前の月">${ic('back')}</button>
           <h2>${month.getFullYear()}年${month.getMonth() + 1}月</h2>
-          <button class="icon-btn" data-act="month" data-id="1" aria-label="次の月" ${ui.month >= 0 || !ui.month ? 'disabled' : ''}>›</button>
+          <button class="icon-btn" data-act="month" data-id="1" aria-label="次の月" ${ui.month >= 0 || !ui.month ? 'disabled' : ''}>${ic('next')}</button>
         </div>
         <div class="big">${fmtYen(total)}</div>
         <p class="muted">${esc(name('a'))} ${fmtYen(paid('a'))} / ${esc(name('b'))} ${fmtYen(paid('b'))}</p>
         ${inMonth.length ? `<ul class="list">${inMonth.map(e => e.kind === 'settle' ? `
           <li class="done"><div class="grow"><div class="title">精算 ${esc(name(e.from))} → ${esc(name(e.to))}</div><div class="muted">${esc(e.date)}</div></div>
-            <strong>${fmtYen(e.amount)}</strong><button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">🗑</button></li>` : `
+            <strong>${fmtYen(e.amount)}</strong><button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">${ic('trash')}</button></li>` : `
           <li>
             <span class="tag ${esc(e.paidBy)}">${esc(name(e.paidBy))}</span>
             <div class="grow"><div class="title">${esc(e.title)}</div><div class="muted">${esc(e.date)} · ${SPLIT[e.split] || ''}</div></div>
             <strong>${fmtYen(e.amount)}</strong>
-            <button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">🗑</button>
+            <button class="icon-btn" data-act="del-expense" data-id="${esc(e.id)}" aria-label="削除">${ic('trash')}</button>
           </li>`).join('')}</ul>` : '<p class="empty">この月の記録はありません</p>'}
       </div>`;
   },
 
-  notes() {
-    const notes = all('notes').sort((x, y) => (!!y.pinned - !!x.pinned) || (y.updatedAt - x.updatedAt));
-    return `
-      <div class="card">
-        <h2>メモを追加</h2>
-        <form class="add" data-form="note">
-          <input name="title" placeholder="例: Wi-Fi のパスワード / ゴミの分別" required maxlength="40">
-          <textarea name="body" placeholder="内容" maxlength="2000"></textarea>
-          <button class="btn">追加</button>
-        </form>
-      </div>
-      <div class="card">
-        ${notes.length ? notes.map(n => `
-          <details class="note-item" data-id="${esc(n.id)}" ${ui.openNote === n.id ? 'open' : ''}>
-            <summary>${n.pinned ? '📌 ' : ''}${esc(n.title)}</summary>
-            <form class="add" data-form="note" data-id="${esc(n.id)}">
-              <input name="title" value="${esc(n.title)}" required maxlength="40">
-              <textarea name="body" maxlength="2000">${esc(n.body)}</textarea>
-              <div class="btn-row">
-                <button class="btn small">保存</button>
-                <button type="button" class="btn small ghost" data-act="pin-note" data-id="${esc(n.id)}">${n.pinned ? 'ピンを外す' : '📌 ピン留め'}</button>
-                <button type="button" class="btn small ghost danger" data-act="del-note" data-id="${esc(n.id)}">削除</button>
-              </div>
-            </form>
-          </details>`).join('') : '<p class="empty">ふたりで覚えておきたいことを書いておけます</p>'}
-      </div>`;
+  futari() {
+    const openForMe = all('requests').filter(r => r.to === device.me && r.status === 'open').length;
+    const segs = Object.entries(FUTARI_SEGS).map(([k, label]) =>
+      `<button class="seg ${k === futariSeg ? 'on' : ''}" data-goto="futari/${k}">${label}${k === 'requests' && openForMe ? `<span class="dot-count">${openForMe}</span>` : ''}</button>`).join('');
+    return `<div class="segs">${segs}</div>${futariScreens[futariSeg]()}`;
   },
 
   settings() {
     const n = names();
-    const defaultServer = /^https?:$/.test(location.protocol) ? location.origin : '';
     const syncCard = sync.enabled ? `
       <div class="card">
-        <h2>ふたりの同期 <span class="sync-label">${esc({ ok: '同期済み', syncing: '同期中…', offline: 'オフライン', local: '' }[sync.status])}</span></h2>
-        <p class="muted">相手のスマホでこのアプリを開き、「その他 → 設定 → コードで参加」にこのコードを入力してください。</p>
+        <h2>${ic('users')} ふたりの同期 <span class="sync-label">${esc({ ok: '同期済み', syncing: '同期中…', offline: 'オフライン', local: '' }[sync.status])}</span></h2>
+        <p class="muted">パートナーのスマホでまだつないでいなければ、招待リンクを送ってください。</p>
+        <button class="btn" data-act="share-invite">${ic('share')} 招待リンクを送る</button>
+        <p class="muted" style="margin-top:12px">リンクを使えないときは、「コードで参加」にこのコードを入力します。</p>
         <div class="code">${esc(device.sync.room.replace(/(.{5})/, '$1-'))}</div>
         <div class="btn-row">
-          <button class="btn small" data-act="copy-code">コードをコピー</button>
+          <button class="btn small ghost" data-act="copy-code">${ic('copy')} コードをコピー</button>
           <button class="btn small ghost" data-act="leave">同期を解除</button>
         </div>
         <p class="muted">サーバー: ${esc(device.sync.server)}</p>
       </div>` : `
       <div class="card">
-        <h2>ふたりの同期</h2>
-        <p class="muted">どちらか一人が「はじめる」で共有コードを作り、もう一人が「コードで参加」に入力します。</p>
-        <div class="btn-row"><button class="btn" data-act="create-room">はじめる（コードを作る）</button></div>
+        <h2>${ic('users')} ふたりの同期</h2>
+        <p class="muted">招待リンクを送ると、パートナーがリンクを開くだけでつながります。</p>
+        <div class="btn-row"><button class="btn" data-act="share-invite">${ic('share')} 招待リンクを送る</button></div>
         <form class="add" data-form="join" style="margin-top:14px">
-          <label class="field">コードで参加
+          <label class="field">コードで参加（招待された側）
             <input name="room" placeholder="例: ABCDE-FGH23" required autocomplete="off" autocapitalize="characters">
           </label>
           <button class="btn ghost">参加する</button>
         </form>
         <details style="margin-top:12px">
           <summary class="muted">同期サーバーのURL</summary>
-          <input id="server-url" value="${esc(device.lastServer || defaultServer)}" placeholder="https://example.com" style="margin-top:8px">
+          <input id="server-url" value="${esc(defaultServer())}" placeholder="https://example.com" style="margin-top:8px">
         </details>
       </div>`;
 
@@ -965,9 +908,15 @@ const screens = {
 
     return `
       ${syncCard}
-      <div class="card"><h2>🔔 通知</h2>${pushBody}</div>
+      <div class="card"><h2>${ic('bell')} 通知</h2>${pushBody}</div>
       <div class="card">
-        <h2>ふたりの名前</h2>
+        <h2>${ic('user')} この端末を使う人</h2>
+        <div class="btn-row">
+          ${['a', 'b'].map(w => `<button class="chip ${device.me === w ? 'on' : ''}" data-act="set-me" data-id="${w}">${esc(name(w))}</button>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <h2>${ic('edit')} ふたりの名前</h2>
         <form class="add" data-form="names">
           <label class="field">1人目<input name="a" value="${esc(n.a)}" maxlength="12" required></label>
           <label class="field">2人目<input name="b" value="${esc(n.b)}" maxlength="12" required></label>
@@ -975,55 +924,305 @@ const screens = {
         </form>
       </div>
       <div class="card">
-        <h2>この端末を使う人</h2>
-        <div class="btn-row">
-          ${['a', 'b'].map(w => `<button class="chip ${device.me === w ? 'on' : ''}" data-act="set-me" data-id="${w}">${esc(name(w))}</button>`).join('')}
-        </div>
-      </div>
-      <div class="card">
-        <h2>データのバックアップ</h2>
+        <h2>${ic('package')} データのバックアップ</h2>
         <div class="btn-row">
           <button class="btn small" data-act="export">書き出す</button>
           <label class="btn small ghost">読み込む<input type="file" accept="application/json" data-act="import" hidden></label>
           ${sync.enabled ? '' : '<button class="btn small ghost" data-act="reset">初期化</button>'}
         </div>
+      </div>
+      <p class="muted center">アイコン: <a href="https://lucide.dev" target="_blank" rel="noopener">Lucide</a>（ISC License）</p>`;
+  },
+};
+
+// 「ふたり」タブの中の画面
+const futariScreens = {
+  thanks() {
+    const s = L.weekSummary({ log: all('log'), thanks: all('thanks'), requests: all('requests') });
+    const thanks = all('thanks').sort(byNewest);
+    const row = (label, key, unit) => `<tr><th>${label}</th><td>${s[key].a}${unit}</td><td>${s[key].b}${unit}</td></tr>`;
+    const covers = s.cover.a + s.cover.b;
+    return `
+      <div class="card">
+        <h2>${ic('thanks')} ${esc(name(other(device.me)))}へのありがとう</h2>
+        <form class="add" data-form="thanks">
+          <textarea name="text" placeholder="例: 今日ご飯を作ってくれてありがとう。すごくおいしかった！" required maxlength="300"></textarea>
+          <button class="btn">送る</button>
+        </form>
+      </div>
+      <div class="card">
+        <h2>${ic('review')} この7日間のふりかえり</h2>
+        <table class="summary">
+          <tr><th></th><td><span class="tag a">${esc(name('a'))}</span></td><td><span class="tag b">${esc(name('b'))}</span></td></tr>
+          ${row('家事', 'chores', '回')}${row('ポイント', 'points', 'pt')}${row('ありがとう', 'thanks', '回')}${row('お願いに応えた', 'requestsDone', '回')}
+        </table>
+        <p class="muted">${covers ? `代わりにやった家事が${covers}回ありました。` : ''}${s.thanks.a + s.thanks.b ? 'ありがとうを伝え合えていますね。' : '今週はまだありがとうがありません。ひとこと送ってみませんか？'}</p>
+      </div>
+      <div class="card">
+        <h2>${ic('heart')} これまでのありがとう</h2>
+        ${thanks.length ? `<ul class="list">${thanks.slice(0, ui.thanksAll ? undefined : 20).map(thanksItem).join('')}</ul>` : '<p class="empty">まだありません</p>'}
+        ${thanks.length > 20 && !ui.thanksAll ? '<button class="btn small ghost" data-act="thanks-all">もっと見る</button>' : ''}
+      </div>`;
+  },
+
+  requests() {
+    const me = device.me;
+    const reqs = all('requests').sort(byNewest);
+    const forMe = reqs.filter(r => r.to === me && (r.status === 'open' || r.status === 'accepted'));
+    const fromMe = reqs.filter(r => r.from === me && r.status !== 'done');
+    const done = reqs.filter(r => r.status === 'done' && Date.now() - (r.doneAt || 0) < 14 * DAY);
+    return `
+      ${forMe.length ? `<div class="card hint">
+        <h2>${ic('request')} ${esc(name(other(me)))}からのお願い</h2>
+        <ul class="list">${forMe.map(r => `
+          <li>
+            <div class="grow"><div class="title">${esc(r.text)}</div><div class="muted">${r.due ? `${esc(r.due)}まで · ` : ''}${REQUEST_STATUS[r.status]}</div></div>
+            <div class="btn-col">${r.status === 'open'
+              ? `<button class="btn small" data-act="req-accept" data-id="${esc(r.id)}">引き受ける</button><button class="btn small ghost" data-act="req-decline" data-id="${esc(r.id)}">むずかしい</button>`
+              : `<button class="btn small" data-act="req-done" data-id="${esc(r.id)}">やった！</button>`}</div>
+          </li>`).join('')}</ul>
+      </div>` : ''}
+      <div class="card">
+        <h2>${ic('request')} ${esc(name(other(me)))}へのお願い</h2>
+        <form class="add" data-form="request">
+          <input name="text" placeholder="例: 今度の休みに電球を替えてほしい" required maxlength="100">
+          <div class="row"><label class="field">いつまでに（任意）<input type="date" name="due"></label></div>
+          <button class="btn">お願いする</button>
+        </form>
+      </div>
+      ${fromMe.length ? `<div class="card">
+        <h2>お願いしたこと</h2>
+        <ul class="list">${fromMe.map(r => `
+          <li>
+            <div class="grow"><div class="title">${esc(r.text)}</div><div class="muted">${r.due ? `${esc(r.due)}まで · ` : ''}${REQUEST_STATUS[r.status]}</div></div>
+            <button class="icon-btn" data-act="req-cancel" data-id="${esc(r.id)}" aria-label="取り消し">${ic('trash')}</button>
+          </li>`).join('')}</ul>
+      </div>` : ''}
+      ${done.length ? `<div class="card">
+        <h2>${ic('done')} かなったお願い</h2>
+        <ul class="list">${done.map(r => `
+          <li class="done">
+            <span class="tag ${esc(r.to)}">${esc(name(r.to))}</span>
+            <div class="grow"><div class="title">${esc(r.text)}</div></div>
+            ${r.from === me && !r.thanked ? `<button class="btn small" data-act="req-thanks" data-id="${esc(r.id)}">ありがとう</button>` : ''}
+          </li>`).join('')}</ul>
+      </div>` : ''}`;
+  },
+
+  events() {
+    const up = L.upcomingEvents(all('events'));
+    const past = all('events').filter(ev => !up.some(u => u.ev.id === ev.id));
+    return `
+      <div class="card">
+        <h2>${ic('calendar')} 記念日・予定を追加</h2>
+        <form class="add" data-form="event">
+          <input name="title" placeholder="例: 結婚記念日 / 誕生日 / 旅行" required maxlength="40">
+          <div class="row">
+            <input name="date" type="date" required>
+            <label class="field inline"><input type="checkbox" name="yearly" checked> 毎年</label>
+          </div>
+          <button class="btn">追加</button>
+        </form>
+        <p class="muted">通知をオンにすると、7日前・3日前・当日の朝にお知らせします。</p>
+      </div>
+      <div class="card">
+        <h2>${ic('gift')} これから</h2>
+        ${up.length ? `<ul class="list">${up.map(x => { const l = L.eventLabel(x); return `
+          <li>
+            <div class="grow"><div class="title">${esc(x.ev.title)}${esc(l.extra)}</div><div class="muted">${l.dateText}${x.ev.yearly ? ' · 毎年' : ''}</div></div>
+            <strong>${esc(l.when)}</strong>
+            <button class="icon-btn" data-act="del-event" data-id="${esc(x.ev.id)}" aria-label="削除">${ic('trash')}</button>
+          </li>`; }).join('')}</ul>` : '<p class="empty">登録された記念日はありません</p>'}
+      </div>
+      ${past.length ? `<div class="card"><h2>過ぎた予定</h2><ul class="list">${past.map(ev => `
+          <li class="done"><div class="grow"><div class="title">${esc(ev.title)}</div><div class="muted">${esc(ev.date)}</div></div>
+          <button class="icon-btn" data-act="del-event" data-id="${esc(ev.id)}" aria-label="削除">${ic('trash')}</button></li>`).join('')}</ul></div>` : ''}
+      ${calendarCard()}`;
+  },
+
+  notes() {
+    const notes = all('notes').sort((x, y) => (!!y.pinned - !!x.pinned) || (y.updatedAt - x.updatedAt));
+    return `
+      <div class="card">
+        <h2>${ic('note')} メモを追加</h2>
+        <form class="add" data-form="note">
+          <input name="title" placeholder="例: Wi-Fi のパスワード / ゴミの分別" required maxlength="40">
+          <textarea name="body" placeholder="内容" maxlength="2000"></textarea>
+          <button class="btn">追加</button>
+        </form>
+      </div>
+      <div class="card">
+        ${notes.length ? notes.map(n => `
+          <details class="note-item" data-id="${esc(n.id)}" ${ui.openNote === n.id ? 'open' : ''}>
+            <summary>${n.pinned ? ic('pin', 'sm') + ' ' : ''}${esc(n.title)}</summary>
+            <form class="add" data-form="note" data-id="${esc(n.id)}">
+              <input name="title" value="${esc(n.title)}" required maxlength="40">
+              <textarea name="body" maxlength="2000">${esc(n.body)}</textarea>
+              <div class="btn-row">
+                <button class="btn small">保存</button>
+                <button type="button" class="btn small ghost" data-act="pin-note" data-id="${esc(n.id)}">${n.pinned ? 'ピンを外す' : `${ic('pin', 'sm')} ピン留め`}</button>
+                <button type="button" class="btn small ghost danger" data-act="del-note" data-id="${esc(n.id)}">削除</button>
+              </div>
+            </form>
+          </details>`).join('') : '<p class="empty">ふたりで覚えておきたいことを書いておけます</p>'}
       </div>`;
   },
 };
 
-// ---------- 操作 ----------
-document.querySelector('.tabs').addEventListener('click', e => {
-  const b = e.target.closest('button[data-tab]');
-  if (b) go(b.dataset.tab);
-});
-document.getElementById('back').addEventListener('click', () => go('more'));
+// ---------- ＋ボタンから開くシート ----------
+const sheet = {
+  name: null,
+  open(name) { this.name = name; this.render(); document.body.classList.add('sheet-open'); },
+  close() { this.name = null; sheetEl.innerHTML = ''; sheetEl.hidden = true; document.body.classList.remove('sheet-open'); },
+  render() {
+    sheetEl.hidden = false;
+    const body = this.views[this.name] ? this.views[this.name]() : '';
+    sheetEl.innerHTML = `
+      <div class="sheet-backdrop" data-act="sheet-close"></div>
+      <div class="sheet-panel" role="dialog" aria-modal="true">
+        <div class="sheet-head">
+          ${this.name !== 'menu' ? `<button class="icon-btn" data-act="sheet" data-id="menu" aria-label="戻る">${ic('back')}</button>` : '<span></span>'}
+          <strong>${this.titles[this.name] || ''}</strong>
+          <button class="icon-btn" data-act="sheet-close" aria-label="閉じる">${ic('close')}</button>
+        </div>
+        ${body}
+      </div>`;
+    const first = sheetEl.querySelector('input:not([type=file]):not([type=checkbox]), textarea');
+    if (first && this.name !== 'menu' && this.name !== 'chore') setTimeout(() => first.focus(), 50);
+  },
+  titles: { menu: '記録する', chore: '家事をやった', shop: '買い物に追加', expense: '支出を記録', thanks: 'ありがとう', request: 'お願い' },
+  views: {
+    menu() {
+      const item = (id, icn, label, cls = '') => `<button class="sheet-item ${cls}" data-act="sheet" data-id="${id}">${ic(icn)}<span>${label}</span></button>`;
+      return `<div class="sheet-grid">
+        ${item('chore', 'done', '家事をやった', 'c-chore')}
+        ${item('shop', 'shopping', '買い物に追加', 'c-shop')}
+        ${receiptAvailable() ? `<label class="sheet-item c-budget">${ic('camera')}<span>レシートを読む</span><input type="file" accept="image/*" data-act="receipt" hidden></label>` : ''}
+        ${item('expense', 'budget', '支出を記録', 'c-budget')}
+        ${item('thanks', 'thanks', 'ありがとう', 'c-thanks')}
+        ${item('request', 'request', 'お願い', 'c-request')}
+      </div>`;
+    },
+    chore() {
+      const list = L.choresWithStatus(all('chores'), all('log')).sort((x, y) => (y.st.due - x.st.due) || x.c.title.localeCompare(y.c.title, 'ja'));
+      return list.length ? `<ul class="list">${list.map(x => choreItem(x, false)).join('')}</ul>` : '<p class="empty">家事タブから家事を追加してください</p>';
+    },
+    shop() {
+      return `<form class="add" data-form="shop"><div class="row"><input name="name" placeholder="例: 牛乳" required maxlength="40"><button class="btn" style="flex:0 0 auto">追加</button></div></form>`;
+    },
+    expense() { return expenseForm(null); },
+    thanks() {
+      return `<form class="add" data-form="thanks">
+        <textarea name="text" placeholder="${esc(name(other(device.me)))}へ。例: 今日ご飯を作ってくれてありがとう！" required maxlength="300"></textarea>
+        <button class="btn">送る</button></form>`;
+    },
+    request() {
+      return `<form class="add" data-form="request">
+        <input name="text" placeholder="${esc(name(other(device.me)))}へ。例: 電球を替えてほしい" required maxlength="100">
+        <div class="row"><label class="field">いつまでに（任意）<input type="date" name="due"></label></div>
+        <button class="btn">お願いする</button></form>`;
+    },
+  },
+};
 
-document.getElementById('me-toggle').addEventListener('click', () => {
-  device.me = other(device.me);
-  persist();
-  pushUpdate();
-  toast(`${name(device.me)}として操作中`);
-  render();
-});
+// ---------- はじめての案内 ----------
+const onboard = {
+  step: null,
+  open(step) { this.step = step; this.render(); },
+  close() { this.step = null; onboardEl.hidden = true; onboardEl.innerHTML = ''; device.onboarded = true; persist(); render(); },
+  render() {
+    onboardEl.hidden = false;
+    const s = this.views[this.step]();
+    const order = ['welcome', 'invite', 'notify', 'done'];
+    const idx = order.indexOf(this.step === 'join' || this.step === 'who' ? 'invite' : this.step);
+    onboardEl.innerHTML = `
+      <div class="ob-panel">
+        <div class="ob-top">
+          <div class="ob-dots">${order.map((_, i) => `<span class="${i <= idx ? 'on' : ''}"></span>`).join('')}</div>
+          ${this.step !== 'done' ? '<button class="ob-skip" data-act="ob-skip">スキップ</button>' : ''}
+        </div>
+        ${illustration(s.illust)}
+        <h1>${s.title}</h1>
+        ${s.body}
+      </div>`;
+  },
+  views: {
+    welcome: () => ({
+      illust: 'welcome',
+      title: 'ふたりの暮らしへようこそ',
+      body: `<p class="muted">家事の分担、買い物、ありがとうを、ふたりで気持ちよく共有するアプリです。</p>
+        <form class="add" data-form="ob-names">
+          <label class="field">あなたの名前<input name="me" required maxlength="12" placeholder="例: ひろ"></label>
+          <label class="field">パートナーの名前<input name="partner" required maxlength="12" placeholder="例: ゆき"></label>
+          <button class="btn">次へ</button>
+        </form>
+        <button class="link-btn" data-act="ob-step" data-id="join">招待リンク・コードを受け取った方はこちら</button>`,
+    }),
+    invite: () => ({
+      illust: 'invite',
+      title: `${esc(name(other(device.me)))}を招待しましょう`,
+      body: `<p class="muted">招待リンクを LINE などで送ってください。${esc(name(other(device.me)))}がリンクを開くと、ふたりのスマホがつながります。</p>
+        <button class="btn" data-act="share-invite">${ic('share')} 招待リンクを送る</button>
+        ${sync.enabled ? `<p class="muted invite-url">${esc(inviteUrl())}</p>` : ''}
+        <div class="btn-row ob-nav"><button class="btn ghost" data-act="ob-step" data-id="notify">${sync.enabled ? '次へ' : 'あとで'}</button></div>`,
+    }),
+    join: () => ({
+      illust: 'invite',
+      title: '招待を受け取った方',
+      body: `<p class="muted">招待リンクを開くと自動でつながります。コードを受け取った場合は、ここに入力してください。</p>
+        <form class="add" data-form="join"><input name="room" placeholder="例: ABCDE-FGH23" required autocomplete="off" autocapitalize="characters"><button class="btn">参加する</button></form>
+        <button class="link-btn" data-act="ob-step" data-id="welcome">戻る</button>`,
+    }),
+    who: () => ({
+      illust: 'welcome',
+      title: 'あなたはどちらですか？',
+      body: `<p class="muted">このスマホを使う人を選んでください。あとから設定で変えられます。</p>
+        <div class="btn-row who">${['a', 'b'].map(w => `<button class="chip big ${device.me === w ? 'on' : ''}" data-act="set-me" data-id="${w}">${esc(name(w))}</button>`).join('')}</div>
+        <div class="btn-row ob-nav"><button class="btn" data-act="ob-step" data-id="notify">次へ</button></div>`,
+    }),
+    notify: () => {
+      let body;
+      if (isIos && !isStandalone()) {
+        body = `<p class="muted">iPhone では、ホーム画面に追加すると通知を受け取れます。</p>
+          <ol class="steps"><li>下の共有ボタンを押す</li><li>「ホーム画面に追加」を選ぶ</li><li>ホーム画面の「ふたり」から開き直す</li></ol>`;
+      } else if (!pushSupported() || !sync.enabled) {
+        body = `<p class="muted">${sync.enabled ? 'この端末は通知に対応していません。' : 'パートナーとつなぐと、朝の家事リマインドやありがとうの通知を受け取れます。設定からいつでもオンにできます。'}</p>`;
+      } else if (device.push) {
+        body = `<p>${ic('check')} 通知はオンになっています</p>`;
+      } else {
+        body = `<p class="muted">朝の家事リマインド、買い物リストの追加、ありがとうやお願いが届いたときにお知らせします。</p>
+          <button class="btn" data-act="enable-push">${ic('bell')} 通知をオンにする</button>`;
+      }
+      return { illust: 'notify', title: '通知を受け取る', body: `${body}<div class="btn-row ob-nav"><button class="btn ghost" data-act="ob-step" data-id="done">${device.push ? '次へ' : 'あとで'}</button></div>` };
+    },
+    done: () => ({
+      illust: 'done',
+      title: '準備ができました',
+      body: `<p class="muted">右下の ＋ ボタンから、いつでも家事・買い物・支出・ありがとうを記録できます。</p>
+        <button class="btn" data-act="ob-done">はじめる</button>`,
+    }),
+  },
+};
 
-window.addEventListener('hashchange', () => {
-  const t = location.hash.slice(1);
-  if (t !== tab && titles[t]) go(t);
-});
-
-// 通知をタップしたとき（サービスワーカーから）
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.addEventListener('message', e => { if (e.data?.tab) go(e.data.tab); });
+// 初めて開いたときだけ案内を出す（すでに使っているデータがあれば出さない）
+function shouldOnboard() {
+  if (device.onboarded || device.sync) return false;
+  return !COLLECTIONS.some(col => Object.values(store.records[col]).some(r => r.updatedAt > 1));
 }
 
+// ---------- 操作 ----------
 function serverUrl() {
-  const v = (document.getElementById('server-url')?.value || '').trim();
+  const input = document.getElementById('server-url');
+  const v = (input ? input.value : defaultServer()).trim();
   if (!/^https?:\/\/[^\s]+$/.test(v)) { toast('同期サーバーのURLを入力してください'); return null; }
   device.lastServer = v;
   return v;
 }
 
-const normalizeCode = s => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
+const normalizeCode = s => {
+  const m = /#join=([A-Za-z0-9-]+)/.exec(s); // 招待リンクをそのまま貼られたとき
+  return (m ? m[1] : s).toUpperCase().replace(/[^A-Z0-9]/g, '');
+};
 
 function setStock(s, low) {
   put('stock', { ...s, low });
@@ -1035,16 +1234,44 @@ function setStock(s, low) {
   if (!low) open.forEach(x => remove('shopping', x.id));
 }
 
-view.addEventListener('click', async e => {
+function startReceipt(file) {
+  sheet.close();
+  if (tab !== 'budget') go('budget');
+  ui.reading = true;
+  ui.receipt = null;
+  render();
+  readReceipt(file).then(r => {
+    if (!r.is_receipt) { toast('レシートや支払い画面が見つかりませんでした'); return; }
+    ui.receipt = r;
+    toast(r.total ? `${fmtYen(r.total)} を読み取りました` : '金額が読み取れませんでした。入力してください');
+  }).catch(err => toast(err.message)).finally(() => { ui.reading = false; if (tab === 'budget') render(); });
+}
+
+async function onClick(e) {
   const goEl = e.target.closest('[data-goto]');
-  if (goEl) { go(goEl.dataset.goto); return; }
-  const el = e.target.closest('button[data-act]');
-  if (!el) return;
+  if (goEl) {
+    const [t, seg] = goEl.dataset.goto.split('/');
+    sheet.close();
+    go(t, seg);
+    return;
+  }
+  const el = e.target.closest('[data-act]');
+  if (!el || el.matches('input')) return;
   const id = el.dataset.id;
-  const me = device.me;
+  const inSheet = sheetEl.contains(el);
   switch (el.dataset.act) {
+    // シート・案内
+    case 'sheet': sheet.open(id); return;
+    case 'sheet-close': sheet.close(); return;
+    case 'ob-step': onboard.open(id); return;
+    case 'ob-skip': case 'ob-done': onboard.close(); return;
+    case 'share-invite':
+      el.disabled = true;
+      try { await shareInvite(); } catch (err) { toast('サーバーにつながりません'); }
+      el.disabled = false;
+      break;
     // 家事
-    case 'done-chore': completeChore(id); break;
+    case 'done-chore': completeChore(id); if (inSheet) sheet.close(); break;
     case 'edit-chore': ui.editChore = id; render(); window.scrollTo(0, 0); return;
     case 'cancel-edit': ui.editChore = null; break;
     case 'del-chore':
@@ -1063,7 +1290,7 @@ view.addEventListener('click', async e => {
       if (!l) return;
       sendThanks(`代わりに「${l.title}」をやってくれてありがとう！`);
       put('log', { ...l, thanked: true });
-      toast('ありがとうを送りました 💌');
+      toast('ありがとうを送りました');
       break;
     }
     // 買い物・在庫
@@ -1105,7 +1332,7 @@ view.addEventListener('click', async e => {
       if (!r) return;
       sendThanks(`「${r.text}」をやってくれてありがとう！`);
       put('requests', { ...r, thanked: true });
-      toast('ありがとうを送りました 💌');
+      toast('ありがとうを送りました');
       break;
     }
     // 記念日・家計簿・メモ
@@ -1140,19 +1367,6 @@ view.addEventListener('click', async e => {
     case 'reset':
       if (!confirm('この端末のデータをすべて消して初期状態に戻しますか？')) return;
       store = seededStore(); pending = new Set(); persist(); break;
-    case 'create-room': {
-      const server = serverUrl();
-      if (!server) return;
-      el.disabled = true;
-      try {
-        const code = await createRoom(server);
-        await joinRoom(server, code, 'a');
-        toast('共有コードを作りました');
-      } catch (err) {
-        toast('サーバーにつながりません');
-      }
-      break;
-    }
     case 'copy-code':
       try { await navigator.clipboard.writeText(device.sync.room); toast('コピーしました'); }
       catch (err) { toast('コピーできませんでした'); }
@@ -1174,7 +1388,7 @@ view.addEventListener('click', async e => {
     default: return;
   }
   render();
-});
+}
 
 // メモの開閉を覚えておく（toggle はバブリングしないのでキャプチャで拾う）
 view.addEventListener('toggle', e => {
@@ -1184,7 +1398,7 @@ view.addEventListener('toggle', e => {
   }
 }, true);
 
-view.addEventListener('change', e => {
+function onChange(e) {
   const t = e.target;
   if (t.name === 'schedule') {
     t.closest('form').querySelector('.days-row').hidden = t.value !== 'days';
@@ -1208,16 +1422,7 @@ view.addEventListener('change', e => {
     return;
   }
   if (t.dataset.act === 'receipt') {
-    const file = t.files[0];
-    if (!file) return;
-    ui.reading = true;
-    ui.receipt = null;
-    render();
-    readReceipt(file).then(r => {
-      if (!r.is_receipt) { toast('レシートや支払い画面が見つかりませんでした'); return; }
-      ui.receipt = r;
-      toast(r.total ? `${fmtYen(r.total)} を読み取りました` : '金額が読み取れませんでした。入力してください');
-    }).catch(err => toast(err.message)).finally(() => { ui.reading = false; if (tab === 'budget') render(); });
+    if (t.files[0]) startReceipt(t.files[0]);
     return;
   }
   if (t.dataset.act !== 'import') return;
@@ -1240,13 +1445,14 @@ view.addEventListener('change', e => {
     toast('読み込みました');
     render();
   }).catch(() => toast('読み込めないファイルです'));
-});
+}
 
-view.addEventListener('submit', async e => {
+async function onSubmit(e) {
   e.preventDefault();
   const form = e.target;
   const f = new FormData(form);
   const me = device.me;
+  const inSheet = sheetEl.contains(form);
   const text = k => String(f.get(k) || '').trim();
   switch (form.dataset.form) {
     case 'chore': {
@@ -1266,13 +1472,14 @@ view.addEventListener('submit', async e => {
     }
     case 'shop':
       put('shopping', { id: uid(), name: text('name'), done: false, by: me, at: Date.now() });
+      if (inSheet) toast(`「${text('name')}」を追加しました`);
       break;
     case 'stock':
       put('stock', { id: uid(), name: text('name'), low: false });
       break;
     case 'thanks':
       sendThanks(text('text'));
-      toast('ありがとうを送りました 💌');
+      toast('ありがとうを送りました');
       break;
     case 'request':
       put('requests', { id: uid(), from: me, to: other(me), text: text('text'), due: f.get('due') || '', status: 'open', at: Date.now() });
@@ -1284,11 +1491,12 @@ view.addEventListener('submit', async e => {
     case 'expense': {
       const amount = Math.round(Number(f.get('amount')));
       if (!(amount > 0)) { toast('金額を入力してください'); return; }
+      const r = inSheet ? null : ui.receipt;
       put('expenses', {
         id: uid(), title: text('title'), amount, date: f.get('date') || today(), paidBy: f.get('paidBy'), split: f.get('split'), at: Date.now(),
-        ...(ui.receipt?.items.length ? { items: ui.receipt.items.slice(0, 20) } : {}),
+        ...(r?.items.length ? { items: r.items.slice(0, 20) } : {}),
       });
-      ui.receipt = null;
+      if (!inSheet) ui.receipt = null;
       toast('記録しました');
       break;
     }
@@ -1302,6 +1510,11 @@ view.addEventListener('submit', async e => {
       put('settings', { id: 'names', a: text('a'), b: text('b') });
       toast('保存しました');
       break;
+    case 'ob-names':
+      device.me = 'a';
+      put('settings', { id: 'names', a: text('me'), b: text('partner') });
+      onboard.open('invite');
+      return;
     case 'join': {
       const code = normalizeCode(f.get('room'));
       if (code.length !== 10) { toast('コードは10文字です'); return; }
@@ -1314,12 +1527,40 @@ view.addEventListener('submit', async e => {
         toast(err.message.startsWith('共有') ? err.message : 'サーバーにつながりません');
         return;
       }
+      if (onboard.step) { onboard.open('who'); return; }
       break;
     }
     default: return;
   }
+  if (inSheet) sheet.close();
   render();
+}
+
+for (const root of [view, sheetEl, onboardEl]) {
+  root.addEventListener('click', onClick);
+  root.addEventListener('change', onChange);
+  root.addEventListener('submit', onSubmit);
+}
+
+document.querySelector('.tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-tab]');
+  if (b) { sheet.close(); go(b.dataset.tab); }
 });
+document.getElementById('back').addEventListener('click', () => go(prevTab));
+document.getElementById('settings-btn').addEventListener('click', () => go('settings'));
+document.getElementById('fab').addEventListener('click', () => sheet.open('menu'));
+
+window.addEventListener('hashchange', () => {
+  const m = /^#join=(.+)$/.exec(location.hash);
+  if (m) { joinFromLink(normalizeCode(m[1])); return; }
+  const r = route(location.hash);
+  if (r.tab !== tab || (r.seg && r.seg !== futariSeg)) go(r.tab, r.seg);
+});
+
+// 通知をタップしたとき（サービスワーカーから）
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', e => { if (e.data?.tab) { const [t, seg] = e.data.tab.split('/'); go(t, seg); } });
+}
 
 function exportData() {
   const blob = new Blob([JSON.stringify({ version: 2, records: store.records }, null, 2)], { type: 'application/json' });
@@ -1334,7 +1575,18 @@ if ('serviceWorker' in navigator && location.protocol !== 'file:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
+// タブとヘッダーのアイコン
+document.querySelectorAll('.tabs button').forEach(b => { b.innerHTML = `${ic(TAB_ICONS[b.dataset.tab])}<span>${titles[b.dataset.tab]}</span>`; });
+document.getElementById('settings-btn').innerHTML = ic('settings');
+document.getElementById('back').innerHTML = ic('back');
+document.getElementById('fab').innerHTML = ic('plus');
+
 render();
 sync.connect();
 pushUpdate();
-checkFeatures().then(() => { if (tab === 'budget') render(); });
+checkFeatures().then(() => { if (tab === 'budget' || sheet.name) render(); });
+{
+  const m = /^#join=(.+)$/.exec(location.hash);
+  if (m) joinFromLink(normalizeCode(m[1]));
+  else if (shouldOnboard()) onboard.open('welcome');
+}

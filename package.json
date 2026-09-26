@@ -1,0 +1,16 @@
+{
+  "name": "real-estate-manager",
+  "version": "0.1.0",
+  "description": "不動産物件情報を登録・検索・管理するWebアプリ",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/server.js",
+    "seed": "node --disable-warning=ExperimentalWarning src/seed.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+  },
+  "license": "MIT"
+}

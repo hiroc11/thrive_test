@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>不動産情報管理</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>不動産情報管理</h1>
+    <div class="topbar-actions">
+      <a id="export-link" class="btn btn-ghost" href="/api/properties/export.csv">CSV出力</a>
+      <button id="new-btn" class="btn btn-primary" type="button">＋ 物件を登録</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats" id="stats" aria-label="集計"></section>
+
+    <section class="panel">
+      <form id="filter-form" class="filters">
+        <input type="search" name="q" placeholder="物件名・住所・駅・備考で検索" aria-label="キーワード">
+        <select name="transaction_type" aria-label="取引種別"><option value="">取引種別：すべて</option></select>
+        <select name="property_type" aria-label="物件種別"><option value="">物件種別：すべて</option></select>
+        <select name="status" aria-label="ステータス"><option value="">ステータス：すべて</option></select>
+        <input type="number" name="min_price" min="0" placeholder="価格 下限(円)" aria-label="価格下限">
+        <input type="number" name="max_price" min="0" placeholder="価格 上限(円)" aria-label="価格上限">
+        <input type="number" name="max_walk" min="0" placeholder="駅徒歩(分)以内" aria-label="駅徒歩">
+        <select name="sort" aria-label="並び順">
+          <option value="updated_desc">更新が新しい順</option>
+          <option value="created_desc">登録が新しい順</option>
+          <option value="price_asc">価格が安い順</option>
+          <option value="price_desc">価格が高い順</option>
+          <option value="area_desc">面積が広い順</option>
+          <option value="walk_asc">駅から近い順</option>
+          <option value="built_desc">築年が新しい順</option>
+          <option value="name_asc">物件名順</option>
+        </select>
+        <button type="reset" class="btn btn-ghost">クリア</button>
+      </form>
+
+      <p id="result-count" class="muted"></p>
+      <div class="table-wrap">
+        <table class="list">
+          <thead>
+            <tr>
+              <th>物件名</th><th>種別</th><th>取引</th><th class="num">価格・賃料</th>
+              <th>所在地 / 最寄駅</th><th>間取り・面積</th><th>築年</th><th>ステータス</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="list-body"></tbody>
+        </table>
+      </div>
+      <p id="empty" class="empty" hidden>該当する物件がありません。</p>
+    </section>
+  </main>
+
+  <dialog id="form-dialog" class="dialog">
+    <form id="property-form" method="dialog" novalidate>
+      <h2 id="form-title">物件を登録</h2>
+      <div class="form-grid" id="form-fields"></div>
+      <p class="form-error" id="form-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost" data-close>キャンセル</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="detail-dialog" class="dialog">
+    <div id="detail-body"></div>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-danger" id="delete-btn">削除</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn btn-ghost" data-close>閉じる</button>
+      <button type="button" class="btn btn-primary" id="edit-btn">編集</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

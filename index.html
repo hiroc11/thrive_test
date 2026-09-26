@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>増殖ラン</title>
+<style>
+  html,body{margin:0;height:100%;background:#1b1f3a;overflow:hidden;touch-action:none;font-family:system-ui,sans-serif}
+  canvas{display:block;margin:0 auto;height:100%;max-width:100%;aspect-ratio:9/16}
+</style>
+</head>
+<body>
+<canvas id="c" width="360" height="640"></canvas>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const W = 360, H = 640, PLAYER_Y = 540, SPEED = 180;
+
+let state, level = 1, best = 1;
+try { best = +localStorage.getItem('best') || 1; level = best; } catch (e) {}
+
+// ---- レベル生成: ゲート(演算) → 敵 → ... → ボス ----
+function makeLevel(lv) {
+  const objs = [];
+  let y = -200;
+  const rows = 5 + Math.min(lv, 10);
+  for (let i = 0; i < rows; i++) {
+    if (i > 0 && i % 3 === 0) {
+      objs.push({ type: 'enemy', y, n: 8 + lv * 6 + i * 4, x: 60 + Math.random() * 240 });
+    } else {
+      // 片方は「おいしい」、片方は「罠」にして選択を迫る
+      const good = [['+', 5 + lv * 2], ['×', 2], ['+', 10 + lv * 3], ['×', 3]][Math.floor(Math.random() * 4)];
+      const bad = [['-', 5 + lv * 2], ['÷', 2], ['+', 1], ['-', 10 + lv]][Math.floor(Math.random() * 4)];
+      const flip = Math.random() < 0.5;
+      objs.push({ type: 'gate', y, l: flip ? good : bad, r: flip ? bad : good, used: false });
+    }
+    y -= 260;
+  }
+  objs.push({ type: 'boss', y: y - 100, n: Math.round(30 * Math.pow(1.55, lv)) });
+  return objs;
+}
+
+function reset() {
+  state = { x: W / 2, n: 1, objs: makeLevel(level), phase: 'ready', t: 0, pops: [] };
+}
+reset();
+
+// ---- 入力: ドラッグ / マウス / 矢印キー ----
+let targetX = W / 2, keys = {};
+function toX(e) { const r = cv.getBoundingClientRect(); return (e.clientX - r.left) * W / r.width; }
+cv.addEventListener('pointerdown', e => {
+  if (state.phase === 'ready') state.phase = 'run';
+  else if (state.phase === 'win' || state.phase === 'lose') { reset(); return; }
+  targetX = toX(e);
+});
+cv.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'mouse') targetX = toX(e); });
+addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (e.key !== ' ') return;
+  if (state.phase === 'ready') state.phase = 'run';
+  else if (state.phase === 'win' || state.phase === 'lose') reset();
+});
+addEventListener('keyup', e => { keys[e.key] = false; });
+
+function apply([op, v], n) {
+  if (op === '+') return n + v;
+  if (op === '-') return n - v;
+  if (op === '×') return n * v;
+  return Math.floor(n / v);
+}
+
+function pop(text, color) { state.pops.push({ text, color, t: 0 }); }
+
+function update(dt) {
+  const s = state;
+  s.pops.forEach(p => p.t += dt);
+  s.pops = s.pops.filter(p => p.t < 1);
+  if (s.phase !== 'run') return;
+  if (keys.ArrowLeft) targetX -= 300 * dt;
+  if (keys.ArrowRight) targetX += 300 * dt;
+  targetX = Math.max(30, Math.min(W - 30, targetX));
+  s.x += (targetX - s.x) * Math.min(1, dt * 12);
+
+  for (const o of s.objs) {
+    o.y += SPEED * dt;
+    if (o.type === 'gate' && !o.used && o.y >= PLAYER_Y) {
+      o.used = true;
+      const g = s.x < W / 2 ? o.l : o.r;
+      const before = s.n;
+      s.n = Math.max(0, apply(g, s.n));
+      pop(`${g[0]}${g[1]}`, s.n >= before ? '#5f5' : '#f55');
+    }
+    if (o.type === 'enemy' && !o.used && Math.abs(o.y - PLAYER_Y) < 20 && Math.abs(o.x - s.x) < 70) {
+      o.used = true;
+      s.n -= o.n;
+      pop(`-${o.n}`, '#f55');
+    }
+    if (o.type === 'boss' && o.y >= PLAYER_Y - 40) {
+      if (s.n > o.n) {
+        s.phase = 'win';
+        level++;
+        try { if (level > best) { best = level; localStorage.setItem('best', best); } } catch (e) {}
+      } else s.phase = 'lose';
+    }
+  }
+  if (s.n <= 0) { s.n = 0; s.phase = 'lose'; }
+}
+
+// ---- 描画 ----
+function crowd(cx, cy, n, color) {
+  const shown = Math.min(n, 120);
+  for (let i = 0; i < shown; i++) {
+    const a = i * 2.39996, r = 4.2 * Math.sqrt(i);   // ひまわり配置で「群れ」に見せる
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.6, 5, 0, 7); ctx.fill();
+  }
+}
+function label(t, x, y, size, color = '#fff') {
+  ctx.font = `bold ${size}px system-ui`; ctx.textAlign = 'center';
+  ctx.lineWidth = 4; ctx.strokeStyle = '#000a'; ctx.strokeText(t, x, y);
+  ctx.fillStyle = color; ctx.fillText(t, x, y);
+}
+
+function draw() {
+  const s = state;
+  ctx.fillStyle = '#2a3060'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#8a93c9'; ctx.fillRect(20, 0, W - 40, H);
+
+  for (const o of s.objs) {
+    if (o.y < -80 || o.y > H + 80) continue;
+    if (o.type === 'gate') {
+      [[o.l, 20], [o.r, W / 2]].forEach(([g, x]) => {
+        const good = g[0] === '+' && g[1] > 1 || g[0] === '×';
+        ctx.fillStyle = good ? '#3b8fffcc' : '#ff4b4bcc';
+        ctx.globalAlpha = o.used ? 0.3 : 1;
+        ctx.fillRect(x + 4, o.y - 30, W / 2 - 28, 50);
+        ctx.globalAlpha = 1;
+        label(`${g[0]}${g[1]}`, x + W / 4 - 10, o.y + 8, 26);
+      });
+    } else if (o.type === 'enemy' && !o.used) {
+      crowd(o.x, o.y, o.n, '#e33');
+      label(o.n, o.x, o.y - 30, 18, '#fcc');
+    } else if (o.type === 'boss') {
+      ctx.fillStyle = '#a11'; ctx.fillRect(W / 2 - 60, o.y - 60, 120, 80);
+      label('BOSS', W / 2, o.y - 25, 22);
+      label(o.n, W / 2, o.y + 5, 24, '#ff0');
+    }
+  }
+
+  crowd(s.x, PLAYER_Y, s.n, '#39f');
+  label(s.n, s.x, PLAYER_Y - 45, 28, '#fff');
+  s.pops.forEach(p => label(p.text, s.x, PLAYER_Y - 80 - p.t * 60, 30, p.color));
+
+  label(`LEVEL ${level}`, W / 2, 40, 22);
+  if (s.phase === 'ready') label('タップでスタート', W / 2, H / 2, 28, '#ff0');
+  if (s.phase === 'win') { label('CLEAR!', W / 2, H / 2 - 20, 48, '#ff0'); label('タップで次へ', W / 2, H / 2 + 30, 22); }
+  if (s.phase === 'lose') { label('あと少し…!', W / 2, H / 2 - 20, 40, '#f66'); label('タップでリトライ', W / 2, H / 2 + 30, 22); }
+}
+
+let last = performance.now();
+function loop(now) {
+  update(Math.min(0.05, (now - last) / 1000));
+  last = now;
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

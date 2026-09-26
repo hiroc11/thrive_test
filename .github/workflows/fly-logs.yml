@@ -1,0 +1,16 @@
+# Fly.io のサーバーログから、エラーの行だけを取り出して表示する（手動実行）
+name: Fly.io logs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  logs:
+    runs-on: ubuntu-latest
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      APP: ${{ vars.FLY_APP_NAME || format('futari-{0}', github.repository_owner) }}
+    steps:
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Recent errors
+        run: flyctl logs -a "$APP" --no-tail 2>&1 | grep -iE "receipt|error|failed|push" | tail -n 60 || true

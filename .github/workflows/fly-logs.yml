@@ -1,16 +1,32 @@
-# Fly.io のサーバーログから、エラーの行だけを取り出して表示する（手動実行）
-name: Fly.io logs
+# 不具合の調査用: サーバーログのエラー行と、レシート読み取りの試し実行の結果を表示する
+name: Diagnose
 
 on:
   workflow_dispatch:
+  push:
+    paths: ['.github/workflows/fly-logs.yml']
 
 jobs:
-  logs:
+  diagnose:
     runs-on: ubuntu-latest
     env:
       FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
       APP: ${{ vars.FLY_APP_NAME || format('futari-{0}', github.repository_owner) }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev
+      - name: Try reading a receipt image with the same code and key
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          node -e "
+            const r = require('./server/receipt.js');
+            const data = require('fs').readFileSync('app/icon-192.png').toString('base64');
+            r.read({ mediaType: 'image/png', data }, '2026-09-26').then(x => console.log('RESULT', JSON.stringify(x)));
+          "
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Recent errors
-        run: flyctl logs -a "$APP" --no-tail 2>&1 | grep -iE "receipt|error|failed|push" | tail -n 60 || true
+      - name: Recent server errors
+        run: flyctl logs -a "$APP" --no-tail 2>&1 | grep -iE "receipt|error|failed" | tail -n 40 || true

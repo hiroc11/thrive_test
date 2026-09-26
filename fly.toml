@@ -1,0 +1,35 @@
+# Fly.io の設定。app 名は `fly launch --no-deploy` で自分用のものに書き換わります。
+app = "futari-app"
+primary_region = "nrt" # 東京
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  DATA_DIR = "/data"
+  TRUST_PROXY = "1"
+
+# ふたりのデータを保存する永続ディスク
+[[mounts]]
+  source = "futari_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # 使っていないときは止めて料金を抑える（アクセスがあれば自動で起動）
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/api/health"
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

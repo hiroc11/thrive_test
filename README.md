@@ -27,6 +27,7 @@ npm start
 | --- | --- | --- |
 | `PORT` | `8080` | 待ち受けポート |
 | `DATA_DIR` | `./data` | ふたりのデータ（ルームごとの JSON）の保存先 |
+| `TRUST_PROXY` | なし | `1` にすると、プロキシが付けた接続元 IP を使います（Fly.io など） |
 
 ## ふたりの端末をつなぐ
 
@@ -39,14 +40,12 @@ npm start
 
 ## 公開（デプロイ）
 
-`Dockerfile` を使って、Docker が動くサービスならどこでも動かせます。
-**`/data` は永続ディスク（ボリューム）にしてください。** そうしないと、再起動のたびにデータが消えます。
+**Fly.io（東京リージョン）へのデプロイ手順は [DEPLOY.md](DEPLOY.md) にあります。** 設定は `fly.toml` に入っています。
 
-- Fly.io: `fly launch` のあと `fly volumes create data` を実行し、`/data` にマウント
-- Render / Railway: Docker でデプロイし、Persistent Disk（Volume）を `/data` にマウント
-- 自宅の PC / Raspberry Pi: `npm start` で起動し、Cloudflare Tunnel などで HTTPS 公開
+ほかのサービスでも、Docker が動けば `Dockerfile` で動かせます。
+その場合は、**`/data` を永続ディスク（ボリューム）にしてください。** そうしないと、再起動でデータが消えます。
+プロキシの後ろで動かすときは、`TRUST_PROXY=1` を設定してください。
 
-スマホでは、公開した URL を開いて「ホーム画面に追加」するとアプリのように使えます。
 アプリだけを GitHub Pages などに置く場合は、設定画面の「同期サーバーのURL」にサーバーのURLを入れてください。
 
 ## しくみ

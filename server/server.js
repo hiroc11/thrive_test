@@ -21,6 +21,8 @@ const MAX_BODY = 1024 * 1024;
 const MAX_RECORD = 4096;
 const MAX_RECORDS_PER_ROOM = 50000;
 const CREATE_LIMIT_PER_HOUR = 20;
+// Fly.io などのプロキシの後ろで動かすときは 1 にして、本当の接続元 IP を使う
+const TRUST_PROXY = process.env.TRUST_PROXY === '1';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -129,6 +131,14 @@ function allowCreate(ip) {
   return true;
 }
 
+function clientIp(req) {
+  if (TRUST_PROXY) {
+    const fwd = req.headers['fly-client-ip'] || String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+    if (fwd) return fwd;
+  }
+  return req.socket.remoteAddress;
+}
+
 function send(res, status, body) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(body));
@@ -183,7 +193,7 @@ async function handleApi(req, res, url) {
   if (parts[1] !== 'rooms') return send(res, 404, { error: 'not found' });
 
   if (parts.length === 2 && req.method === 'POST') {
-    if (!allowCreate(req.socket.remoteAddress)) return send(res, 429, { error: 'too many rooms' });
+    if (!allowCreate(clientIp(req))) return send(res, 429, { error: 'too many rooms' });
     return send(res, 201, { code: createRoom() });
   }
 

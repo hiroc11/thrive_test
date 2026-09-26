@@ -112,3 +112,18 @@ label.field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
   position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom)); transform: translateX(-50%);
   background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 99px; font-size: 14px; z-index: 10;
 }
+
+.title-wrap { display: flex; align-items: center; gap: 8px; }
+.sync-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); display: inline-block; }
+.sync-dot.ok { background: var(--both); }
+.sync-dot.syncing { background: #f2cc8f; }
+.sync-dot.offline { background: #c0392b; }
+.sync-label { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.code {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 28px; font-weight: 700; letter-spacing: 3px;
+  text-align: center; padding: 14px; margin: 10px 0; border-radius: 12px; background: var(--bg); border: 1px dashed var(--accent);
+}
+.card.hint { border-color: var(--accent); }
+summary { cursor: pointer; }

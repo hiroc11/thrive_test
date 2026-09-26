@@ -1,0 +1,12 @@
+{
+  "name": "futari",
+  "version": "0.2.0",
+  "private": true,
+  "description": "ふたりの暮らし - 夫婦で家事分担・買い物・感謝・記念日を共有するアプリ",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node --test test/*.test.js",
+    "test:e2e": "node test/e2e.js"
+  },
+  "engines": { "node": ">=18" }
+}

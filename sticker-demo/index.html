@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}</style>
+</head>
+<body>
+<title>ぷくホロシール帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=DM+Mono:wght@500&display=swap">
+<style>
+  :root {
+    --bg: #f5eff8;
+    --page: #fffafd;
+    --page-line: #f0e4f3;
+    --ink: #3a2d45;
+    --muted: #85759a;
+    --accent: #e8508f;
+    --chip-normal: #e9e4ee;
+    --chip-normal-ink: #5d5169;
+    --chip-rare: #dcecff;
+    --chip-rare-ink: #2b5b95;
+    --chip-srare: #ffe0ee;
+    --chip-srare-ink: #a8255d;
+    --shadow: rgba(80, 40, 90, .28);
+    --round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Yu Gothic", system-ui, sans-serif;
+    --mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #1c1722;
+      --page: #282130;
+      --page-line: #342b3e;
+      --ink: #f3eaf7;
+      --muted: #b3a3c2;
+      --accent: #ff7fb4;
+      --chip-normal: #3a3244;
+      --chip-normal-ink: #d9cfe3;
+      --chip-rare: #1f3552;
+      --chip-rare-ink: #a9cdfb;
+      --chip-srare: #4a1f33;
+      --chip-srare-ink: #ffb3d2;
+      --shadow: rgba(0, 0, 0, .55);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #1c1722;
+    --page: #282130;
+    --page-line: #342b3e;
+    --ink: #f3eaf7;
+    --muted: #b3a3c2;
+    --accent: #ff7fb4;
+    --chip-normal: #3a3244;
+    --chip-normal-ink: #d9cfe3;
+    --chip-rare: #1f3552;
+    --chip-rare-ink: #a9cdfb;
+    --chip-srare: #4a1f33;
+    --chip-srare-ink: #ffb3d2;
+    --shadow: rgba(0, 0, 0, .55);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--round);
+    font-weight: 500;
+    padding: 0 16px;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding-block: 28px 40px; display: grid; gap: 20px; }
+
+  header { display: grid; gap: 8px; }
+  h1 { margin: 0; font-size: clamp(28px, 7vw, 38px); font-weight: 900; letter-spacing: .02em; text-wrap: balance; }
+  h1 span { color: var(--accent); }
+  .lead { margin: 0; color: var(--muted); line-height: 1.7; font-size: 14px; }
+  .sensor { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .sensor button {
+    font: inherit; font-weight: 700; font-size: 13px;
+    border: 2px solid var(--accent); color: var(--accent); background: transparent;
+    border-radius: 999px; padding: 6px 14px; cursor: pointer;
+  }
+  .sensor button:focus-visible, .cell:focus-visible, dialog button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .sensor small { color: var(--muted); font-size: 12px; }
+
+  /* シール帳の台紙（剥離紙のような細いストライプ） */
+  .book {
+    background:
+      repeating-linear-gradient(0deg, transparent 0 23px, var(--page-line) 23px 24px),
+      var(--page);
+    border-radius: 18px;
+    padding: 18px 12px 12px;
+    box-shadow: 0 1px 0 var(--page-line), 0 10px 30px -18px var(--shadow);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 4px;
+  }
+  .cell {
+    display: grid; justify-items: center; gap: 4px;
+    background: none; border: 0; padding: 0 0 8px; color: inherit; font: inherit;
+    cursor: pointer; border-radius: 12px;
+  }
+  .name { font-size: 12px; font-weight: 700; text-align: center; line-height: 1.3; }
+  .serial { font-family: var(--mono); font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .chip {
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    padding: 2px 8px; border-radius: 999px;
+    background: var(--chip-normal); color: var(--chip-normal-ink);
+  }
+  .chip.rare { background: var(--chip-rare); color: var(--chip-rare-ink); }
+  .chip.srare { background: var(--chip-srare); color: var(--chip-srare-ink); }
+  .chip.secret { background: linear-gradient(90deg, #f6d77a, #fff3c4, #e2ac3f); color: #5a3c05; }
+
+  .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .legend div { display: grid; gap: 2px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+  .legend b { color: var(--ink); font-size: 13px; }
+  @media (max-width: 380px) { .legend { grid-template-columns: 1fr; } }
+
+  /* ---------- シール本体 ---------- */
+  .st { --tx: 0; --ty: 0; --mag: 0; --sp1: .5; --sp2: .5; position: relative; width: 100%; aspect-ratio: 1; touch-action: none; }
+  .tilt {
+    position: absolute; inset: 12%;
+    transform: perspective(520px) rotateX(calc(var(--ty) * -16deg)) rotateY(calc(var(--tx) * 16deg));
+    filter: drop-shadow(calc(var(--tx) * -5px) calc(6px + var(--ty) * -3px) 5px var(--shadow));
+  }
+  .edge, .face { position: absolute; -webkit-mask: var(--mask) center / 100% 100% no-repeat; mask: var(--mask) center / 100% 100% no-repeat; }
+  .edge { inset: -7%; background: #fff; }
+  .face { inset: 0; isolation: isolate; overflow: hidden; }
+  .face > i { position: absolute; inset: 0; display: none; }
+  .base { display: block !important; background: var(--base); }
+
+  /* ホロ：虹色の帯が傾きに合わせて流れる */
+  .holo .rainbow, .secret .rainbow {
+    display: block;
+    background: repeating-linear-gradient(115deg, #ff8fd0 0%, #ffe38a 7%, #8dffc6 14%, #8fd0ff 21%, #d6a0ff 28%, #ff8fd0 35%);
+    background-size: 300% 300%;
+    background-position: calc(50% + var(--tx) * 70%) calc(50% + var(--ty) * 70%);
+    mix-blend-mode: hard-light;
+    opacity: calc(.4 + var(--mag) * .5);
+  }
+  .holo .foil, .secret .foil {
+    display: block;
+    background:
+      repeating-linear-gradient(60deg, transparent 0 5px, rgba(255,255,255,.4) 5px 6px),
+      repeating-linear-gradient(-60deg, transparent 0 7px, rgba(255,255,255,.25) 7px 8px);
+    background-position: calc(var(--tx) * 14px) calc(var(--ty) * 14px);
+    mix-blend-mode: overlay;
+  }
+  .holo .glare, .secret .glare {
+    display: block;
+    background: linear-gradient(calc(115deg + var(--tx) * 25deg), transparent 30%, rgba(255,255,255,.75) 48%, transparent 62%);
+    background-size: 250% 250%;
+    background-position: calc(50% - var(--tx) * 60%) calc(50% - var(--ty) * 60%);
+    mix-blend-mode: soft-light;
+  }
+
+  /* ラメ：粒が角度によってまたたく */
+  .glitter .g1, .glitter .g2, .secret .g1, .secret .g2 {
+    display: block;
+    background-image: var(--glitter);
+    background-size: 70px 70px;
+    mix-blend-mode: screen;
+  }
+  .glitter .g1, .secret .g1 { opacity: var(--sp1); background-position: calc(var(--tx) * 6px) calc(var(--ty) * 6px); }
+  .glitter .g2, .secret .g2 { opacity: var(--sp2); background-position: calc(35px - var(--tx) * 6px) calc(21px - var(--ty) * 6px); }
+  .glitter .glare { display: block; background: radial-gradient(ellipse 60% 45% at calc(50% - var(--tx) * 30%) calc(40% - var(--ty) * 30%), rgba(255,255,255,.35), transparent 70%); }
+
+  /* ぷっくり：ふちの影と、動くツヤ */
+  .puffy .rim {
+    display: block;
+    background: radial-gradient(circle at 50% 45%, transparent 48%, rgba(60, 0, 40, .28) 100%);
+    mix-blend-mode: multiply;
+  }
+  .puffy .gloss {
+    display: block;
+    background: radial-gradient(ellipse 48% 36% at calc(50% - var(--tx) * 22%) calc(34% - var(--ty) * 18%), rgba(255,255,255,.85), rgba(255,255,255,.25) 45%, transparent 72%);
+  }
+  .puffy .dot {
+    display: block; inset: auto;
+    left: calc(24% - var(--tx) * 8%); top: calc(18% - var(--ty) * 8%);
+    width: 18%; height: 10%; border-radius: 50%;
+    background: rgba(255,255,255,.95); transform: rotate(-32deg); filter: blur(.6px);
+  }
+  .kao { position: absolute; inset: 0; display: block !important; }
+  .kao::before, .kao::after {
+    content: ""; position: absolute; top: 46%; width: 9%; height: 11%; border-radius: 50%; background: #4a2140;
+  }
+  .kao::before { left: 33%; }
+  .kao::after { right: 33%; }
+  .kao b { position: absolute; left: 43%; top: 58%; width: 14%; height: 7%; border: 3px solid #4a2140; border-top: 0; border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+  .kao em { position: absolute; top: 58%; width: 12%; height: 6%; border-radius: 50%; background: rgba(255, 90, 140, .45); }
+  .kao em:first-of-type { left: 20%; }
+  .kao em:last-of-type { right: 20%; }
+
+  /* ---------- 拡大表示 ---------- */
+  dialog {
+    border: 0; border-radius: 22px; padding: 22px 20px 18px;
+    width: min(360px, calc(100vw - 32px));
+    background: var(--page); color: var(--ink);
+    box-shadow: 0 30px 60px -20px var(--shadow);
+  }
+  dialog::backdrop { background: rgba(30, 15, 40, .45); }
+  .detail { display: grid; gap: 10px; justify-items: center; text-align: center; }
+  .detail .st { width: min(260px, 70vw); }
+  .detail h2 { margin: 0; font-size: 22px; font-weight: 900; }
+  .detail .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .detail .serial { font-size: 13px; }
+  .detail p { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .rate { display: flex; gap: 4px; }
+  .rate i { width: 10px; height: 10px; border-radius: 50%; background: var(--page-line); }
+  .rate i.on { background: var(--accent); }
+  dialog button {
+    font: inherit; font-weight: 700; margin-top: 4px;
+    border: 0; border-radius: 999px; padding: 10px 28px;
+    background: var(--accent); color: #fff; cursor: pointer;
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>ぷく<span>ホロ</span>シール帳</h1>
+    <p class="lead">スマホを傾けるか、シールを指でなぞってみてください。タップすると大きく見られます。<br>どのシールも通し番号つきの数量限定です。</p>
+    <div class="sensor" id="sensorRow" hidden>
+      <button type="button" id="sensorBtn">傾きセンサーを使う</button>
+      <small id="sensorMsg"></small>
+    </div>
+  </header>
+
+  <section class="book" id="book" aria-label="シール帳 1ページ目"></section>
+
+  <section class="legend" aria-label="シールの種類">
+    <div><b>ホロ</b>虹色が角度で流れる</div>
+    <div><b>ぷっくり</b>ツヤの点が動く</div>
+    <div><b>ラメ</b>粒がキラッとまたたく</div>
+  </section>
+</div>
+
+<dialog id="dlg" aria-labelledby="dName">
+  <div class="detail">
+    <div id="dSticker"></div>
+    <h2 id="dName"></h2>
+    <div class="meta"><span class="chip" id="dChip"></span><span class="serial" id="dSerial"></span></div>
+    <div class="rate" id="dRate" aria-label="交換レート"></div>
+    <p id="dNote"></p>
+    <button type="button" id="dClose">閉じる</button>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  const SHAPES = {
+    heart: '<path d="M50 90C19 67 5 51 5 32 5 17 17 7 30 7c9 0 16 5 20 12 4-7 11-12 20-12 13 0 25 10 25 25 0 19-14 35-45 58Z"/>',
+    star: '<path d="M50 4c3 0 4 2 5 4l9 20 22 3c5 1 7 6 3 9L73 56l4 22c1 5-4 8-8 6L50 73 31 84c-4 2-9-1-8-6l4-22L11 40c-4-3-2-8 3-9l22-3 9-20c1-2 2-4 5-4Z"/>',
+    circle: '<circle cx="50" cy="50" r="46"/>',
+    cloud: '<path d="M26 80C11 80 4 67 10 56 3 43 15 29 29 34c4-17 29-21 37-5 14-8 31 3 26 19 10 7 6 32-12 32Z"/>'
+  };
+  const maskURI = shape =>
+    `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>${SHAPES[shape]}</svg>`)}")`;
+
+  const RARITY = {
+    normal: ['ノーマル', ''], rare: ['レア', 'rare'], srare: ['Sレア', 'srare'], secret: ['シークレット', 'secret']
+  };
+
+  const STICKERS = [
+    { name: 'ゆめかわハート', shape: 'heart', kind: 'holo', rarity: 'rare', no: 37, of: 300, rate: 3,
+      base: 'linear-gradient(135deg,#c9d0dc,#8f9bb0 45%,#d7dce6 70%,#9aa6ba)' },
+    { name: 'もちまる', shape: 'circle', kind: 'puffy', rarity: 'normal', no: 1204, of: 5000, rate: 1, kao: true,
+      base: 'radial-gradient(circle at 45% 40%,#ffd9ea,#ffa1ca 60%,#ef6aa6 100%)' },
+    { name: 'きらきらくも', shape: 'cloud', kind: 'glitter', rarity: 'rare', no: 88, of: 500, rate: 3,
+      base: 'linear-gradient(160deg,#d6c5ff,#a28af3)' },
+    { name: 'いちごミルク', shape: 'heart', kind: 'puffy', rarity: 'srare', no: 12, of: 200, rate: 4,
+      base: 'radial-gradient(circle at 45% 38%,#ffe4e9,#ff8ea3 55%,#e44f6d 100%)' },
+    { name: 'ながれぼし', shape: 'star', kind: 'holo', rarity: 'srare', no: 45, of: 150, rate: 4,
+      base: 'linear-gradient(135deg,#b9c6ef,#7486c4 50%,#c8d2f5)' },
+    { name: 'ひみつの一番星', shape: 'star', kind: 'secret', rarity: 'secret', no: 7, of: 100, rate: 5,
+      base: 'linear-gradient(135deg,#f3d27a,#c8922a 45%,#f5dc92 70%,#a8741c)' }
+  ];
+
+  // ラメの粒テクスチャをその場で生成
+  (function makeGlitter() {
+    const c = document.createElement('canvas');
+    c.width = c.height = 140;
+    const g = c.getContext('2d');
+    const colors = ['#ffffff', '#fff3b0', '#ffc2e2', '#bdf3ff', '#e2ccff'];
+    for (let i = 0; i < 260; i++) {
+      g.fillStyle = colors[i % colors.length];
+      g.globalAlpha = .5 + Math.random() * .5;
+      const x = Math.random() * 140, y = Math.random() * 140, r = .5 + Math.random() * 1.3;
+      g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+      if (i % 23 === 0) { // ときどき十字の光
+        g.fillRect(x - 5, y - .5, 10, 1);
+        g.fillRect(x - .5, y - 5, 1, 10);
+      }
+    }
+    document.documentElement.style.setProperty('--glitter', `url(${c.toDataURL()})`);
+  })();
+
+  function makeSticker(s) {
+    const el = document.createElement('div');
+    el.className = `st ${s.kind}`;
+    el.style.setProperty('--mask', maskURI(s.shape));
+    el.style.setProperty('--base', s.base);
+    el.seed = Math.random() * 6;
+    el.innerHTML = `<div class="tilt"><div class="edge"></div><div class="face">
+      <i class="base"></i><i class="rainbow"></i><i class="foil"></i><i class="g1"></i><i class="g2"></i>
+      <i class="rim"></i><i class="glare"></i><i class="gloss"></i><i class="dot"></i>
+      ${s.kao ? '<i class="kao"><em></em><b></b><em></em></i>' : ''}
+    </div></div>`;
+    return el;
+  }
+
+  const fmt = s => `No.${String(s.no).padStart(String(s.of).length, '0')} / ${s.of}`;
+
+  const book = document.getElementById('book');
+  const live = []; // 傾きを反映するシール
+  STICKERS.forEach((s, i) => {
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'cell';
+    cell.setAttribute('aria-label', `${s.name}（${RARITY[s.rarity][0]}）を大きく見る`);
+    const st = makeSticker(s);
+    st.idx = i;
+    cell.append(st);
+    cell.insertAdjacentHTML('beforeend',
+      `<span class="name">${s.name}</span><span class="chip ${RARITY[s.rarity][1]}">${RARITY[s.rarity][0]}</span><span class="serial">${fmt(s)}</span>`);
+    cell.addEventListener('click', e => { if (!dragged) open(s); });
+    book.append(cell);
+    live.push(st);
+  });
+
+  // ---------- 拡大表示 ----------
+  const dlg = document.getElementById('dlg');
+  let big = null;
+  function open(s) {
+    const holder = document.getElementById('dSticker');
+    holder.innerHTML = '';
+    big = makeSticker(s);
+    big.idx = 9;
+    holder.append(big);
+    document.getElementById('dName').textContent = s.name;
+    const chip = document.getElementById('dChip');
+    chip.className = `chip ${RARITY[s.rarity][1]}`;
+    chip.textContent = RARITY[s.rarity][0];
+    document.getElementById('dSerial').textContent = fmt(s);
+    document.getElementById('dRate').innerHTML =
+      Array.from({ length: 5 }, (_, k) => `<i class="${k < s.rate ? 'on' : ''}"></i>`).join('');
+    document.getElementById('dNote').textContent =
+      `このシールは世界に${s.of.toLocaleString()}枚だけ。あなたのは${s.no}番目です。交換レートは点の数が多いほど高めです。`;
+    dlg.showModal();
+  }
+  document.getElementById('dClose').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('close', () => { big = null; });
+
+  // ---------- 入力：指・マウス／傾きセンサー／待機中のゆらぎ ----------
+  let px = null, py = null, lastInput = -1e9, downX = 0, downY = 0, dragged = false;
+  let gyro = null;
+  addEventListener('pointermove', e => { px = e.clientX; py = e.clientY; lastInput = performance.now();
+    if (Math.hypot(px - downX, py - downY) > 8) dragged = true; });
+  addEventListener('pointerdown', e => { px = downX = e.clientX; py = downY = e.clientY; dragged = false; lastInput = performance.now(); });
+
+  const sensorRow = document.getElementById('sensorRow');
+  const sensorMsg = document.getElementById('sensorMsg');
+  if (typeof DeviceOrientationEvent !== 'undefined' && matchMedia('(pointer: coarse)').matches) {
+    sensorRow.hidden = false;
+    document.getElementById('sensorBtn').addEventListener('click', async () => {
+      try {
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+          const r = await DeviceOrientationEvent.requestPermission();
+          if (r !== 'granted') throw 0;
+        }
+        let got = false;
+        addEventListener('deviceorientation', e => {
+          if (e.gamma == null) return;
+          got = true;
+          gyro = { x: e.gamma / 25, y: (e.beta - 40) / 25 };
+        });
+        sensorMsg.textContent = '傾けてみてください';
+        setTimeout(() => { if (!got) sensorMsg.textContent = 'この画面ではセンサーが使えません。指でなぞって試してください。'; }, 1200);
+      } catch {
+        sensorMsg.textContent = 'センサーが許可されませんでした。指でなぞって試してください。';
+      }
+    });
+  }
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = v => Math.max(-1, Math.min(1, v));
+
+  function frame(now) {
+    const targets = big ? [...live, big] : live;
+    const idle = now - lastInput > 2500;
+    for (const el of targets) {
+      let tx = 0, ty = 0;
+      if (gyro) { tx = clamp(gyro.x); ty = clamp(gyro.y); }
+      else if (!idle && px != null) {
+        const r = el.getBoundingClientRect();
+        tx = clamp((px - (r.left + r.width / 2)) / (r.width * .9));
+        ty = clamp((py - (r.top + r.height / 2)) / (r.height * .9));
+      } else if (!reduce) {
+        const t = now / 1000;
+        tx = .6 * Math.sin(t * .9 + el.idx * .7);
+        ty = .45 * Math.sin(t * .7 + el.idx * 1.3);
+      }
+      el.cx = (el.cx || 0) + (tx - (el.cx || 0)) * .14;
+      el.cy = (el.cy || 0) + (ty - (el.cy || 0)) * .14;
+      const x = el.cx, y = el.cy;
+      el.style.setProperty('--tx', x.toFixed(3));
+      el.style.setProperty('--ty', y.toFixed(3));
+      el.style.setProperty('--mag', Math.min(1, Math.hypot(x, y)).toFixed(3));
+      el.style.setProperty('--sp1', (.2 + .8 * Math.max(0, Math.sin(x * 4 + y * 3 + el.seed))).toFixed(3));
+      el.style.setProperty('--sp2', (.2 + .8 * Math.max(0, Math.sin(-x * 3 + y * 4 + el.seed + 2))).toFixed(3));
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

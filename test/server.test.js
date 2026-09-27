@@ -193,6 +193,9 @@ test('sends the morning digest once a day and the weekly review on Sunday', asyn
     { col: 'chores', rec: { id: 'w', title: '洗濯', assignee: 'b', every: 1, points: 2, updatedAt: 1 } },
     { col: 'chores', rec: { id: 'f', title: 'お風呂掃除', assignee: 'both', every: 1, points: 2, updatedAt: 1 } },
     { col: 'events', rec: { id: 'e', title: '結婚記念日', date: '2020-10-01', yearly: true, updatedAt: 1 } },
+    { col: 'deadlines', rec: { id: 'd1', title: '車検', date: '2026-10-05', updatedAt: 1 } },               // 7日後
+    { col: 'deadlines', rec: { id: 'd2', title: '火災保険', date: '2026-10-05', done: true, updatedAt: 1 } }, // 済み
+    { col: 'deadlines', rec: { id: 'd3', title: 'パスポート', date: '2026-10-10', updatedAt: 1 } },          // 12日後 → 出さない
   ] });
   await post(`/api/rooms/${code}/push`, { subscription: SUB('mo-a'), who: 'a', prefs: { time: '07:30' } });
   const mine = async () => (await pushes()).filter(p => p.endpoint === SUB('mo-a').endpoint);
@@ -206,6 +209,8 @@ test('sends the morning digest once a day and the weekly review on Sunday', asyn
   assert.match(got[0].body, /お風呂掃除/);
   assert.doesNotMatch(got[0].body, /洗濯/);          // 相手の担当
   assert.match(got[0].body, /結婚記念日まであと3日/);
+  assert.match(got[0].body, /「車検」の期限まであと7日/);
+  assert.doesNotMatch(got[0].body, /火災保険|パスポート/);
   await tick(day(28, 8, 0)); // 同じ日にもう一度は送らない
   assert.strictEqual((await mine()).length, 1);
 
@@ -356,4 +361,31 @@ test('chat-like pushes are off by default (LINE carries those)', async () => {
   ] });
   const got = (await pushes()).filter(p => p.endpoint === SUB('quiet-a').endpoint).slice(before).map(p => p.title);
   assert.deepStrictEqual(got, ['🙏 奥さんからお願い']); // 名前が未設定なので既定の「奥さん」
+});
+
+test('quick add from Siri / Shortcuts', async () => {
+  const code = await newRoom();
+  const q = qs => fetch(`${BASE}/api/rooms/${code}/quick?${new URLSearchParams(qs)}`);
+  let res = await q({ kind: 'shop', who: 'b', text: ' 牛乳 ' });
+  assert.strictEqual(res.status, 200);
+  assert.match(res.headers.get('content-type'), /text\/plain/);
+  assert.strictEqual(await res.text(), '「牛乳」を買い物リストに追加しました');
+  await q({ kind: 'shop', who: 'b', text: '牛乳' });
+  res = await q({ kind: 'small', who: 'a', text: 'ゴミ袋のセット' });
+  assert.strictEqual(res.status, 200);
+  res = await q({ kind: 'home', who: 'b', min: '15' });
+  assert.match(await res.text(), /今から帰ることを記録しました（\d+:\d\dごろ着）/);
+  res = await post(`/api/rooms/${code}/quick`, { kind: 'shop', who: 'a', text: 'たまご' });
+  assert.deepStrictEqual(await res.json(), { ok: true, message: '「たまご」を買い物リストに追加しました' });
+
+  assert.strictEqual((await q({ kind: 'shop', text: '' })).status, 400);
+  assert.strictEqual((await q({ kind: 'evil', text: 'x' })).status, 400);
+  assert.strictEqual((await fetch(`${BASE}/api/rooms/ABCDEFGHJK/quick?kind=shop&text=x`)).status, 404);
+
+  const { changes } = await post(`/api/rooms/${code}/sync`, { since: 0, changes: [] }).then(r => r.json());
+  const recs = col => changes.filter(c => c.col === col).map(c => c.rec);
+  assert.deepStrictEqual(recs('shopping').map(r => [r.name, r.by]), [['牛乳', 'b'], ['牛乳', 'b'], ['たまご', 'a']]);
+  assert.strictEqual(recs('shopfreq').find(r => r.name === '牛乳').count, 2);
+  assert.deepStrictEqual(recs('log').map(r => [r.title, r.by, r.small, r.points, r.choreId]), [['ゴミ袋のセット', 'a', true, 1, null]]);
+  assert.strictEqual(recs('pings')[0].from, 'b');
 });

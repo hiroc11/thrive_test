@@ -205,7 +205,7 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await B.click('[data-act=req-thanks]');
   await nav(A, 'thanks');
   await until(A, () => document.querySelector('main').innerText.includes('「電球を替えてほしい」をやってくれてありがとう'));
-  const summary = await A.locator('table.summary').innerText();
+  const summary = await A.locator('table.summary:not(.meeting)').innerText();
   assert.match(summary, /お願いに応えた\s+1回\s+0回/, summary);
   console.log('✓ requests + weekly summary');
 
@@ -392,6 +392,104 @@ const until = (P, fn, arg) => P.waitForFunction(fn, arg, { timeout: 5000 });
   await A.click(`main [data-act=done-chore][data-id="${firstChore}"]`);
   assert.strictEqual(await badge(), before - 1);
   console.log('✓ badge', before, '→', before - 1);
+
+  // ---------- v6: 便利機能 ----------
+  // 晩ごはん → 材料を買い物リストへ（リストにあるものは除く・家にあるものは外す・材料の修正は共有）
+  await A.click('#fab');
+  await A.click('#sheet [data-act=sheet][data-id=dinner]');
+  await A.click('#sheet [data-act=ingredients][data-name="カレー"]');
+  assert.ok(await A.locator('#sheet li:has-text("豚こま") input').isDisabled()); // すでに買い物リストにある
+  await A.fill('#sheet form[data-form=ingr] input', 'ローリエ'); await A.press('#sheet form[data-form=ingr] input', 'Enter');
+  await A.locator('#sheet li:has-text("じゃがいも") input').uncheck();
+  await A.click('#sheet [data-act=ingr-add]');
+  await nav(B, 'shopping');
+  await until(B, () => ['カレールー', '玉ねぎ', 'にんじん', 'ローリエ'].every(n => [...document.querySelectorAll('main li .title')].some(t => t.innerText.trim() === n)));
+  assert.ok(!(await rowTitles(B)).includes('じゃがいも'));
+  assert.strictEqual((await rowTitles(B)).filter(t => t === '豚こま').length, 1);
+  await B.click('#fab'); await B.click('#sheet [data-act=sheet][data-id=dinner]');
+  await B.click('#sheet [data-act=ingredients][data-name="カレー"]');
+  assert.match(await B.locator('#sheet').innerText(), /ローリエ/); // 直した材料が相手にも
+  await B.click('#sheet .sheet-head [data-act=sheet-close]');
+  console.log('✓ dinner → ingredients');
+
+  // 名もなき家事: ＋ → チップ1つで記録 → ふりかえりの回数に入る
+  await A.click('#fab'); await A.click('#sheet [data-act=sheet][data-id=small]');
+  await A.click('#sheet [data-act=small-chore][data-name="ゴミ袋のセット"]');
+  assert.ok(await A.locator('#sheet').isHidden());
+  await A.click('#fab'); await A.click('#sheet [data-act=sheet][data-id=small]');
+  await A.fill('#sheet form[data-form=small] input', '網戸の修理'); await A.press('#sheet form[data-form=small] input', 'Enter');
+  await nav(B, 'thanks');
+  await until(B, () => /うち名もなき家事\s*2回/.test(document.querySelector('main table.meeting')?.innerText || ''));
+  console.log('✓ small chores + monthly meeting');
+
+  // ふたり会議: 話したいことを追加 → 相手にも → 話した
+  await B.fill('main form[data-form=topic] input', '年末の帰省どうする？'); await B.press('main form[data-form=topic] input', 'Enter');
+  assert.match(await B.locator('main a.line-btn:has-text("日程を相談")').getAttribute('href'), /line\.me/);
+  await nav(A, 'thanks');
+  await until(A, () => document.querySelector('main').innerText.includes('年末の帰省どうする？'));
+  await A.click('main li:has-text("年末の帰省") [data-act=topic-done]');
+  await until(B, () => !!document.querySelector('main li.done [data-act=topic-done]'));
+  console.log('✓ topics');
+
+  // 期限・更新: 追加 → 相手にも「あと7日」→ 済み
+  const ymdIn = d => { const x = new Date(Date.now() + d * 864e5); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
+  await nav(A, 'events');
+  await A.fill('main form[data-form=deadline] input[name=title]', '車検');
+  await A.fill('main form[data-form=deadline] input[name=date]', ymdIn(7));
+  await A.selectOption('main form[data-form=deadline] select[name=kind]', '車・免許');
+  await A.click('main form[data-form=deadline] .btn');
+  await nav(B, 'events');
+  await until(B, () => /車検[\s\S]*あと7日/.test(document.querySelector('main').innerText));
+  await B.click('main li:has-text("車検") [data-act=deadline-done]');
+  await until(A, () => !document.querySelector('main li.soon'));
+  console.log('✓ deadlines');
+
+  // プレゼントの記録: 記念日とつなぐ → 記念日が近いと「前にあげたもの」を表示
+  const giftDetails = B.locator('main details:has(form[data-form=gift])');
+  await giftDetails.locator('summary').click();
+  await B.fill('main form[data-form=gift] input[name=what]', '花束');
+  await B.fill('main form[data-form=gift] input[name=date]', '2025-10-01');
+  await B.selectOption('main form[data-form=gift] select[name=eventId]', { label: 'ゆきの誕生日' });
+  await B.click('main form[data-form=gift] .btn');
+  await until(A, () => [...document.querySelectorAll('main .card.hint')].some(c => c.innerText.includes('花束') && c.innerText.includes('2025年')));
+  console.log('✓ gifts');
+
+  // 持ち物チェックリスト: ひな形から作る → 相手がチェック → だれが入れたか
+  await nav(A, 'notes');
+  await A.click('main [data-act=pack-template][data-id="旅行"]');
+  await nav(B, 'notes');
+  await until(B, () => document.querySelector('main').innerText.includes('充電器'));
+  await B.click('main li:has-text("充電器") [data-act=pack-check]');
+  await until(A, () => [...document.querySelectorAll('main li.done')].some(li => li.innerText.includes('充電器') && /ゆき.*が入れた/.test(li.innerText)));
+  assert.match(await A.locator('main .chip.on').innerText(), /旅行 1\/12/);
+  await A.click('main [data-act=pack-reset]');
+  await until(B, () => !document.querySelector('main li.done [data-act=pack-check]'));
+  console.log('✓ packing list');
+
+  // 貯金目標: 行きたいとつなぐ → ふたりで入金 → 合計
+  await nav(A, 'budget');
+  await A.fill('main form[data-form=goal] input[name=title]', '温泉旅行');
+  await A.fill('main form[data-form=goal] input[name=target]', '50000');
+  await A.selectOption('main form[data-form=goal] select[name=wishId]', { label: '箱根温泉' });
+  await A.click('main form[data-form=goal] .btn');
+  await A.fill('main form[data-form=deposit] input', '20000'); await A.press('main form[data-form=deposit] input', 'Enter');
+  await nav(B, 'budget');
+  await until(B, () => !!document.querySelector('main form[data-form=deposit]'));
+  await B.fill('main form[data-form=deposit] input', '30000'); await B.press('main form[data-form=deposit] input', 'Enter');
+  await until(A, () => document.querySelector('main .goal.reached')?.innerText.includes('達成'));
+  assert.match(await A.locator('main .goal').innerText(), /箱根温泉[\s\S]*¥50,000[\s\S]*100%/);
+  console.log('✓ savings goal');
+
+  // Siri・ショートカット: 設定に URL → その URL で追加すると相手のリストに届く
+  await nav(A, 'settings');
+  const shopUrl = await A.locator('.shortcut input').first().inputValue();
+  assert.match(shopUrl, /\/api\/rooms\/[A-Z2-9]{10}\/quick\?who=a&kind=shop&text=$/);
+  const qres = await fetch(shopUrl + encodeURIComponent('トイレットペーパー'));
+  assert.strictEqual(await qres.text(), '「トイレットペーパー」を買い物リストに追加しました');
+  await nav(B, 'shopping');
+  await until(B, () => [...document.querySelectorAll('main li .title')].some(t => t.innerText.trim() === 'トイレットペーパー'));
+  await nav(A, 'home');
+  console.log('✓ shortcuts');
 
   // はじめての案内（招待する側）: 名前 → 招待リンク作成 → 通知 → 完了
   const [, C] = await mk();

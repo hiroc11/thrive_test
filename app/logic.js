@@ -244,6 +244,63 @@
     return st;
   }
 
+  // 料理ごとのよく使う材料（晩ごはんが決まったら買い物リストへ）
+  const DINNER_INGREDIENTS = {
+    'カレー': ['カレールー', '玉ねぎ', 'にんじん', 'じゃがいも', '豚こま'],
+    'ハンバーグ': ['ひき肉', '玉ねぎ', 'パン粉', '卵'],
+    '鍋': ['白菜', 'ねぎ', 'しいたけ', '豆腐', '鶏もも肉', '鍋の素'],
+    '焼き魚': ['鮭', '大根'],
+    '生姜焼き': ['豚ロース', '生姜', '玉ねぎ', 'キャベツ'],
+    'パスタ': ['パスタ', 'ベーコン', 'にんにく', 'トマト缶'],
+    'うどん': ['うどん', 'ねぎ', '油揚げ'],
+    '餃子': ['餃子の皮', 'ひき肉', 'キャベツ', 'にら'],
+    '親子丼': ['鶏もも肉', '玉ねぎ', '卵', 'みつば'],
+    'オムライス': ['卵', '鶏もも肉', '玉ねぎ', 'ケチャップ'],
+    '唐揚げ': ['鶏もも肉', '片栗粉', '生姜', 'にんにく'],
+    'お刺身': ['刺身', '大葉'],
+    '麻婆豆腐': ['豆腐', 'ひき肉', 'ねぎ', '麻婆豆腐の素'],
+    'シチュー': ['シチュールー', '鶏もも肉', 'じゃがいも', 'にんじん', '玉ねぎ', '牛乳'],
+    '焼きそば': ['焼きそば麺', '豚こま', 'キャベツ', 'もやし'],
+    'お好み焼き': ['お好み焼き粉', 'キャベツ', '豚バラ', '卵', 'ソース'],
+  };
+
+  // 名もなき家事（予定に入れるほどではない小さな家事）
+  const SMALL_CHORES = [
+    'トイレットペーパーの補充', 'ゴミ袋のセット', '排水口のゴミ取り', '郵便物の整理', '洗剤の詰め替え', 'ティッシュの補充',
+    '靴をそろえる', '玄関のそうじ', 'シーツの交換', 'タオルの交換', '冷蔵庫の中の整理', '植物の水やり',
+    '電池の交換', '宅配の受け取り', '書類の手続き', '献立を考える', 'レシートの整理', '子どもの持ち物準備',
+  ];
+
+  // 持ち物チェックリストのひな形
+  const PACK_TEMPLATES = {
+    '旅行': ['財布', 'スマホ', '充電器', 'モバイルバッテリー', '着替え', '下着', 'パジャマ', '歯ブラシ', 'スキンケア', '薬', '保険証', 'チケット・予約確認'],
+    '帰省': ['財布', 'スマホ', '充電器', '着替え', '下着', 'おみやげ', '薬', '保険証', 'チケット'],
+    'キャンプ': ['テント', '寝袋', 'マット', 'ランタン', 'チェア', 'テーブル', 'クーラーボックス', '調理道具', '食材', '虫よけ', 'ゴミ袋', '着替え'],
+    '出張': ['財布', 'スマホ', '充電器', 'PC', '名刺', '着替え', 'シャツ', '歯ブラシ', 'チケット'],
+  };
+
+  // 期限・更新（車検・保険など）: 期限までの日数
+  function deadlineDays(d, now = new Date()) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date || '')) return null;
+    const [y, m, day] = d.date.split('-').map(Number);
+    return daysBetween(now, new Date(y, m - 1, day));
+  }
+  function upcomingDeadlines(list, now = new Date()) {
+    return alive(list).filter(d => !d.done).map(d => ({ d, days: deadlineDays(d, now) }))
+      .filter(x => x.days !== null).sort((x, y) => x.days - y.days);
+  }
+
+  // ひと月のまとめ（ふたり会議）: ym = 'YYYY-MM'
+  function monthSummary(data, ym) {
+    const inMonth = t => { const d = new Date(t); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` === ym; };
+    const s = { chores: { a: 0, b: 0 }, small: { a: 0, b: 0 }, thanks: { a: 0, b: 0 }, requestsDone: { a: 0, b: 0 }, spend: 0 };
+    alive(data.log || []).filter(l => inMonth(l.at) && s.chores[l.by] !== undefined).forEach(l => { s.chores[l.by]++; if (l.small) s.small[l.by]++; });
+    alive(data.thanks || []).filter(t => inMonth(t.at) && s.thanks[t.from] !== undefined).forEach(t => { s.thanks[t.from]++; });
+    alive(data.requests || []).filter(r => r.status === 'done' && inMonth(r.doneAt || 0) && s.requestsDone[r.to] !== undefined).forEach(r => { s.requestsDone[r.to]++; });
+    alive(data.expenses || []).filter(e => e.kind !== 'settle' && String(e.date || '').startsWith(ym)).forEach(e => { s.spend += Number(e.amount) || 0; });
+    return s;
+  }
+
   // 文字列から短い ID を作る（同じ名前 → 同じ ID）
   function hashId(s) {
     let h = 5381;
@@ -300,5 +357,6 @@
     lastDoneMap, lastLogOf, assigneeOf, choreStatus, scheduleLabel, choresWithStatus, dueChoresFor,
     nextOccurrence, upcomingEvents, eventLabel, weekSummary, balance, badgeCount,
     SHOP_CATS, shopCategory, EXPENSE_CATS, expenseCategory, recurringDue, DINNER_PRESETS, dinnerSuggestions, dinnerState, hashId,
+    DINNER_INGREDIENTS, SMALL_CHORES, PACK_TEMPLATES, deadlineDays, upcomingDeadlines, monthSummary,
   };
 });

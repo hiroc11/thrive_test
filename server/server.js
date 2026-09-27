@@ -22,6 +22,7 @@ const STATIC_DIR = path.resolve(__dirname, '..', 'app');
 const COLLECTIONS = new Set([
   'settings', 'chores', 'log', 'shopping', 'thanks', 'events', 'requests', 'expenses', 'stock', 'notes',
   'pings', 'moods', 'wishes', 'dinner', 'recurring', 'shopfreq',
+  'deadlines', 'recipes', 'topics', 'goals', 'deposits', 'packlists', 'packitems', 'gifts',
 ]);
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const CODE_RE = /^[A-HJ-NP-Z2-9]{10}$/;
@@ -138,6 +139,41 @@ function notify(room, exceptClient) {
   for (const l of room.listeners) {
     if (l.client !== exceptClient) l.res.write(`data: ${room.rev}\n\n`);
   }
+}
+
+// ---------- Siri・ショートカットからの追加 ----------
+function quickAdd(code, room, q) {
+  const who = q.who === 'b' ? 'b' : 'a';
+  const text = String(q.text || '').trim().slice(0, 40);
+  const now = Date.now();
+  const id = `q${now.toString(36)}${crypto.randomBytes(3).toString('hex')}`;
+  const changes = [];
+  let message;
+  if (q.kind === 'shop') {
+    if (!text) return { ok: false, message: '追加するものを入れてください' };
+    changes.push({ col: 'shopping', rec: { id, name: text, done: false, by: who, at: now, updatedAt: now } });
+    const fid = `f-${Logic.hashId(text)}`;
+    const f = (room.records.shopfreq || {})[fid];
+    changes.push({ col: 'shopfreq', rec: { id: fid, name: text, count: (f && !f.deleted ? f.count || 0 : 0) + 1, lastAt: now, updatedAt: now } });
+    message = `「${text}」を買い物リストに追加しました`;
+  } else if (q.kind === 'small') {
+    changes.push({ col: 'log', rec: { id, choreId: null, title: text || '名もなき家事', by: who, at: now, points: 1, small: true, updatedAt: now } });
+    message = `「${text || '名もなき家事'}」を記録しました。おつかれさま！`;
+  } else if (q.kind === 'home') {
+    const d = new Date(now + (Math.min(Math.max(Number(q.min) || 20, 1), 300)) * 60000);
+    const eta = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+    changes.push({ col: 'pings', rec: { id, from: who, kind: 'home', eta, at: now, updatedAt: now } });
+    message = `今から帰ることを記録しました（${eta}ごろ着）`;
+  } else {
+    return { ok: false, message: 'kind は shop / small / home のどれかです' };
+  }
+  const accepted = applyChanges(room, changes);
+  if (accepted.length) {
+    scheduleSave(code, room);
+    notify(room, null);
+    push.onChanges(room, accepted);
+  }
+  return { ok: true, message };
 }
 
 // ---------- HTTP ----------
@@ -265,6 +301,19 @@ async function handleApi(req, res, url) {
       push.onChanges(room, accepted);
     }
     return send(res, 200, { rev: room.rev, changes: changesSince(room, since) });
+  }
+
+  // Siri・ショートカットから、アプリを開かずに追加する（例: ?kind=shop&text=牛乳&who=a）
+  if (parts[3] === 'quick' && (req.method === 'GET' || req.method === 'POST')) {
+    let q;
+    try { q = req.method === 'POST' ? await readJson(req) : Object.fromEntries(url.searchParams); } catch (e) { return send(res, 400, { error: 'bad request' }); }
+    const r = quickAdd(code, room, q);
+    if (req.method === 'GET') {
+      res.writeHead(r.ok ? 200 : 400, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end(r.message);
+      return;
+    }
+    return send(res, r.ok ? 200 : 400, r);
   }
 
   if (parts[3] === 'calendar' && req.method === 'POST') {

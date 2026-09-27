@@ -183,6 +183,11 @@ function morningMessage(room, who, prefs, now) {
     if (requests.length) parts.push(`お願い ${requests.length}件`);
   }
   if (prefs.events) {
+    // 期限・更新（車検・保険など）: 30日前・7日前・前日・当日
+    Logic.upcomingDeadlines(list(room, 'deadlines'), now).forEach(({ d, days }) => {
+      if (days === 0) parts.push(`📋 今日が「${d.title}」の期限です`);
+      else if ([1, 7, 30].includes(days)) parts.push(`📋 「${d.title}」の期限まであと${days}日`);
+    });
     Logic.upcomingEvents(list(room, 'events'), now).forEach(x => {
       const l = Logic.eventLabel(x, now);
       if (l.days === 0) parts.push(`🎉 今日は${x.ev.title}${l.extra}`);

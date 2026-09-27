@@ -1,4 +1,4 @@
-const CACHE = 'futari-v6';
+const CACHE = 'futari-v7';
 const ASSETS = ['./', 'index.html', 'style.css', 'icons.js', 'illustrations.js', 'logic.js', 'app.js', 'manifest.webmanifest', 'icon.svg', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(

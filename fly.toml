@@ -1,0 +1,35 @@
+# Fly.io の設定。app 名は `fly apps create` で作った名前に書き換える
+app = "puku-holo"
+primary_region = "nrt"   # 東京
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8787"
+  DB_FILE = "/app/server/data/puku.db"
+  TRUST_PROXY = "1"
+
+# データベース（SQLite）を置く永続ディスク
+[mounts]
+  source = "puku_data"
+  destination = "/app/server/data"
+
+[http_service]
+  internal_port = 8787
+  force_https = true
+  # リアルタイム通知と SQLite のため、常に1台だけ動かし続ける
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    path = "/healthz"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

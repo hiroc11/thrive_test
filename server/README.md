@@ -23,6 +23,35 @@ npm test           # サーバーのテスト
 `docker build -t puku-holo .` → `docker run -p 8787:8787 -v puku-data:/app/server/data puku-holo` でも動きます。
 **サーバーは1台で動かし、`DB_FILE` は消えないディスクに置いてください**（リアルタイム通知と回数制限をメモリで持っているため）。
 
+## Fly.io に公開する
+
+設定は `fly.toml`（東京リージョン・常に1台・永続ディスクつき）に入っています。自分のパソコンのターミナルで：
+
+```sh
+# 1. flyctl を入れてログイン（Mac なら brew install flyctl）
+curl -L https://fly.io/install.sh | sh
+fly auth login
+
+# 2. アプリを作る。名前は世界で1つだけなので、空いている名前にして fly.toml の app も同じ名前に書き換える
+fly apps create puku-holo
+
+# 3. データベース用の永続ディスク（1GB）を東京に作る
+fly volumes create puku_data --region nrt --size 1
+
+# 4. 運営用の数字を見るための合言葉を登録（画面には出ないので、控えておく）
+fly secrets set ADMIN_TOKEN=$(openssl rand -hex 24)
+
+# 5. 公開（--ha=false で1台だけにする。SQLite とリアルタイム通知のため）
+fly deploy --ha=false
+```
+
+公開後は `https://<アプリ名>.fly.dev` で開けます。運営用の数字は
+`curl -H "x-admin-token: <合言葉>" https://<アプリ名>.fly.dev/api/admin/metrics` で見られます。
+
+**GitHub から自動で公開する場合**：`fly tokens create deploy` で作ったトークンを、リポジトリの Settings → Secrets and variables → Actions に `FLY_API_TOKEN` という名前で登録します。以後 main に入るたびに、テストが通ったら `.github/workflows/fly-deploy.yml` が公開します。
+
+**バックアップ**：Fly.io はボリュームのスナップショットを自動で取ります（保持日数は Fly.io の設定で確認）。大事な公開の前には `fly volumes snapshots create <ボリュームID>` で手動でも取っておくと安心です。
+
 ## できること
 
 | 機能 | 中身 |

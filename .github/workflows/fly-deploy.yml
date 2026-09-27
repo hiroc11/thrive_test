@@ -1,0 +1,24 @@
+# main に入ったらテストしてから Fly.io に公開する。
+# リポジトリの Settings > Secrets に FLY_API_TOKEN（`fly tokens create deploy` で作る）を登録しておくこと
+name: Fly deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency: fly-deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+        working-directory: server
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only --ha=false
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

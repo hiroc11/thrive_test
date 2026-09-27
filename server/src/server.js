@@ -55,7 +55,9 @@ export function createApp({ dbFile = ':memory:', appDir = path.join(here, '../..
     res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...SECURITY_HEADERS, ...headers });
     res.end(JSON.stringify(body));
   };
-  const ipOf = req => (trustProxy && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()) || req.socket.remoteAddress || '';
+  // Fly.io は Fly-Client-IP に本当の接続元を入れる。ほかのロードバランサーは X-Forwarded-For の先頭
+  const ipOf = req => (trustProxy && (String(req.headers['fly-client-ip'] || '') ||
+    String(req.headers['x-forwarded-for'] || '').split(',')[0].trim())) || req.socket.remoteAddress || '';
 
   function readBody(req) {
     return new Promise((resolve, reject) => {
@@ -184,7 +186,9 @@ export function createApp({ dbFile = ':memory:', appDir = path.join(here, '../..
   return { server, svc };
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+// 直接起動されたときだけ待ち受ける（シンボリックリンク経由の起動でも判定できるよう実体のパスで比べる）
+const isMain = () => { try { return fs.realpathSync(process.argv[1]) === fileURLToPath(import.meta.url); } catch { return false; } };
+if (isMain()) {
   const dbFile = process.env.DB_FILE || path.join(here, '../data/puku.db');
   fs.mkdirSync(path.dirname(dbFile), { recursive: true });
   const { server } = createApp({ dbFile, adminToken: process.env.ADMIN_TOKEN || '', trustProxy: process.env.TRUST_PROXY === '1' });

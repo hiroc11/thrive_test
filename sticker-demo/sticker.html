@@ -393,6 +393,35 @@
     max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 14px; background: var(--ink); color: var(--page); font-size: 13px; font-weight: 700;
     box-shadow: 0 10px 30px -10px var(--shadow); }
 
+  .daily { width: 100%; display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 16px;
+    background: var(--page); box-shadow: 0 10px 30px -22px var(--shadow); }
+  .stamp-card { display: grid; gap: 4px; }
+  .stamp-card span { font-size: 11px; color: var(--muted); }
+  .stamps7 { display: flex; gap: 4px; }
+  .stamps7 i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 11px; font-weight: 900;
+    border: 2px dashed var(--page-line); color: var(--muted); }
+  .stamps7 i.on { border: 0; color: #fff; background: radial-gradient(circle at 35% 35%, #ffc2dc, var(--accent)); }
+  .stamps7 i.goal { border-color: #e2ac3f; color: #b07a12; }
+  .stamps7 i.new { animation: stampIn .5s cubic-bezier(.3, 1.8, .5, 1); }
+  @keyframes stampIn { from { transform: scale(2.2) rotate(-20deg); opacity: 0; } }
+  .daily-side { display: grid; gap: 4px; justify-items: end; }
+  .daily-side .btn { font-size: 13px; padding: 8px 14px; white-space: nowrap; }
+  .daily-side .btn:disabled { opacity: .5; cursor: default; }
+  .link { font: inherit; font-size: 11px; color: var(--muted); background: none; border: 0; padding: 2px; text-decoration: underline; cursor: pointer; }
+  @media (max-width: 380px) { .daily { flex-direction: column; align-items: stretch; } .daily-side { justify-items: stretch; } }
+  .z-total { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: baseline; }
+  .z-total b { font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .z-total span { font-size: 12px; color: var(--muted); }
+  .z-total i { grid-column: 1 / -1; display: block; height: 8px; border-radius: 4px; background: var(--page-line); overflow: hidden; }
+  .z-total em { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, #8fd0ff, var(--accent)); }
+  .z-group h3 { display: flex; justify-content: space-between; }
+  .z-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 4px; }
+  .z-cell { display: grid; justify-items: center; gap: 1px; text-align: center; font-size: 10.5px; font-weight: 700; }
+  .z-cell .st { max-width: 62px; }
+  .z-cell small { font-family: var(--mono); font-size: 9.5px; color: var(--muted); }
+  .st.unknown .tilt { filter: brightness(0) opacity(.13); }
+  .st.unknown .face > i:not(.base) { display: none !important; }
+  dialog#zukan,
   dialog#shop, dialog#gift { border: 0; border-radius: 22px; padding: 18px 16px; width: min(420px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); overflow: auto;
     background: var(--page); color: var(--ink); box-shadow: 0 30px 60px -20px var(--shadow); }
   .sheet { display: grid; gap: 10px; }
@@ -571,10 +600,21 @@
       <button type="button" class="btn ghost small" id="kiraAdd">+1,000（デモ）</button>
       <button type="button" class="btn ghost small" id="shopOpen">デコショップ</button>
       <button type="button" class="btn ghost small" id="giftOpen">ギフトを贈る</button>
+      <button type="button" class="btn ghost small" id="zukanOpen">図鑑</button>
     </div>
     <div class="inbox" id="inbox" hidden>
       <span id="inboxText"></span>
       <button type="button" class="btn small" id="inboxOpen">開ける</button>
+    </div>
+    <div class="daily">
+      <div class="stamp-card">
+        <div class="stamps7" id="stamps7" aria-label="ログインスタンプ"></div>
+        <span id="stampNote"></span>
+      </div>
+      <div class="daily-side">
+        <button type="button" class="btn" id="freeBtn">今日の無料パック</button>
+        <button type="button" class="link" id="dayNext">デモ：1日進める</button>
+      </div>
     </div>
     <div class="pity" aria-label="天井（確定までのパック数）">
       <div class="meter"><span>レア以上確定まで</span><b id="pRare"></b><i><em id="pRareBar"></em></i></div>
@@ -775,6 +815,16 @@
   </div>
 </dialog>
 
+<dialog id="zukan" aria-labelledby="zTitle">
+  <div class="sheet">
+    <h2 id="zTitle">図鑑</h2>
+    <div class="z-total"><b id="zPct">0%</b><span id="zCount"></span><i><em id="zBar"></em></i></div>
+    <p>一度でも手に入れたシールは色つき、まだのシールはシルエットで表示されます。そろえても景品はもらえません（記録だけ）。</p>
+    <div id="zBody"></div>
+    <button type="button" class="btn" id="zClose">閉じる</button>
+  </div>
+</dialog>
+
 <dialog id="gift" aria-labelledby="giftTitle">
   <div class="sheet">
     <h2 id="giftTitle">ゆいなにギフトを贈る</h2>
@@ -960,6 +1010,7 @@
     s.st = st;
     if (isNew) owned.unshift(s); else owned.push(s);
     saveOwned();
+    if (!seen.has(s.code)) { seen.add(s.code); try { localStorage.setItem(SEEN_KEY, JSON.stringify([...seen])); } catch {} }
   }
   const owned = []; // 自分のシール帳に入っているシール
   function removeOwned(s) {
@@ -1032,6 +1083,8 @@
       base: 'radial-gradient(circle at 40% 45%,#ffe7c4,#ffc27c 60%,#e8904a 100%)' },
     { name: 'ももじり', code: 'momojiri', shape: 'momo', art: 'oshiri', kind: 'puffy oshiri', rarity: 'normal', no: 2020, of: 5000, rate: 1,
       base: 'radial-gradient(circle at 40% 48%,#fff0f3,#ffb3c4 55%,#f47f9a 100%)' },
+    { name: 'がんばりぼし', code: 'ganbari', shape: 'star', kind: 'aurora', rarity: 'rare', no: 1200, of: 99999, rate: 3, reward: true,
+      base: 'linear-gradient(160deg,#fff7d6,#ffe1f0)' },
     { name: 'ミントぐも', code: 'mint', shape: 'cloud', kind: 'glitter', rarity: 'normal', no: 1873, of: 5000, rate: 1,
       base: 'linear-gradient(160deg,#c6f5e6,#7fd8bd)' }
   ];
@@ -1044,6 +1097,11 @@
     if (!d || n < 1 || n > d.of) return null;
     return { ...d, no: n };
   }
+
+  // 図鑑：一度でも手に入れたデザイン
+  const SEEN_KEY = 'puku-holo-seen-v1';
+  const seen = new Set();
+  try { (JSON.parse(localStorage.getItem(SEEN_KEY) || '[]') || []).forEach(c => seen.add(String(c))); } catch {}
 
   // 手持ちはこのブラウザにだけ保存（別の端末やほかの人には届かない）
   const STORE = 'puku-holo-owned-v1';
@@ -1060,7 +1118,7 @@
 
   // ---------- パックの中身（デザインごとに発行済み枚数を数える） ----------
   const POOL = [
-    ...DESIGNS.map(s => ({ ...s, issued: s.no }))
+    ...DESIGNS.filter(d => !d.reward).map(s => ({ ...s, issued: s.no })) // ごほうびシールはパックから出ない
   ];
 
   // おすもうシリーズの見本（力士・ニャンコ・ワンコの段に分ける）
@@ -1139,7 +1197,8 @@
   const WALLET = 'puku-holo-wallet-v1';
   const monthKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}`; };
   const W = { kira: 3000, month: monthKey(), spent: 0, cap: 5000, sinceRare: 0, sinceSR: 0,
-    papers: ['plain'], tapes: ['none'], paper: 'plain', tape: 'none', inbox: [] };
+    papers: ['plain'], tapes: ['none'], paper: 'plain', tape: 'none', inbox: [],
+    dayOffset: 0, freeDate: '', stampDate: '', stamps: 0, rewardNo: 1200 };
   try { Object.assign(W, JSON.parse(localStorage.getItem(WALLET) || '{}')); } catch {}
   const saveW = () => { try { localStorage.setItem(WALLET, JSON.stringify(W)); } catch {} };
   const toastEl = document.getElementById('toast');
@@ -1251,7 +1310,7 @@
   async function openPack(gift) {
     if (state !== 'idle') return;
     if (!gift && !spend(100)) { pack.style.setProperty('--tear', 0); return; }
-    giftNote = gift || null;
+    giftNote = gift && gift.from ? gift : null;
     state = 'opening';
     current = draw();
     const r = current.rarity, fast = reduce;
@@ -1422,6 +1481,111 @@
   renderPity();
   applyDecor();
   renderInbox();
+
+  // ---------- 毎日：無料パックとログインスタンプ ----------
+  // 日付は端末の日付。デモ用に「1日進める」で dayOffset を足せる
+  function today() {
+    const d = new Date(Date.now() + W.dayOffset * 864e5);
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  }
+  function renderDaily(stampedNow) {
+    const box = document.getElementById('stamps7');
+    box.innerHTML = Array.from({ length: 7 }, (_, i) => {
+      const on = i < W.stamps;
+      const cls = [on ? 'on' : '', i === 6 ? 'goal' : '', stampedNow && i === W.stamps - 1 ? 'new' : ''].filter(Boolean).join(' ');
+      return `<i class="${cls}">${on ? '★' : i === 6 ? '賞' : i + 1}</i>`;
+    }).join('');
+    document.getElementById('stampNote').textContent =
+      `ログインスタンプ ${W.stamps}/7・7こで「がんばりぼし」。休んでも消えないよ`;
+    const free = document.getElementById('freeBtn');
+    const used = W.freeDate === today();
+    free.disabled = used;
+    free.textContent = used ? '無料パックはまた明日' : '今日の無料パック';
+  }
+  function checkIn() {
+    const d = today();
+    if (W.stampDate === d) { renderDaily(false); return; }
+    W.stampDate = d;
+    W.stamps += 1;
+    saveW();
+    renderDaily(true);
+    if (W.stamps >= 7) {
+      // ごほうび：パックからは出ない、スタンプ限定のシール
+      W.rewardNo += 1;
+      W.stamps = 0;
+      saveW();
+      const reward = { ...DESIGN_OF.ganbari, no: W.rewardNo };
+      setTimeout(() => {
+        addCell(reward, true);
+        renderDaily(false);
+        toast('スタンプが7こたまった！「がんばりぼし」をシール帳に貼ったよ');
+      }, 900);
+    } else {
+      toast(`ログインスタンプ ${W.stamps}こめ！`);
+    }
+  }
+  document.getElementById('freeBtn').addEventListener('click', () => {
+    if (W.freeDate === today() || state !== 'idle') return;
+    W.freeDate = today();
+    saveW();
+    renderDaily(false);
+    openPack({ free: true });
+  });
+  document.getElementById('dayNext').addEventListener('click', () => {
+    W.dayOffset += 1;
+    saveW();
+    checkIn();
+  });
+  checkIn();
+
+  // ---------- 図鑑 ----------
+  const zukan = document.getElementById('zukan');
+  const ZGROUPS = [
+    ['はじまりのシール', d => ['yume', 'mochi', 'kumo', 'ichigo', 'nagare', 'himitsu', 'mikan', 'mint'].includes(d.code)],
+    ['おすもうシリーズ', d => d.art === 'rikishi'],
+    ['エフェクト', d => ['aurora', 'jelly', 'prism', 'kinpika', 'change'].includes(d.code)],
+    ['いろいろシリーズ', d => d.kind === 'drop' || d.kind === 'flat' || d.art === 'oshiri'],
+    ['ごほうび', d => d.reward]
+  ];
+  function renderZukan() {
+    const body = document.getElementById('zBody');
+    body.innerHTML = '';
+    const counts = {};
+    owned.forEach(s => { counts[s.code] = (counts[s.code] || 0) + 1; });
+    let total = 0, got = 0;
+    ZGROUPS.forEach(([label, test]) => {
+      const list = DESIGNS.filter(test);
+      const have = list.filter(d => seen.has(d.code)).length;
+      total += list.length;
+      got += have;
+      const group = document.createElement('div');
+      group.className = 'z-group';
+      group.innerHTML = `<h3><span>${label}</span><span>${have}/${list.length}</span></h3>`;
+      const grid = document.createElement('div');
+      grid.className = 'z-grid';
+      list.forEach(d => {
+        const known = seen.has(d.code);
+        const cell = document.createElement('div');
+        cell.className = 'z-cell';
+        const st = makeSticker(d);
+        st.idx = 70;
+        if (!known) st.classList.add('unknown');
+        cell.append(st);
+        cell.insertAdjacentHTML('beforeend', known
+          ? `<span>${d.name}</span><small>${counts[d.code] ? `もってる ×${counts[d.code]}` : 'いまは持ってない'}</small>`
+          : '<span>？？？</span><small>まだ</small>');
+        grid.append(cell);
+      });
+      group.append(grid);
+      body.append(group);
+    });
+    const pct = Math.floor(got / total * 100);
+    document.getElementById('zPct').textContent = `${pct}%`;
+    document.getElementById('zCount').textContent = `${got} / ${total} 種類`;
+    document.getElementById('zBar').style.width = `${pct}%`;
+  }
+  document.getElementById('zukanOpen').addEventListener('click', () => { renderZukan(); zukan.showModal(); });
+  document.getElementById('zClose').addEventListener('click', () => zukan.close());
 
   // ---------- 友達と交換（ゆいなは自動で動く相手役） ----------
   const byName = n => POOL.find(p => p.name === n);
@@ -2406,6 +2570,7 @@
     const targets = big ? [...live, pack, big] : [...live, pack];
     if (trade.open) targets.push(...trade.querySelectorAll('.st'));
     if (online.open) targets.push(...online.querySelectorAll('.st'));
+    if (zukan.open) targets.push(...zukan.querySelectorAll('.st:not(.unknown)'));
     const idle = now - lastInput > 2500;
     for (const el of targets) {
       let tx = 0, ty = 0;

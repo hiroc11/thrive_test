@@ -110,7 +110,11 @@
   .series-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
   .series-head h2 { margin: 0; font-size: 18px; font-weight: 900; }
   .series-head span { font-size: 12px; color: var(--muted); }
-  .series-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; padding: 10px 4px 6px; border-radius: 16px;
+  .series-rows { display: grid; gap: 10px; }
+  .series-group { display: grid; gap: 4px; }
+  .series-group h3 { margin: 0; font-size: 13px; font-weight: 900; color: var(--muted); letter-spacing: .06em; }
+  .series-row .st { max-width: 68px; }
+  .series-row { display: grid; gap: 2px; padding: 10px 4px 6px; border-radius: 16px;
     background: radial-gradient(circle at 50% 120%, color-mix(in srgb, #c8a064 22%, var(--page)), var(--page) 70%); }
   .series-row .cell { gap: 2px; padding-bottom: 4px; }
   .series-row .name { font-size: 11px; }
@@ -422,7 +426,7 @@
 
   <section class="series" aria-labelledby="sumoTitle">
     <div class="series-head"><h2 id="sumoTitle">おすもうシリーズ</h2><span>パックから出るよ。タップで見本を見る</span></div>
-    <div class="series-row" id="sumoRow"></div>
+    <div class="series-rows" id="sumoRows"></div>
   </section>
 
   <section class="legend" aria-label="シールの種類">
@@ -547,7 +551,11 @@
     circle: '<circle cx="50" cy="50" r="46"/>',
     cloud: '<path d="M26 80C11 80 4 67 10 56 3 43 15 29 29 34c4-17 29-21 37-5 14-8 31 3 26 19 10 7 6 32-12 32Z"/>',
     // 力士：まげ・頭・まんまるのおなか・足
-    rikishi: '<path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/>'
+    rikishi: '<path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/>',
+    // 力士ニャンコ：三角耳としっぽ
+    rikishiCat: '<path d="M33 22 30 4 45 14Z"/><path d="M67 22 70 4 55 14Z"/><path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/><path d="M84 74q13-2 9-17" stroke="#000" stroke-width="7" fill="none" stroke-linecap="round"/>',
+    // 力士ワンコ：たれ耳と巻きしっぽ
+    rikishiDog: '<path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="30" cy="31" rx="6.5" ry="11" transform="rotate(22 30 31)"/><ellipse cx="70" cy="31" rx="6.5" ry="11" transform="rotate(-22 70 31)"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/><path d="M85 66q11-6 6-15q-6 2-3 8" stroke="#000" stroke-width="6" fill="none" stroke-linecap="round"/>'
   };
   const maskURI = shape =>
     `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>${SHAPES[shape]}</svg>`)}")`;
@@ -590,11 +598,28 @@
     document.documentElement.style.setProperty('--glitter', `url(${c.toDataURL()})`);
   })();
 
-  // 力士の絵（顔・まげ・まわし）。横綱は綱と紙垂つき
+  // 力士の絵（顔・まげ・まわし）。横綱は綱と紙垂つき。species で人・ネコ・イヌを描き分ける
   function rikishiArt(s) {
     const ink = '#3a2530', mw = s.mw, skin = '#d9876c';
+    const cat = s.species === 'cat', dog = s.species === 'dog';
+    const head = cat ? `
+      <path d="M34.5 18 32.5 8.5 41 14.5ZM65.5 18 67.5 8.5 59 14.5Z" fill="#ff9fb8" opacity=".8"/>
+      ${s.pattern === 'tabby' ? `<path d="M40 20l2 4M60 20l-2 4M31 30h4M65 30h4M32 33.5h3M65 33.5h3" stroke="${s.fur}" stroke-width="2" stroke-linecap="round"/>` : ''}
+      ${s.pattern === 'calico' ? `<path d="M31 22q5-9 14-5q-2 8-12 10Z" fill="#f2a54a"/><path d="M57 17q10-3 12 8q-6 3-12-2Z" fill="#3a3338"/><ellipse cx="72" cy="57" rx="7" ry="5" fill="#f2a54a"/><ellipse cx="29" cy="70" rx="5" ry="4" fill="#3a3338"/>` : ''}`
+      : dog ? `
+      <ellipse cx="30" cy="31" rx="6.5" ry="11" transform="rotate(22 30 31)" fill="${s.fur}"/>
+      <ellipse cx="70" cy="31" rx="6.5" ry="11" transform="rotate(-22 70 31)" fill="${s.fur}"/>
+      <ellipse cx="50" cy="40" rx="10" ry="6.5" fill="${s.muzzle}"/>
+      ${s.pattern === 'shiba' ? `<ellipse cx="39" cy="40" rx="6" ry="4.5" fill="${s.muzzle}"/><ellipse cx="61" cy="40" rx="6" ry="4.5" fill="${s.muzzle}"/><circle cx="42" cy="28.5" r="1.8" fill="${s.muzzle}"/><circle cx="58" cy="28.5" r="1.8" fill="${s.muzzle}"/>` : ''}`
+      : `<path d="M31 31a19 19 0 0 1 38 0c-6-5-12-7-19-7s-13 2-19 7Z" fill="${ink}"/>`;
+    const snout = cat
+      ? `<path d="M48.5 37.3h3l-1.5 1.9Z" fill="#ff7f9e"/><path d="M27 36.5h7M27 40.5l7-1M73 36.5h-7M73 40.5l-7-1" stroke="${ink}" stroke-width="1" opacity=".55" stroke-linecap="round"/>`
+      : dog ? `<ellipse cx="50" cy="37.4" rx="2.7" ry="2" fill="${ink}"/><path d="M48.8 42.6q1.2 2.8 2.4 0Z" fill="#ff7f9e"/>` : '';
+    const belly = cat || dog
+      ? `<ellipse cx="50" cy="60" rx="17" ry="11" fill="${s.muzzle || '#fff6ea'}" opacity=".85"/>`
+      : `<ellipse cx="50" cy="61" rx="1.6" ry="2.3" fill="${skin}" opacity=".75"/>`;
     return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M31 31a19 19 0 0 1 38 0c-6-5-12-7-19-7s-13 2-19 7Z" fill="${ink}"/>
+      ${head}
       ${s.yokozuna
         ? `<path d="M38 13c4-10 20-10 24 0l-4 6H42Z" fill="${ink}"/>`
         : `<ellipse cx="50" cy="13" rx="7" ry="5" fill="${ink}"/>`}
@@ -602,9 +627,10 @@
       <path d="M39 34q3.5-3.5 7 0M54 34q3.5-3.5 7 0" stroke="${ink}" stroke-width="2.3" fill="none" stroke-linecap="round"/>
       <ellipse cx="37" cy="39.5" rx="4.2" ry="2.4" fill="#ff6f96" opacity=".5"/>
       <ellipse cx="63" cy="39.5" rx="4.2" ry="2.4" fill="#ff6f96" opacity=".5"/>
+      ${snout}
       <path d="M46.5 41q1.75 2 3.5 0q1.75 2 3.5 0" stroke="${ink}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-      <path d="M21 56q-4 9 1 17M79 56q4 9-1 17" stroke="${skin}" stroke-width="1.6" fill="none" opacity=".5" stroke-linecap="round"/>
-      <ellipse cx="50" cy="61" rx="1.6" ry="2.3" fill="${skin}" opacity=".75"/>
+      <path d="M21 56q-4 9 1 17M79 56q4 9-1 17" stroke="${cat || dog ? ink : skin}" stroke-width="1.6" fill="none" opacity="${cat || dog ? '.2' : '.5'}" stroke-linecap="round"/>
+      ${belly}
       <path d="M14 71q36 13 72 0l-1.5 10q-34.5 12-69 0Z" fill="${mw}"/>
       <path d="M44 80h12l-1.5 13h-9Z" fill="${mw}"/>
       <path d="M37.5 82v9M41 83v10M59 83v10M62.5 82v9" stroke="${mw}" stroke-width="1.7" stroke-linecap="round" opacity=".85"/>
@@ -674,6 +700,24 @@
       mw: '#e2508a', base: 'linear-gradient(135deg,#ffe6da,#f2b59c 50%,#ffe9df)' },
     { name: 'きらら嶽', code: 'kirara', rank: '横綱', shape: 'rikishi', art: 'rikishi', kind: 'secret', rarity: 'secret', no: 3, of: 50, rate: 5, yokozuna: true,
       mw: '#8a5a12', base: 'linear-gradient(135deg,#fff0c9,#f3c98a 45%,#fff3d6 70%,#e0a867)' },
+    { name: 'にゃんの山', code: 'nyanyama', rank: '前頭', species: 'cat', pattern: 'tabby', fur: '#d0773a', muzzle: '#fff3e2',
+      shape: 'rikishiCat', art: 'rikishi', kind: 'puffy', rarity: 'normal', no: 512, of: 3000, rate: 1,
+      mw: '#2c3e78', base: 'radial-gradient(circle at 45% 40%,#ffe7c4,#ffc27c 60%,#e8904a 100%)' },
+    { name: 'みけ乃花', code: 'mikeno', rank: '小結', species: 'cat', pattern: 'calico', muzzle: '#ffffff',
+      shape: 'rikishiCat', art: 'rikishi', kind: 'glitter', rarity: 'rare', no: 64, of: 600, rate: 3,
+      mw: '#d9482b', base: 'linear-gradient(160deg,#fffaf2,#efe3d2)' },
+    { name: 'しろたま海', code: 'shirotama', rank: '大関', species: 'cat', muzzle: '#ffffff',
+      shape: 'rikishiCat', art: 'rikishi', kind: 'holo', rarity: 'srare', no: 17, of: 200, rate: 4,
+      mw: '#6a4fc9', base: 'linear-gradient(135deg,#ffffff,#dcd8e6 50%,#f7f5fc)' },
+    { name: 'しば丸', code: 'shiba', rank: '前頭', species: 'dog', pattern: 'shiba', fur: '#c9732f', muzzle: '#fff4e2',
+      shape: 'rikishiDog', art: 'rikishi', kind: 'puffy', rarity: 'normal', no: 488, of: 3000, rate: 1,
+      mw: '#2b2b33', base: 'radial-gradient(circle at 45% 40%,#ffdcae,#f0aa60 60%,#d9843a 100%)' },
+    { name: 'わたあめ錦', code: 'wataame', rank: '関脇', species: 'dog', fur: '#e3e0ec', muzzle: '#ffffff',
+      shape: 'rikishiDog', art: 'rikishi', kind: 'glitter', rarity: 'rare', no: 71, of: 600, rate: 3,
+      mw: '#3aa6c9', base: 'linear-gradient(160deg,#ffffff,#eceff6)' },
+    { name: 'こがね嶽', code: 'kogane', rank: '横綱', species: 'dog', fur: '#cf8d3f', muzzle: '#fff3d6', yokozuna: true,
+      shape: 'rikishiDog', art: 'rikishi', kind: 'secret', rarity: 'secret', no: 2, of: 50, rate: 5,
+      mw: '#7a1f2b', base: 'linear-gradient(135deg,#fff0c9,#f3c98a 45%,#fff3d6 70%,#e0a867)' },
     { name: 'ミントぐも', code: 'mint', shape: 'cloud', kind: 'glitter', rarity: 'normal', no: 1873, of: 5000, rate: 1,
       base: 'linear-gradient(160deg,#c6f5e6,#7fd8bd)' }
   ];
@@ -705,9 +749,21 @@
     ...DESIGNS.map(s => ({ ...s, issued: s.no }))
   ];
 
-  // おすもうシリーズの見本
-  const sumoRow = document.getElementById('sumoRow');
-  DESIGNS.filter(d => d.art === 'rikishi').forEach(d => {
+  // おすもうシリーズの見本（力士・ニャンコ・ワンコの段に分ける）
+  const sumoRows = document.getElementById('sumoRows');
+  [['力士', undefined], ['力士ニャンコ', 'cat'], ['力士ワンコ', 'dog']].forEach(([label, species]) => {
+    const group = DESIGNS.filter(d => d.art === 'rikishi' && d.species === species);
+    const wrap = document.createElement('div');
+    wrap.className = 'series-group';
+    wrap.innerHTML = `<h3>${label}</h3>`;
+    const row = document.createElement('div');
+    row.className = 'series-row';
+    row.style.gridTemplateColumns = `repeat(${group.length}, 1fr)`;
+    wrap.append(row);
+    sumoRows.append(wrap);
+    group.forEach(d => addPreview(d, row));
+  });
+  function addPreview(d, sumoRow) {
     const cell = document.createElement('button');
     cell.type = 'button';
     cell.className = 'cell';
@@ -719,7 +775,7 @@
     cell.insertAdjacentHTML('beforeend', `<span class="rank">${d.rank}</span><span class="name">${d.name}</span><span class="chip ${RARITY[d.rarity][1]}">${RARITY[d.rarity][0]}</span>`);
     cell.addEventListener('click', () => { if (!dragged) open(d, true); });
     sumoRow.append(cell);
-  });
+  }
   const ODDS = [['normal', 60], ['rare', 28], ['srare', 10], ['secret', 2]];
   function draw() {
     let roll = Math.random() * 100, rarity = 'normal';

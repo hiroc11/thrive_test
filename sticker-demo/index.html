@@ -135,12 +135,50 @@
   .fx-desc { font-size: 10.5px; line-height: 1.45; color: var(--muted); text-align: center; text-wrap: balance; }
 
   /* ---------- シール本体 ---------- */
-  .st { --tx: 0; --ty: 0; --mag: 0; --sp1: .5; --sp2: .5; position: relative; width: 100%; aspect-ratio: 1; touch-action: none; }
+  .st { --tx: 0; --ty: 0; --mag: 0; --sp1: .5; --sp2: .5; --press: 0; --soft: .5; position: relative; width: 100%; aspect-ratio: 1; touch-action: none; transform-origin: 50% 80%; }
+  /* 押したときのやわらかさ（大きいほどよくつぶれる） */
+  .puffy, .jelly { --soft: 1; }
+  .drop { --soft: .7; }
+  .oshiri { --soft: 1.4; }
+  .flat { --soft: .3; }
+  .metal { --soft: .15; }
   .tilt {
-    position: absolute; inset: 12%;
-    transform: perspective(520px) rotateX(calc(var(--ty) * -16deg)) rotateY(calc(var(--tx) * 16deg));
-    filter: drop-shadow(calc(var(--tx) * -5px) calc(6px + var(--ty) * -3px) 5px var(--shadow));
+    position: absolute; inset: 12%; transform-origin: 50% 85%;
+    transform: perspective(520px) rotateX(calc(var(--ty) * -16deg)) rotateY(calc(var(--tx) * 16deg))
+      scale(calc(1 + var(--press) * .05 * var(--soft)), calc(1 - var(--press) * .09 * var(--soft)));
+    filter: drop-shadow(calc(var(--tx) * -5px) calc(6px + var(--ty) * -3px - var(--press) * 3px) calc(5px - var(--press) * 2px) var(--shadow));
   }
+  /* 指の位置のへこみと、離したときの波紋 */
+  .face > i.press {
+    display: block;
+    background: radial-gradient(circle at var(--pxp, 50%) var(--pyp, 50%),
+      rgba(60, 20, 60, calc(var(--press) * .13)) 0 calc(4% + var(--soft) * 4%),
+      rgba(255, 255, 255, calc(var(--press) * .45)) calc(8% + var(--soft) * 6%),
+      transparent calc(14% + var(--soft) * 12%));
+  }
+  .face > i.ripple { display: block; inset: auto; width: 22%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,.85);
+    transform: translate(-50%, -50%); pointer-events: none; }
+
+  /* ぷくドロップ：厚い透明樹脂のドーム */
+  .drop .edge { background: rgba(255,255,255,.75); }
+  .drop .tilt { filter: drop-shadow(calc(var(--tx) * -5px) calc(7px + var(--ty) * -3px - var(--press) * 3px) 6px color-mix(in srgb, var(--tint, #ff7fb4) 55%, transparent)); }
+  .drop .dropfx {
+    display: block;
+    background:
+      radial-gradient(ellipse 36% 24% at calc(34% - var(--tx) * 14%) calc(24% - var(--ty) * 12%), rgba(255,255,255,.95), rgba(255,255,255,0) 72%),
+      radial-gradient(ellipse 46% 26% at calc(64% + var(--tx) * 12%) calc(80% + var(--ty) * 8%), rgba(255,255,255,.6), transparent 70%),
+      radial-gradient(circle at 50% 52%, transparent 56%, rgba(40,0,40,.2) 76%, rgba(255,255,255,.55) 90%, transparent 97%);
+  }
+  .drop .kao { filter: blur(.4px); transform: scale(1.08); }
+  .drop .dot { display: block; inset: auto; left: calc(26% - var(--tx) * 8%); top: calc(16% - var(--ty) * 8%); width: 14%; height: 8%; border-radius: 50%;
+    background: #fff; transform: rotate(-32deg); }
+
+  /* シンプル：光らない、紙のようなマット */
+  .flat .edge { inset: -5%; }
+  .flat .gloss { display: block; background:
+      radial-gradient(rgba(0,0,0,.028) 1px, transparent 1.2px) 0 0 / 5px 5px,
+      radial-gradient(rgba(255,255,255,.08) 1px, transparent 1.2px) 2px 3px / 6px 6px; }
+  .flat .kao::before, .flat .kao::after { width: 7%; height: 7%; top: 44%; }
   .edge, .face { position: absolute; -webkit-mask: var(--mask) center / 100% 100% no-repeat; mask: var(--mask) center / 100% 100% no-repeat; }
   .edge { inset: -7%; background: #fff; }
   .face { inset: 0; isolation: isolate; overflow: hidden; }
@@ -525,6 +563,10 @@
   <header>
     <h1>ぷく<span>ホロ</span>シール帳</h1>
     <p class="lead">スマホを傾けるか、シールを指でなぞってみてください。タップすると大きく見られます。<br>どのシールも通し番号つきの数量限定です。</p>
+    <div class="sensor">
+      <button type="button" id="soundBtn" aria-pressed="true">音：オン</button>
+      <small>押したときの音。素材ごとにちがうよ</small>
+    </div>
     <div class="sensor" id="sensorRow" hidden>
       <button type="button" id="sensorBtn">傾きセンサーを使う</button>
       <small id="sensorMsg"></small>
@@ -595,6 +637,11 @@
   <section class="series" aria-labelledby="sumoTitle">
     <div class="series-head"><h2 id="sumoTitle">おすもうシリーズ</h2><span>パックから出るよ。タップで見本を見る</span></div>
     <div class="series-rows" id="sumoRows"></div>
+  </section>
+
+  <section class="series" aria-labelledby="moreTitle">
+    <div class="series-head"><h2 id="moreTitle">いろいろシリーズ</h2><span>パックから出るよ。押すと感触がちがう</span></div>
+    <div class="series-rows" id="moreRows"></div>
   </section>
 
   <section class="series" aria-labelledby="fxTitle">
@@ -761,7 +808,15 @@
     // 力士ニャンコ：三角耳としっぽ
     rikishiCat: '<path d="M33 22 30 4 45 14Z"/><path d="M67 22 70 4 55 14Z"/><path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/><path d="M84 74q13-2 9-17" stroke="#000" stroke-width="7" fill="none" stroke-linecap="round"/>',
     // 力士ワンコ：たれ耳と巻きしっぽ
-    rikishiDog: '<path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="30" cy="31" rx="6.5" ry="11" transform="rotate(22 30 31)"/><ellipse cx="70" cy="31" rx="6.5" ry="11" transform="rotate(-22 70 31)"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/><path d="M85 66q11-6 6-15q-6 2-3 8" stroke="#000" stroke-width="6" fill="none" stroke-linecap="round"/>'
+    rikishiDog: '<path d="M38 13c4-10 20-10 24 0l-4 6H42Z"/><circle cx="50" cy="32" r="19"/><ellipse cx="30" cy="31" rx="6.5" ry="11" transform="rotate(22 30 31)"/><ellipse cx="70" cy="31" rx="6.5" ry="11" transform="rotate(-22 70 31)"/><ellipse cx="50" cy="65" rx="37" ry="29"/><ellipse cx="32" cy="92" rx="10" ry="6"/><ellipse cx="68" cy="92" rx="10" ry="6"/><path d="M85 66q11-6 6-15q-6 2-3 8" stroke="#000" stroke-width="6" fill="none" stroke-linecap="round"/>',
+    bear: '<circle cx="50" cy="56" r="36"/><circle cx="22" cy="24" r="14"/><circle cx="78" cy="24" r="14"/>',
+    ribbon: '<path d="M50 44C38 28 14 18 10 34c-4 16 6 34 22 30 8-2 14-8 18-14 4 6 10 12 18 14 16 4 26-14 22-30C86 18 62 28 50 44Z"/><circle cx="50" cy="48" r="10"/><path d="M44 54 34 88l12-6 4 10 4-10 12 6-10-34Z"/>',
+    onigiri: '<path d="M50 8c8 0 14 6 20 16l20 38c8 16-2 30-20 30H30C12 92 2 78 10 62l20-38C36 14 42 8 50 8Z"/>',
+    clover: '<circle cx="50" cy="28" r="17"/><circle cx="28" cy="50" r="17"/><circle cx="72" cy="50" r="17"/><circle cx="50" cy="70" r="17"/><path d="M54 82q5 8 14 11" stroke="#000" stroke-width="6" fill="none" stroke-linecap="round"/>',
+    // おしり：まんまるのほっぺ2つ＋しっぽや葉っぱ
+    oshiriDog: '<ellipse cx="33" cy="60" rx="27" ry="29"/><ellipse cx="67" cy="60" rx="27" ry="29"/><path d="M50 34q-12-18 3-26q16 3 5 17" stroke="#000" stroke-width="10" fill="none" stroke-linecap="round"/>',
+    oshiriCat: '<ellipse cx="33" cy="60" rx="27" ry="29"/><ellipse cx="67" cy="60" rx="27" ry="29"/><path d="M52 36q-3-20 12-28" stroke="#000" stroke-width="9" fill="none" stroke-linecap="round"/>',
+    momo: '<ellipse cx="34" cy="60" rx="28" ry="30"/><ellipse cx="66" cy="60" rx="28" ry="30"/><path d="M50 34q-2-16 13-24q11 9-4 23Z"/>'
   };
   const maskURI = shape =>
     `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>${SHAPES[shape]}</svg>`)}")`;
@@ -848,6 +903,29 @@
     </svg>`;
   }
 
+  // おしり：割れ目・ほっぺの赤み・しっぽや葉っぱ
+  function oshiriArt(s) {
+    const crease = `<path d="M50 38q-3.5 20 0 44" stroke="rgba(120,50,40,.32)" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    const blush = `<ellipse cx="28" cy="70" rx="7" ry="4" fill="#ff7fa0" opacity=".42"/><ellipse cx="72" cy="70" rx="7" ry="4" fill="#ff7fa0" opacity=".42"/>`;
+    const extra = s.shape === 'oshiriDog'
+      ? `<ellipse cx="50" cy="84" rx="17" ry="8" fill="#fff4e2"/><path d="M50 34q-12-18 3-26q16 3 5 17" stroke="#fff4e2" stroke-width="3.5" fill="none" stroke-linecap="round"/>`
+      : s.shape === 'oshiriCat'
+        ? `<path d="M53 30l6-2M55 22l6-3M59 15l5-4" stroke="${s.fur}" stroke-width="2.4" stroke-linecap="round"/><path d="M9 55l6 2M8 63l6 1M91 55l-6 2M92 63l-6 1" stroke="${s.fur}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`
+        : `<path d="M50 34q-2-16 13-24q11 9-4 23Z" fill="#7cc576"/><path d="M52 31q3-10 10-17" stroke="#4f9a4b" stroke-width="1.4" fill="none"/>`;
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${extra}${crease}${blush}</svg>`;
+  }
+  // シンプル：線と面だけのフラットな絵
+  function simpleArt(s) {
+    const ink = '#3a2530';
+    if (s.shape === 'onigiri') return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M33 64h34v28H33Z" fill="#26332a"/><circle cx="42" cy="47" r="2.4" fill="${ink}"/><circle cx="58" cy="47" r="2.4" fill="${ink}"/>
+      <path d="M46.5 53q3.5 3 7 0" stroke="${ink}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <ellipse cx="36" cy="53" rx="4" ry="2.3" fill="#ff8fa8" opacity=".5"/><ellipse cx="64" cy="53" rx="4" ry="2.3" fill="#ff8fa8" opacity=".5"/></svg>`;
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M50 16v24M50 60v24M16 50h24M60 50h24" stroke="rgba(255,255,255,.55)" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+  }
+  const artFor = s => s.art === 'rikishi' ? rikishiArt(s) : s.art === 'oshiri' ? oshiriArt(s) : s.art === 'simple' ? simpleArt(s) : '';
+
   function makeSticker(s) {
     const el = document.createElement('div');
     el.className = `st ${s.kind}`;
@@ -858,10 +936,11 @@
     el.seed = Math.random() * 6;
     el.innerHTML = `<div class="tilt"><div class="edge"></div><div class="face">
       <i class="base"></i><i class="lentB"></i><i class="aur"></i><i class="rainbow"></i><i class="pr"></i><i class="foil"></i><i class="mt"></i><i class="g1"></i><i class="g2"></i>
-      ${s.art === 'rikishi' ? `<i class="art">${rikishiArt(s)}</i>` : ''}
+      ${s.art ? `<i class="art">${artFor(s)}</i>` : ''}
       ${s.art === 'rikishi' && s.kind === 'lenti' ? `<i class="art art2">${rikishiArt({ ...s, mw: s.mw2 || s.mw, heart: true })}</i>` : ''}
       <i class="ridge"></i><i class="gel"></i><i class="rim"></i><i class="glare"></i><i class="gloss"></i><i class="dot"></i>
       ${s.kao ? '<i class="kao"><em></em><b></b><em></em></i>' : ''}
+      <i class="dropfx"></i><i class="press"></i>
     </div></div>`;
     return el;
   }
@@ -943,6 +1022,24 @@
       base2: 'radial-gradient(circle at 45% 40%,#d9ecff,#9fcbff 60%,#5f98ea 100%)' },
     { name: 'ウインク関', code: 'wink', rank: '小結', shape: 'rikishi', art: 'rikishi', kind: 'lenti', rarity: 'srare', no: 33, of: 200, rate: 4,
       mw: '#e2508a', mw2: '#2f6fd6', base: 'radial-gradient(circle at 45% 40%,#fff1e8,#ffd2bd 60%,#f2a58a 100%)' },
+    { name: 'くまドロップ', code: 'dropkuma', shape: 'bear', kind: 'drop', rarity: 'rare', no: 70, of: 600, rate: 3, kao: true, tint: '#ff9a3c',
+      base: 'radial-gradient(circle at 45% 42%,rgba(255,214,150,.9),rgba(255,160,70,.85) 65%,rgba(214,110,30,.95))' },
+    { name: 'リボンドロップ', code: 'dropribbon', shape: 'ribbon', kind: 'drop', rarity: 'rare', no: 41, of: 600, rate: 3, tint: '#ff5fa2',
+      base: 'radial-gradient(circle at 45% 42%,rgba(255,200,226,.9),rgba(255,110,170,.85) 65%,rgba(214,50,120,.95))' },
+    { name: 'ハートドロップ', code: 'drophart', shape: 'heart', kind: 'drop', rarity: 'srare', no: 14, of: 200, rate: 4, tint: '#9b6bff',
+      base: 'radial-gradient(circle at 45% 40%,rgba(226,210,255,.9),rgba(160,120,255,.85) 65%,rgba(104,64,214,.95))' },
+    { name: 'おにぎり', code: 'onigiri', shape: 'onigiri', art: 'simple', kind: 'flat', rarity: 'normal', no: 1500, of: 6000, rate: 1,
+      base: '#fbfaf6' },
+    { name: 'よつば', code: 'yotsuba', shape: 'clover', art: 'simple', kind: 'flat', rarity: 'normal', no: 1320, of: 6000, rate: 1,
+      base: '#5fbf74' },
+    { name: 'にこにこ', code: 'niko', shape: 'circle', kind: 'flat', rarity: 'normal', no: 1777, of: 6000, rate: 1, kao: true,
+      base: '#ffd84d' },
+    { name: 'しばのおしり', code: 'shibajiri', shape: 'oshiriDog', art: 'oshiri', kind: 'puffy oshiri', rarity: 'srare', no: 18, of: 200, rate: 4,
+      base: 'radial-gradient(circle at 40% 45%,#ffdcae,#f0aa60 60%,#d9843a 100%)' },
+    { name: 'ねこのおしり', code: 'nekojiri', shape: 'oshiriCat', art: 'oshiri', kind: 'puffy oshiri', rarity: 'rare', no: 66, of: 600, rate: 3, fur: '#c86a2a',
+      base: 'radial-gradient(circle at 40% 45%,#ffe7c4,#ffc27c 60%,#e8904a 100%)' },
+    { name: 'ももじり', code: 'momojiri', shape: 'momo', art: 'oshiri', kind: 'puffy oshiri', rarity: 'normal', no: 2020, of: 5000, rate: 1,
+      base: 'radial-gradient(circle at 40% 48%,#fff0f3,#ffb3c4 55%,#f47f9a 100%)' },
     { name: 'ミントぐも', code: 'mint', shape: 'cloud', kind: 'glitter', rarity: 'normal', no: 1873, of: 5000, rate: 1,
       base: 'linear-gradient(160deg,#c6f5e6,#7fd8bd)' }
   ];
@@ -988,6 +1085,20 @@
     sumoRows.append(wrap);
     group.forEach(d => addPreview(d, row));
   });
+  // いろいろシリーズの見本
+  const moreRows = document.getElementById('moreRows');
+  [['ぷくドロップ', d => d.kind === 'drop'], ['シンプル', d => d.kind === 'flat'], ['おしり', d => d.art === 'oshiri']].forEach(([label, test]) => {
+    const group = DESIGNS.filter(test);
+    const wrap = document.createElement('div');
+    wrap.className = 'series-group';
+    wrap.innerHTML = `<h3>${label}</h3>`;
+    const row = document.createElement('div');
+    row.className = 'series-row';
+    row.style.gridTemplateColumns = `repeat(${group.length}, 1fr)`;
+    wrap.append(row);
+    moreRows.append(wrap);
+    group.forEach(d => addPreview(d, row));
+  });
   // エフェクト図鑑
   const FX = [
     ['yume', 'ホロ', '虹色が角度で流れる'],
@@ -998,7 +1109,10 @@
     ['prism', 'プリズム', 'カット面で色が割れる'],
     ['kinpika', 'メタリック', '鋭い光が走る'],
     ['change', 'チェンジング', '角度で絵が変わる'],
-    ['himitsu', 'シークレット', 'ホロとラメの全部のせ']
+    ['himitsu', 'シークレット', 'ホロとラメの全部のせ'],
+    ['drophart', 'ドロップ', '厚いドームに光が入る'],
+    ['niko', 'シンプル', '光らない紙の質感'],
+    ['momojiri', 'ぷりぷり', 'いちばんよくつぶれる']
   ];
   const fxGrid = document.getElementById('fxGrid');
   FX.forEach(([code, label, desc]) => {
@@ -1020,12 +1134,12 @@
     const cell = document.createElement('button');
     cell.type = 'button';
     cell.className = 'cell';
-    cell.setAttribute('aria-label', `${d.rank} ${d.name}（${RARITY[d.rarity][0]}）の見本を見る`);
+    cell.setAttribute('aria-label', `${d.rank ? d.rank + ' ' : ''}${d.name}（${RARITY[d.rarity][0]}）の見本を見る`);
     const st = makeSticker(d);
     st.idx = live.length;
     live.push(st);
     cell.append(st);
-    cell.insertAdjacentHTML('beforeend', `<span class="rank">${d.rank}</span><span class="name">${d.name}</span><span class="chip ${RARITY[d.rarity][1]}">${RARITY[d.rarity][0]}</span>`);
+    cell.insertAdjacentHTML('beforeend', `${d.rank ? `<span class="rank">${d.rank}</span>` : ''}<span class="name">${d.name}</span><span class="chip ${RARITY[d.rarity][1]}">${RARITY[d.rarity][0]}</span>`);
     cell.addEventListener('click', () => { if (!dragged) open(d, true); });
     sumoRow.append(cell);
   }
@@ -2186,8 +2300,86 @@
     if (e.pointerType === 'mouse') activeEl = stickerAt(e);
     if (Math.hypot(px - downX, py - downY) > 8) dragged = true; });
   addEventListener('pointerdown', e => { px = downX = e.clientX; py = downY = e.clientY; dragged = false; lastInput = performance.now();
-    activeEl = stickerAt(e); });
-  const release = e => { if (e.pointerType !== 'mouse') activeEl = null; };
+    activeEl = stickerAt(e);
+    const st = e.target instanceof Element ? e.target.closest('.st') : null;
+    if (st) pressSticker(st); });
+
+  // ---------- 触った感触：つぶれる・へこむ・ぷるんと戻る・波紋・音・振動 ----------
+  let pressedEl = null, audio = null;
+  let soundOn = true;
+  try { soundOn = localStorage.getItem('puku-holo-sound') !== 'off'; } catch {}
+  const soundBtn = document.getElementById('soundBtn');
+  const renderSound = () => { soundBtn.textContent = soundOn ? '音：オン' : '音：オフ'; soundBtn.setAttribute('aria-pressed', String(soundOn)); };
+  renderSound();
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    try { localStorage.setItem('puku-holo-sound', soundOn ? 'on' : 'off'); } catch {}
+    renderSound();
+  });
+  const feelOf = el => {
+    const c = el.classList;
+    return c.contains('oshiri') ? 'puri' : c.contains('drop') ? 'koron' : c.contains('flat') ? 'kasa' : c.contains('metal') ? 'kin'
+      : c.contains('puffy') || c.contains('jelly') ? 'puni' : 'shara';
+  };
+  function tone(type, freq, to, dur, gain, at = 0) {
+    const t = audio.currentTime + at;
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(gain, t + .008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(audio.destination);
+    o.start(t);
+    o.stop(t + dur + .02);
+  }
+  function playFeel(kind) {
+    if (!soundOn) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === 'suspended') audio.resume();
+      if (kind === 'puni') tone('sine', 520, 240, .09, .06);
+      else if (kind === 'puri') { tone('sine', 240, 520, .08, .06); tone('sine', 520, 300, .08, .05, .07); }
+      else if (kind === 'koron') { tone('sine', 1320, 0, .18, .045); tone('sine', 1980, 0, .14, .025, .04); }
+      else if (kind === 'kin') tone('triangle', 2400, 0, .28, .035);
+      else if (kind === 'kasa') tone('square', 900, 500, .025, .015);
+      else { tone('sine', 2100, 0, .12, .02); tone('sine', 2800, 0, .1, .015, .05); }
+    } catch {}
+  }
+  function pressSticker(st) {
+    pressedEl = st;
+    st.pressed = true;
+    playFeel(feelOf(st));
+    if (navigator.vibrate) try { navigator.vibrate(feelOf(st) === 'kin' ? 4 : 8); } catch {}
+  }
+  function unpress() {
+    const el = pressedEl;
+    if (!el) return;
+    pressedEl = null;
+    el.pressed = false;
+    if (reduce) return;
+    const k = parseFloat(getComputedStyle(el).getPropertyValue('--soft')) || .5;
+    // ぷるんと戻る（やわらかい素材ほど大きく揺れる）
+    el.animate([
+      { transform: `scale(${1 + .06 * k}, ${1 - .08 * k})` },
+      { transform: `scale(${1 - .05 * k}, ${1 + .06 * k})` },
+      { transform: `scale(${1 + .025 * k}, ${1 - .03 * k})` },
+      { transform: 'none' }
+    ], { duration: 300 + 220 * k, easing: 'ease-out', composite: 'add' });
+    // 指を離した場所から波紋
+    const face = el.querySelector('.face');
+    if (face) {
+      const r = document.createElement('i');
+      r.className = 'ripple';
+      r.style.left = el.style.getPropertyValue('--pxp') || '50%';
+      r.style.top = el.style.getPropertyValue('--pyp') || '50%';
+      face.append(r);
+      r.animate([{ transform: 'translate(-50%,-50%) scale(.3)', opacity: .9 }, { transform: 'translate(-50%,-50%) scale(3.4)', opacity: 0 }],
+        { duration: 520, easing: 'ease-out' }).finished.then(() => r.remove());
+    }
+  }
+  const release = e => { if (e.pointerType !== 'mouse') activeEl = null; unpress(); };
   addEventListener('pointerup', release);
   addEventListener('pointercancel', release);
 
@@ -2243,6 +2435,18 @@
       el.style.setProperty('--mag', Math.min(1, Math.hypot(x, y)).toFixed(3));
       el.style.setProperty('--sp1', (.2 + .8 * Math.max(0, Math.sin(x * 4 + y * 3 + el.seed))).toFixed(3));
       el.style.setProperty('--sp2', (.2 + .8 * Math.max(0, Math.sin(-x * 3 + y * 4 + el.seed + 2))).toFixed(3));
+      // 押し込み量と、指の位置（シールの中の％）
+      const target = el.pressed ? 1 : 0;
+      if (target || el.pr) {
+        el.pr = (el.pr || 0) + (target - (el.pr || 0)) * (target ? .45 : .3);
+        if (el.pr < .01 && !target) el.pr = 0;
+        el.style.setProperty('--press', el.pr.toFixed(3));
+        if (el.pressed && px != null) {
+          const r = el.querySelector('.face')?.getBoundingClientRect() || el.getBoundingClientRect();
+          el.style.setProperty('--pxp', `${Math.max(0, Math.min(100, (px - r.left) / r.width * 100)).toFixed(1)}%`);
+          el.style.setProperty('--pyp', `${Math.max(0, Math.min(100, (py - r.top) / r.height * 100)).toFixed(1)}%`);
+        }
+      }
     }
     requestAnimationFrame(frame);
   }

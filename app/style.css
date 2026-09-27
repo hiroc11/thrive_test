@@ -393,3 +393,8 @@ ul.list li.sw-left { background: color-mix(in srgb, #e5484d 18%, var(--card)); }
 .line-text { min-height: 110px; }
 .small-note { font-size: 12px; margin: 4px 0 0; }
 .card > .line-btn { margin-top: 8px; }
+
+/* ダブルタップで拡大しないようにする（2本指での拡大はそのまま使える） */
+html, body, button, a, label, input, select, textarea, .tile, .chip, .dish, .mood { touch-action: manipulation; }
+/* iPhone は 16px より小さい入力欄をタップすると自動で拡大するので、入力欄は 16px にそろえる */
+input, select, textarea { font-size: 16px; }

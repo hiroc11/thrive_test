@@ -1,0 +1,14 @@
+{
+  "name": "puku-holo-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ぷくホロシール帳のサーバー（第1段階：課金なし）",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
+  }
+}

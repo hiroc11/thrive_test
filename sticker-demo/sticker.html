@@ -402,7 +402,7 @@
     border: 2px dashed var(--page-line); color: var(--muted); }
   .stamps7 i.on { border: 0; color: #fff; background: radial-gradient(circle at 35% 35%, #ffc2dc, var(--accent)); }
   .stamps7 i.goal { border-color: #e2ac3f; color: #b07a12; }
-  .stamps7 i.new { animation: stampIn .5s cubic-bezier(.3, 1.8, .5, 1); }
+  .stamps7 i.fresh { animation: stampIn .5s cubic-bezier(.3, 1.8, .5, 1); }
   @keyframes stampIn { from { transform: scale(2.2) rotate(-20deg); opacity: 0; } }
   .daily-side { display: grid; gap: 4px; justify-items: end; }
   .daily-side .btn { font-size: 13px; padding: 8px 14px; white-space: nowrap; }
@@ -1492,7 +1492,7 @@
     const box = document.getElementById('stamps7');
     box.innerHTML = Array.from({ length: 7 }, (_, i) => {
       const on = i < W.stamps;
-      const cls = [on ? 'on' : '', i === 6 ? 'goal' : '', stampedNow && i === W.stamps - 1 ? 'new' : ''].filter(Boolean).join(' ');
+      const cls = [on ? 'on' : '', i === 6 ? 'goal' : '', stampedNow && i === W.stamps - 1 ? 'fresh' : ''].filter(Boolean).join(' ');
       return `<i class="${cls}">${on ? '★' : i === 6 ? '賞' : i + 1}</i>`;
     }).join('');
     document.getElementById('stampNote').textContent =

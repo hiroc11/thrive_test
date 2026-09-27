@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5eff8">
+<title>ぷくホロシール帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=DM+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/layout.css">
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+
+<!-- はじめての人：ニックネームと生まれた年 -->
+<div class="wrap onboard" id="onboard" hidden>
+  <header><h1>ぷく<span>ホロ</span>シール帳</h1>
+    <p class="lead">光るシールを集めて、友達と交換しよう。はじめに4まいプレゼント！</p></header>
+  <form class="card form" id="signupForm" novalidate>
+    <label for="suName">ニックネーム（友達にだけ見えるよ）</label>
+    <input id="suName" maxlength="10" autocomplete="nickname" placeholder="例：あや" required>
+    <label for="suYear">生まれた年</label>
+    <select id="suYear" required></select>
+    <label class="check"><input type="checkbox" id="suAgree"> <span><a href="terms.html" target="_blank">利用規約</a>と<a href="privacy.html" target="_blank">プライバシーポリシー</a>に同意します（18歳未満の人は保護者の人と読んでね）</span></label>
+    <p class="warn" id="suErr" role="alert" hidden></p>
+    <button class="btn" type="submit">はじめる</button>
+  </form>
+  <form class="card form" id="claimForm" novalidate>
+    <h2>前の端末から引き継ぐ</h2>
+    <label for="claimCode">引き継ぎコード</label>
+    <input id="claimCode" autocomplete="off" placeholder="XXXX-XXXX-XXXX" required>
+    <p class="warn" id="claimErr" role="alert" hidden></p>
+    <button class="btn ghost" type="submit">引き継ぐ</button>
+  </form>
+</div>
+
+<div class="wrap app" id="appRoot" hidden>
+  <header class="top">
+    <h1>ぷく<span>ホロ</span>シール帳</h1>
+    <span class="hello" id="hello"></span>
+  </header>
+
+  <main>
+    <!-- ホーム：毎日のスタンプと無料パック -->
+    <section class="view" data-view="home">
+      <div class="invites" id="invites"></div>
+      <div class="daily">
+        <div class="stamp-card">
+          <div class="stamps7" id="stamps7" aria-label="ログインスタンプ"></div>
+          <span id="stampNote"></span>
+        </div>
+        <div class="daily-side">
+          <button type="button" class="btn" id="freeBtn">今日の無料パック</button>
+        </div>
+      </div>
+      <section class="opener" aria-label="シールパック">
+        <div class="pity" aria-label="天井（確定までのパック数）">
+          <div class="meter"><span>レア以上確定まで</span><b id="pRare"></b><i><em id="pRareBar"></em></i></div>
+          <div class="meter"><span>Sレア以上確定まで</span><b id="pSR"></b><i><em id="pSRBar"></em></i></div>
+        </div>
+        <div class="stage" id="stage">
+          <div class="rays"></div>
+          <div class="glow" id="glow"></div>
+          <div class="slot" id="slot"></div>
+          <div class="pack" id="pack">
+            <div class="pack-top" id="packTop"></div>
+            <div class="pack-body"><b>ぷくホロ</b><span>シールパック</span><small>1パック1枚入り</small></div>
+          </div>
+          <div class="hint" id="hint">切り取り線を横になぞって開けよう →</div>
+        </div>
+        <div class="result" id="result" hidden>
+          <h2 id="rName"></h2>
+          <div class="meta"><span class="chip" id="rChip"></span><span class="serial" id="rSerial"></span></div>
+          <p id="rLeft"></p>
+        </div>
+        <button type="button" class="btn" id="mainBtn">タップで開ける</button>
+        <details class="odds">
+          <summary>出る確率</summary>
+          <table><tbody>
+            <tr><td>ノーマル</td><td>60%</td></tr>
+            <tr><td>レア</td><td>28%</td></tr>
+            <tr><td>Sレア</td><td>10%</td></tr>
+            <tr><td>シークレット</td><td>2%</td></tr>
+          </tbody></table>
+          <p>天井：10パックごとにレア以上が1枚確定。Sレア以上が49パック続けて出なかったら、50パック目は必ずSレア以上。</p>
+          <p>シールをそろえても、別のシールはもらえません（図鑑に記録されるだけ）。</p>
+        </details>
+      </section>
+    </section>
+
+    <!-- シール帳 -->
+    <section class="view" data-view="book" hidden>
+      <div class="view-head">
+        <h2>シール帳 <small id="bookCount"></small></h2>
+        <button type="button" class="btn ghost small" id="shareBtn">画像にしてシェア</button>
+      </div>
+      <section class="book" id="book" aria-label="シール帳"></section>
+      <p class="book-hint">長押しで並べ替え。となりに誰がいるかで、しゃべることが変わるよ</p>
+    </section>
+
+    <!-- 図鑑 -->
+    <section class="view" data-view="zukan" hidden>
+      <div class="view-head"><h2>図鑑</h2></div>
+      <div class="z-total"><b id="zPct">0%</b><span id="zCount"></span><i><em id="zBar"></em></i></div>
+      <p class="note">一度でも手に入れたシールは色つき、まだのシールはシルエット。そろえても景品はもらえません（記録だけ）。</p>
+      <div id="zBody"></div>
+    </section>
+
+    <!-- 友達 -->
+    <section class="view" data-view="friends" hidden>
+      <div class="view-head"><h2>友達</h2></div>
+      <div class="card">
+        <p class="label">あなたのフレンドコード</p>
+        <p class="code-big" id="myCode"></p>
+        <div class="row">
+          <button type="button" class="btn small" id="copyInvite">招待リンクをコピー</button>
+        </div>
+        <p class="note">コードやリンクは、知っている友達にだけ教えてね。</p>
+      </div>
+      <form class="card form" id="addFriendForm" novalidate>
+        <label for="friendCode">友達のフレンドコードで申請</label>
+        <div class="row">
+          <input id="friendCode" autocomplete="off" placeholder="8けた" maxlength="12">
+          <button class="btn" type="submit">申請</button>
+        </div>
+      </form>
+      <div id="incoming"></div>
+      <div class="card">
+        <p class="label">友達リスト</p>
+        <ul class="friends" id="friendList"></ul>
+        <p class="note" id="outgoing"></p>
+      </div>
+    </section>
+
+    <!-- 設定 -->
+    <section class="view" data-view="settings" hidden>
+      <div class="view-head"><h2>設定</h2></div>
+      <form class="card form" id="nickForm" novalidate>
+        <label for="nickInput">ニックネーム</label>
+        <div class="row"><input id="nickInput" maxlength="10"><button class="btn small" type="submit">変える</button></div>
+      </form>
+      <div class="card settings">
+        <div class="row between"><span>押したときの音</span><button type="button" class="btn ghost small" id="soundBtn"></button></div>
+        <div class="row between"><span>傾きセンサー（スマホを傾けると光る）</span><button type="button" class="btn ghost small" id="gyroBtn">使う</button></div>
+      </div>
+      <div class="card">
+        <p class="label">機種変更するとき</p>
+        <p class="note">引き継ぎコードを作って、新しい端末で入れてね。コードは7日間、1回だけ使えます。使うと、この端末からはログアウトします。</p>
+        <button type="button" class="btn small" id="transferBtn">引き継ぎコードを作る</button>
+        <p class="code-big" id="transferCode" hidden></p>
+      </div>
+      <div class="card links">
+        <a href="terms.html" target="_blank">利用規約</a>
+        <a href="privacy.html" target="_blank">プライバシーポリシー</a>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs" aria-label="画面の切り替え">
+    <button type="button" data-tab="home" aria-current="page">ホーム</button>
+    <button type="button" data-tab="book">シール帳</button>
+    <button type="button" data-tab="zukan">図鑑</button>
+    <button type="button" data-tab="friends">友達<span class="badge" id="friendBadge" hidden></span></button>
+    <button type="button" data-tab="settings">設定</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<!-- シールの拡大 -->
+<dialog id="dlg" aria-labelledby="dName">
+  <div class="detail">
+    <div id="dSticker"></div>
+    <h2 id="dName"></h2>
+    <div class="meta"><span class="chip" id="dChip"></span><span class="serial" id="dSerial"></span></div>
+    <div class="rate" id="dRate" aria-label="交換レート"></div>
+    <div class="move">
+      <button type="button" class="btn ghost" id="dPrev">← 前へ</button>
+      <button type="button" class="btn ghost" id="dNext">次へ →</button>
+    </div>
+    <p id="dNote"></p>
+    <button type="button" id="dClose">閉じる</button>
+  </div>
+</dialog>
+
+<!-- 友達メニュー -->
+<dialog id="friendDlg" aria-labelledby="fdName">
+  <div class="sheet">
+    <h2 id="fdName"></h2>
+    <button type="button" class="btn" id="fdTrade">交換する</button>
+    <button type="button" class="btn ghost" id="fdRemove">友達をやめる</button>
+    <button type="button" class="btn ghost" id="fdBlock">ブロックする</button>
+    <details class="report">
+      <summary>通報する</summary>
+      <div id="fdReasons" class="reasons"></div>
+    </details>
+    <button type="button" class="link" id="fdClose">閉じる</button>
+  </div>
+</dialog>
+
+<!-- 交換テーブル -->
+<dialog id="trade" class="trade" aria-labelledby="tName">
+  <div id="tMain">
+    <div class="t-head">
+      <div class="avatar" id="tAv" aria-hidden="true"></div>
+      <div class="who"><b id="tName"></b><span id="tStatus"></span></div>
+      <button type="button" class="x" id="tClose" aria-label="閉じる">×</button>
+      <div class="bubble friend" id="tBubble" hidden></div>
+    </div>
+    <div class="modes" role="group" aria-label="交換のしかた">
+      <button type="button" class="mode" data-mode="normal" aria-pressed="true">ふつう交換</button>
+      <button type="button" class="mode" data-mode="blind" aria-pressed="false">ふせて交換</button>
+    </div>
+    <div class="hand" id="theirHand" aria-label="友達の手持ち（タップでおねだり）"></div>
+    <div class="table">
+      <div class="zone" id="theirZone"><span class="zlabel" id="theirLabel">友達が出す</span></div>
+      <div class="scale" id="tScale" aria-hidden="true"><span id="tScaleName">友達</span><div class="beam" id="tBeam"></div><span>あなた</span></div>
+      <div class="zone mine" id="myZone"><span class="zlabel" id="myLabel">あなたが出す（ドラッグかタップで置く）</span></div>
+      <div class="bubble me" id="tMeBubble" hidden></div>
+    </div>
+    <div class="hand" id="myHand" aria-label="あなたの手持ち"></div>
+    <div class="stamps" id="tStamps"></div>
+    <button type="button" class="hold" id="tHold">長押しで「せーの」</button>
+    <button type="button" class="link" id="tCancel">この交換をやめる</button>
+  </div>
+  <div class="done" id="tDone" hidden>
+    <h2>交換成立！</h2>
+    <div class="got" id="tGot"></div>
+    <p id="tGotText"></p>
+    <button type="button" class="btn" id="tFinish">シール帳を見る</button>
+  </div>
+</dialog>
+
+<!-- シェア画像 -->
+<dialog id="shareDlg" aria-labelledby="shTitle">
+  <div class="sheet">
+    <h2 id="shTitle">シール帳の画像</h2>
+    <img id="shImg" alt="シール帳の画像">
+    <div class="row">
+      <button type="button" class="btn" id="shGo">シェア・保存する</button>
+      <button type="button" class="btn ghost" id="shClose">閉じる</button>
+    </div>
+  </div>
+</dialog>
+</body>
+</html>

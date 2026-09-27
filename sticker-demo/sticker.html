@@ -337,6 +337,75 @@
   @keyframes pop { from { transform: translate(-50%, -100%) scale(.5); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) { .say { animation: none; } }
 
+  /* ---------- キラ・天井・デコ・ギフト ---------- */
+  .wallet { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; }
+  .kira { font-weight: 700; font-size: 14px; padding: 4px 12px; border-radius: 999px; background: linear-gradient(90deg, #fff3c4, #ffd9ec); color: #5a3c05; font-variant-numeric: tabular-nums; }
+  .kira b { font-size: 16px; }
+  .btn.small { font-size: 12px; padding: 5px 12px; }
+  .inbox { display: flex; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 14px; font-size: 13px; font-weight: 700;
+    background: color-mix(in srgb, var(--accent) 12%, var(--page)); border: 2px dashed var(--accent); }
+  .pity { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .meter { display: grid; grid-template-columns: 1fr auto; gap: 3px 6px; align-items: baseline; font-size: 11px; color: var(--muted); }
+  .meter b { color: var(--ink); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .meter i { grid-column: 1 / -1; display: block; height: 6px; border-radius: 3px; background: var(--page-line); overflow: hidden; }
+  .meter em { display: block; height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, #8fd0ff, var(--accent)); transition: width .4s; }
+  .result .card { font-size: 13px; font-weight: 700; color: var(--ink); padding: 8px 14px; border-radius: 12px; background: #fff7e0; color: #5a3c05; }
+  .odds p { margin: 6px 0 0; max-width: 34em; line-height: 1.6; }
+  .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 30;
+    max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 14px; background: var(--ink); color: var(--page); font-size: 13px; font-weight: 700;
+    box-shadow: 0 10px 30px -10px var(--shadow); }
+
+  dialog#shop, dialog#gift { border: 0; border-radius: 22px; padding: 18px 16px; width: min(420px, calc(100vw - 16px)); max-height: calc(100dvh - 16px); overflow: auto;
+    background: var(--page); color: var(--ink); box-shadow: 0 30px 60px -20px var(--shadow); }
+  .sheet { display: grid; gap: 10px; }
+  .sheet h2 { margin: 0; font-size: 20px; font-weight: 900; }
+  .sheet h3 { margin: 4px 0 0; font-size: 13px; font-weight: 900; color: var(--muted); }
+  .sheet p { margin: 0; font-size: 13px; line-height: 1.7; color: var(--muted); }
+  .sheet-kira b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .goods { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+  .good { display: grid; gap: 4px; justify-items: center; text-align: center; padding: 8px; border-radius: 14px; border: 2px solid var(--page-line); font-size: 12px; }
+  .good.on { border-color: var(--accent); }
+  .good b { font-size: 12px; }
+  .good .btn { font-size: 11.5px; padding: 5px 10px; }
+  .good .btn:disabled { opacity: .6; cursor: default; }
+  .swatch { display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; border: 1px solid var(--page-line); }
+  .swatch.tape { aspect-ratio: auto; height: 22px; margin: 12px 0; border: 0; border-radius: 2px; background: var(--tape, transparent);
+    clip-path: polygon(0 0, 100% 0, 97% 25%, 100% 50%, 97% 75%, 100% 100%, 0 100%, 3% 75%, 0 50%, 3% 25%); }
+  .cap { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12px; padding-top: 4px; }
+  .cap label { font-weight: 700; }
+  .cap select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 2px solid var(--page-line); background: var(--bg); color: var(--ink); }
+  .cap span { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cards { display: grid; gap: 8px; }
+  .cards label { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; border: 2px solid var(--page-line); cursor: pointer; font-weight: 700; font-size: 14px;
+    background: linear-gradient(135deg, #fff7fb, #f3f0ff); color: #4a2152; }
+  .cards label:has(input:checked) { border-color: var(--accent); }
+  .cards input { accent-color: var(--accent); }
+  .gift-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .gift-box { justify-self: center; position: relative; width: 90px; height: 80px; margin: 10px 0; border-radius: 10px;
+    background: linear-gradient(90deg, transparent 42%, #ffe38a 42% 58%, transparent 58%), linear-gradient(135deg, #ff9ccb, #c9a7ff); }
+  .gift-box i { position: absolute; left: -6px; right: -6px; top: -12px; height: 22px; border-radius: 8px;
+    background: linear-gradient(90deg, transparent 42%, #ffe38a 42% 58%, transparent 58%), linear-gradient(135deg, #ff7fb4, #b58bff); }
+
+  /* 台紙（pp-）とマスキングテープ（tp-） */
+  .book { position: relative; }
+  .pp-plain { background: repeating-linear-gradient(0deg, transparent 0 11px, var(--page-line) 11px 12px), var(--page); }
+  .pp-ichigo { background: radial-gradient(#ffb3cf 18%, transparent 20%) 0 0 / 22px 22px, radial-gradient(#ffd6e5 12%, transparent 14%) 11px 11px / 22px 22px, #fff4f8; }
+  .pp-gingham { background: repeating-linear-gradient(0deg, rgba(255,150,190,.3) 0 12px, transparent 12px 24px), repeating-linear-gradient(90deg, rgba(255,150,190,.3) 0 12px, transparent 12px 24px), #fffafc; }
+  .pp-seigaiha { background:
+      radial-gradient(circle at 50% 100%, #fff 0 5px, #9fc3ea 5px 7px, #fff 7px 10px, #9fc3ea 10px 12px, #fff 12px 15px, #9fc3ea 15px 17px, transparent 17px) 0 0 / 36px 18px,
+      radial-gradient(circle at 50% 100%, #fff 0 5px, #9fc3ea 5px 7px, #fff 7px 10px, #9fc3ea 10px 12px, #fff 12px 15px, #9fc3ea 15px 17px, transparent 17px) 18px 9px / 36px 18px,
+      #eef5fd; }
+  .pp-hoshizora { --ink: #f3eaf7; --muted: #c9bde0; --page: #231f45; --chip-normal: #3a3355; --chip-normal-ink: #e6defa;
+    background: radial-gradient(#fff 1px, transparent 1.6px) 0 0 / 26px 26px, radial-gradient(#ffe9a8 1px, transparent 1.6px) 13px 13px / 26px 26px, linear-gradient(#27234d, #3d3068);
+    color: var(--ink); }
+  .tp-dots { --tape: radial-gradient(#fff 22%, transparent 25%) 0 0 / 10px 10px, #ff9cc7; }
+  .tp-wa { --tape: repeating-linear-gradient(45deg, #e6c36a 0 5px, #f7e3a6 5px 10px); }
+  .tp-rainbow { --tape: linear-gradient(90deg, #ff9ad5, #ffe38a, #8dffc6, #8fd0ff, #d6a0ff); }
+  .book[class*="tp-"]::before {
+    content: ""; position: absolute; z-index: 5; top: -10px; left: 50%; width: 56%; height: 20px; transform: translateX(-50%) rotate(-2.5deg);
+    background: var(--tape); opacity: .9; clip-path: polygon(0 0, 100% 0, 97% 25%, 100% 50%, 97% 75%, 100% 100%, 0 100%, 3% 75%, 0 50%, 3% 25%);
+  }
+
   /* ---------- 友達と交換 ---------- */
   .friend-card { display: flex; align-items: center; gap: 12px; background: var(--page); border-radius: 16px; padding: 12px 14px;
     box-shadow: 0 10px 30px -22px var(--shadow); }
@@ -455,6 +524,20 @@
   </header>
 
   <section class="opener" aria-label="シールパック">
+    <div class="wallet">
+      <span class="kira"><b id="kira">3,000</b> キラ</span>
+      <button type="button" class="btn ghost small" id="kiraAdd">+1,000（デモ）</button>
+      <button type="button" class="btn ghost small" id="shopOpen">デコショップ</button>
+      <button type="button" class="btn ghost small" id="giftOpen">ギフトを贈る</button>
+    </div>
+    <div class="inbox" id="inbox" hidden>
+      <span id="inboxText"></span>
+      <button type="button" class="btn small" id="inboxOpen">開ける</button>
+    </div>
+    <div class="pity" aria-label="天井（確定までのパック数）">
+      <div class="meter"><span>レア以上確定まで</span><b id="pRare"></b><i><em id="pRareBar"></em></i></div>
+      <div class="meter"><span>Sレア以上確定まで</span><b id="pSR"></b><i><em id="pSRBar"></em></i></div>
+    </div>
     <div class="stage" id="stage">
       <div class="rays"></div>
       <div class="glow" id="glow"></div>
@@ -469,8 +552,9 @@
       <h2 id="rName"></h2>
       <div class="meta"><span class="chip" id="rChip"></span><span class="serial" id="rSerial"></span></div>
       <p id="rLeft"></p>
+      <p class="card" id="rCard" hidden></p>
     </div>
-    <button type="button" class="btn" id="mainBtn">タップで開ける</button>
+    <button type="button" class="btn" id="mainBtn">開ける（100キラ）</button>
     <details class="odds">
       <summary>排出率</summary>
       <table><tbody>
@@ -479,6 +563,8 @@
         <tr><td>Sレア</td><td>10%</td></tr>
         <tr><td>シークレット</td><td>2%</td></tr>
       </tbody></table>
+      <p>天井：10パックごとにレア以上が1枚確定。Sレア以上が49パック続けて出なかったら、50パック目は必ずSレア以上。</p>
+      <p>シールをそろえても、別のシールはもらえません（図鑑に記録されるだけ）。</p>
     </details>
   </section>
 
@@ -495,6 +581,7 @@
   </section>
 
   <section class="book" id="book" aria-label="シール帳 1ページ目"></section>
+  <div class="toast" id="toast" role="status" hidden></div>
   <p class="book-hint">シールを長押しすると並べ替えられるよ。となりに誰がいるかで、しゃべることが変わる！</p>
 
   <section class="series" aria-labelledby="sumoTitle">
@@ -616,6 +703,41 @@
     <div class="got" id="oGot"></div>
     <p id="oGotText"></p>
     <button type="button" class="btn" id="oAgain">続けて交換する</button>
+  </div>
+</dialog>
+
+<dialog id="shop" aria-labelledby="shopTitle">
+  <div class="sheet">
+    <h2 id="shopTitle">デコショップ</h2>
+    <p class="sheet-kira">持っているキラ：<b id="shopKira"></b></p>
+    <h3>台紙</h3>
+    <div class="goods" id="goodsPaper"></div>
+    <h3>マスキングテープ</h3>
+    <div class="goods" id="goodsTape"></div>
+    <div class="cap">
+      <label for="capSel">月の利用上限（保護者の設定）</label>
+      <select id="capSel">
+        <option value="3000">3,000キラ</option>
+        <option value="5000">5,000キラ</option>
+        <option value="10000">10,000キラ</option>
+        <option value="0">上限なし</option>
+      </select>
+      <span id="capInfo"></span>
+    </div>
+    <button type="button" class="btn" id="shopClose">閉じる</button>
+  </div>
+</dialog>
+
+<dialog id="gift" aria-labelledby="giftTitle">
+  <div class="sheet">
+    <h2 id="giftTitle">ゆいなにギフトを贈る</h2>
+    <p>シールパック1つ（100キラ）を、メッセージカードつきで贈ります。中身はゆいなが開けるまでのお楽しみ。</p>
+    <div class="cards" role="radiogroup" aria-label="メッセージカード" id="cards"></div>
+    <div class="gift-box" id="giftBox" hidden aria-hidden="true"><i></i></div>
+    <div class="gift-actions" id="giftActions">
+      <button type="button" class="btn ghost" id="giftCancel">やめる</button>
+      <button type="button" class="btn" id="giftSend">贈る（100キラ）</button>
+    </div>
   </div>
 </dialog>
 
@@ -899,14 +1021,69 @@
     cell.addEventListener('click', () => { if (!dragged) open(d, true); });
     sumoRow.append(cell);
   }
+  // ---------- キラ（アプリ内通貨）・天井・デコ・ギフトの状態。このブラウザにだけ保存 ----------
+  const WALLET = 'puku-holo-wallet-v1';
+  const monthKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}`; };
+  const W = { kira: 3000, month: monthKey(), spent: 0, cap: 5000, sinceRare: 0, sinceSR: 0,
+    papers: ['plain'], tapes: ['none'], paper: 'plain', tape: 'none', inbox: [] };
+  try { Object.assign(W, JSON.parse(localStorage.getItem(WALLET) || '{}')); } catch {}
+  const saveW = () => { try { localStorage.setItem(WALLET, JSON.stringify(W)); } catch {} };
+  const toastEl = document.getElementById('toast');
+  function toast(text) {
+    toastEl.textContent = text;
+    toastEl.hidden = false;
+    clearTimeout(toastEl.t);
+    toastEl.t = setTimeout(() => { toastEl.hidden = true; }, 3000);
+  }
+  function renderWallet() {
+    document.getElementById('kira').textContent = W.kira.toLocaleString();
+    document.getElementById('shopKira').textContent = `${W.kira.toLocaleString()} キラ`;
+    document.getElementById('capInfo').textContent = W.cap ? `今月 ${W.spent.toLocaleString()} / ${W.cap.toLocaleString()} キラ` : `今月 ${W.spent.toLocaleString()} キラ`;
+  }
+  function spend(n) {
+    if (W.month !== monthKey()) { W.month = monthKey(); W.spent = 0; }
+    if (W.kira < n) { toast('キラが足りないよ。「+1,000（デモ）」で増やせます'); return false; }
+    if (W.cap && W.spent + n > W.cap) { toast(`今月の上限（${W.cap.toLocaleString()}キラ）をこえるので使えません`); return false; }
+    W.kira -= n;
+    W.spent += n;
+    saveW();
+    renderWallet();
+    return true;
+  }
+  document.getElementById('kiraAdd').addEventListener('click', () => { W.kira += 1000; saveW(); renderWallet(); toast('デモ用に1,000キラ追加しました（本当の課金ではありません）'); });
+
+  function renderPity() {
+    const r = 10 - W.sinceRare, sr = 50 - W.sinceSR;
+    document.getElementById('pRare').textContent = r <= 1 ? '次で確定！' : `あと${r}パック`;
+    document.getElementById('pSR').textContent = sr <= 1 ? '次で確定！' : `あと${sr}パック`;
+    document.getElementById('pRareBar').style.width = `${W.sinceRare * 10}%`;
+    document.getElementById('pSRBar').style.width = `${W.sinceSR * 2}%`;
+  }
+
   const ODDS = [['normal', 60], ['rare', 28], ['srare', 10], ['secret', 2]];
-  function draw() {
-    let roll = Math.random() * 100, rarity = 'normal';
-    for (const [r, w] of ODDS) { if ((roll -= w) < 0) { rarity = r; break; } }
-    const choices = POOL.filter(p => p.rarity === rarity && p.issued < p.of);
+  function weighted(list) {
+    let roll = Math.random() * list.reduce((t, [, w]) => t + w, 0);
+    for (const [r, w] of list) { if ((roll -= w) < 0) return r; }
+    return list[list.length - 1][0];
+  }
+  // usePity=false はゆいなが開けるパック（あなたの天井には数えない）
+  function draw(usePity = true) {
+    let rarity, pity = false;
+    if (usePity && W.sinceSR >= 49) { rarity = weighted([['srare', 10], ['secret', 2]]); pity = true; }
+    else if (usePity && W.sinceRare >= 9) { rarity = weighted([['rare', 28], ['srare', 10], ['secret', 2]]); pity = true; }
+    else rarity = weighted(ODDS);
+    let choices = POOL.filter(p => p.rarity === rarity && p.issued < p.of);
+    if (!choices.length) choices = POOL.filter(p => p.issued < p.of);
     const d = choices[Math.floor(Math.random() * choices.length)];
     d.issued++;
-    return { ...d, no: d.issued };
+    if (usePity) {
+      if (rarity === 'srare' || rarity === 'secret') { W.sinceSR = 0; W.sinceRare = 0; }
+      else if (rarity === 'rare') { W.sinceRare = 0; W.sinceSR++; }
+      else { W.sinceRare++; W.sinceSR++; }
+      saveW();
+      renderPity();
+    }
+    return { ...d, no: d.issued, pity };
   }
 
   // ---------- 開封演出 ----------
@@ -956,8 +1133,11 @@
     }
   }
 
-  async function openPack() {
+  let giftNote = null;
+  async function openPack(gift) {
     if (state !== 'idle') return;
+    if (!gift && !spend(100)) { pack.style.setProperty('--tear', 0); return; }
+    giftNote = gift || null;
     state = 'opening';
     current = draw();
     const r = current.rarity, fast = reduce;
@@ -1005,7 +1185,11 @@
     chip.className = `chip ${RARITY[r][1]}`;
     chip.textContent = RARITY[r][0];
     document.getElementById('rSerial').textContent = fmt(current);
-    document.getElementById('rLeft').textContent = `世界に${current.of.toLocaleString()}枚・残り${(current.of - current.issued).toLocaleString()}枚`;
+    document.getElementById('rLeft').textContent = `世界に${current.of.toLocaleString()}枚・残り${(current.of - current.issued).toLocaleString()}枚` +
+      (current.pity ? '・天井で確定！' : '');
+    const card = document.getElementById('rCard');
+    card.hidden = !giftNote;
+    if (giftNote) card.textContent = `${giftNote.from}より「${giftNote.message}」`;
     result.hidden = false;
     mainBtn.textContent = 'シール帳に貼って、次のパックへ';
     mainBtn.hidden = false;
@@ -1025,14 +1209,105 @@
     pack.style.setProperty('--tear', 0);
     pack.animate([{ transform: 'translateY(40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: reduce ? 1 : 400, easing: 'cubic-bezier(.2,.8,.2,1)' });
     hint.hidden = false;
-    mainBtn.textContent = 'タップで開ける';
+    mainBtn.textContent = '開ける（100キラ）';
     state = 'idle';
+    renderInbox();
   }
 
   mainBtn.addEventListener('click', () => {
     if (state === 'idle') openPack();
     else if (state === 'revealed') nextPack();
   });
+
+  // ---------- デコショップ ----------
+  const PAPERS = [['plain', 'しましま', 0], ['ichigo', 'いちごドット', 300], ['gingham', 'ピンクギンガム', 300], ['seigaiha', '青海波（和柄）', 400], ['hoshizora', '星空', 500]];
+  const TAPES = [['none', 'なし', 0], ['dots', 'ピンク水玉', 150], ['wa', '金のしま', 150], ['rainbow', 'にじいろ', 200]];
+  function applyDecor() {
+    book.className = 'book' + (W.paper !== 'plain' ? ` pp-${W.paper}` : '') + (W.tape !== 'none' ? ` tp-${W.tape}` : '');
+  }
+  function renderShop() {
+    const make = (list, kind) => list.map(([id, name, price]) => {
+      const owns = W[kind + 's'].includes(id), on = W[kind] === id;
+      const sw = kind === 'paper' ? `<span class="swatch pp-${id}"></span>` : `<span class="swatch tape${id !== 'none' ? ` tp-${id}` : ''}"></span>`;
+      const label = on ? '使用中' : owns ? '使う' : `${price}キラで買う`;
+      return `<div class="good${on ? ' on' : ''}">${sw}<b>${name}</b><button type="button" class="btn${owns ? ' ghost' : ''}" data-kind="${kind}" data-id="${id}" data-price="${price}"${on ? ' disabled' : ''}>${label}</button></div>`;
+    }).join('');
+    document.getElementById('goodsPaper').innerHTML = make(PAPERS, 'paper');
+    document.getElementById('goodsTape').innerHTML = make(TAPES, 'tape');
+    document.getElementById('capSel').value = String(W.cap);
+    renderWallet();
+  }
+  const shop = document.getElementById('shop');
+  document.getElementById('shopOpen').addEventListener('click', () => { renderShop(); shop.showModal(); });
+  document.getElementById('shopClose').addEventListener('click', () => shop.close());
+  shop.addEventListener('click', e => {
+    const b = e.target.closest('button[data-kind]');
+    if (!b) return;
+    const { kind, id } = b.dataset, price = Number(b.dataset.price);
+    if (!W[kind + 's'].includes(id)) {
+      if (!spend(price)) return;
+      W[kind + 's'].push(id);
+      toast('買いました！シール帳に反映したよ');
+    }
+    W[kind] = id;
+    saveW();
+    applyDecor();
+    renderShop();
+  });
+  document.getElementById('capSel').addEventListener('change', e => { W.cap = Number(e.target.value); saveW(); renderWallet(); });
+
+  // ---------- ギフト ----------
+  const CARDS = ['おたんじょうびおめでとう！', 'いつもありがとう！', 'これあげる〜！'];
+  const giftDlg = document.getElementById('gift');
+  document.getElementById('cards').innerHTML = CARDS.map((c, i) =>
+    `<label><input type="radio" name="card" value="${i}"${i === 0 ? ' checked' : ''}>${c}</label>`).join('');
+  document.getElementById('giftOpen').addEventListener('click', () => {
+    document.getElementById('giftBox').hidden = true;
+    document.getElementById('giftActions').hidden = false;
+    giftDlg.showModal();
+  });
+  document.getElementById('giftCancel').addEventListener('click', () => giftDlg.close());
+  document.getElementById('giftSend').addEventListener('click', async () => {
+    if (!spend(100)) return;
+    const message = CARDS[Number(giftDlg.querySelector('input[name=card]:checked').value)];
+    const box = document.getElementById('giftBox');
+    document.getElementById('giftActions').hidden = true;
+    box.hidden = false;
+    await box.animate([{ transform: 'scale(.6)', opacity: 0 }, { transform: 'scale(1.1)', opacity: 1, offset: .3 }, { transform: 'translateY(-160px) scale(.5) rotate(12deg)', opacity: 0 }],
+      { duration: reduce ? 1 : 1100, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).finished;
+    giftDlg.close();
+    // ゆいながその場で開ける（あなたの天井には数えない）
+    const got = draw(false);
+    friendHand.push(got);
+    updateFriendNote();
+    toast(`ゆいな「${message === CARDS[0] ? 'えっ、覚えててくれたの！？' : 'わーい、ありがと〜！'}」…「${got.name}」が出たみたい`);
+    // しばらくするとお返しが届く
+    setTimeout(() => {
+      W.inbox.push({ from: 'ゆいな', message: pick(['お返しだよ〜！', 'ありがとう！これお返し', 'またこうかんしようね！']) });
+      saveW();
+      renderInbox();
+      if (state === 'idle') toast('ゆいなからお返しのギフトが届いたよ！');
+    }, 6000);
+  });
+
+  function renderInbox() {
+    const box = document.getElementById('inbox');
+    box.hidden = !W.inbox.length;
+    if (W.inbox.length) document.getElementById('inboxText').textContent =
+      `${W.inbox[0].from}からギフトが届いてる！` + (W.inbox.length > 1 ? `（ほか${W.inbox.length - 1}個）` : '');
+  }
+  document.getElementById('inboxOpen').addEventListener('click', () => {
+    if (state !== 'idle' || !W.inbox.length) return;
+    const g = W.inbox.shift();
+    saveW();
+    renderInbox();
+    openPack(g);
+  });
+
+  renderWallet();
+  renderPity();
+  applyDecor();
+  renderInbox();
 
   // ---------- 友達と交換（ゆいなは自動で動く相手役） ----------
   const byName = n => POOL.find(p => p.name === n);

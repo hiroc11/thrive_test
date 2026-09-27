@@ -328,7 +328,22 @@
   .odds td { padding: 2px 10px 2px 0; }
   .new { position: absolute; top: 2px; left: 4px; font-size: 10px; font-weight: 900; color: #fff; background: var(--accent);
     border-radius: 6px; padding: 1px 6px; transform: rotate(-8deg); }
-  .cell { position: relative; }
+  .cell { position: relative; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+  .cell.placeholder { opacity: .25; }
+  .reorder-ghost { position: fixed; z-index: 20; width: 96px; pointer-events: none; transform: translate(-50%, -50%) scale(1.15) rotate(-4deg); }
+  .book-hint { font-size: 12px; color: var(--muted); margin: -12px 0 0; }
+  .move { display: flex; gap: 8px; }
+  .move .btn { font-size: 13px; padding: 6px 14px; }
+  /* となりリアクションの吹き出し */
+  .say {
+    position: absolute; z-index: 4; left: 50%; top: 10px; transform: translate(-50%, -100%);
+    padding: 5px 10px; border-radius: 12px; white-space: nowrap;
+    background: var(--ink); color: var(--page); font-size: 11.5px; font-weight: 700; pointer-events: none;
+    animation: pop .28s cubic-bezier(.3, 1.6, .5, 1);
+  }
+  .say::after { content: ""; position: absolute; left: 50%; bottom: -5px; margin-left: -5px; border: 5px solid transparent; border-bottom: 0; border-top-color: var(--ink); }
+  @keyframes pop { from { transform: translate(-50%, -100%) scale(.5); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .say { animation: none; } }
 
   /* ---------- 友達と交換 ---------- */
   .friend-card { display: flex; align-items: center; gap: 12px; background: var(--page); border-radius: 16px; padding: 12px 14px;
@@ -488,6 +503,7 @@
   </section>
 
   <section class="book" id="book" aria-label="シール帳 1ページ目"></section>
+  <p class="book-hint">シールを長押しすると並べ替えられるよ。となりに誰がいるかで、しゃべることが変わる！</p>
 
   <section class="series" aria-labelledby="sumoTitle">
     <div class="series-head"><h2 id="sumoTitle">おすもうシリーズ</h2><span>パックから出るよ。タップで見本を見る</span></div>
@@ -506,6 +522,10 @@
     <h2 id="dName"></h2>
     <div class="meta"><span class="chip" id="dChip"></span><span class="serial" id="dSerial"></span></div>
     <div class="rate" id="dRate" aria-label="交換レート"></div>
+    <div class="move" id="dMove">
+      <button type="button" class="btn ghost" id="dPrev">← 前へ</button>
+      <button type="button" class="btn ghost" id="dNext">次へ →</button>
+    </div>
     <p id="dNote"></p>
     <button type="button" id="dClose">閉じる</button>
   </div>
@@ -739,7 +759,8 @@
     cell.insertAdjacentHTML('beforeend',
       `<span class="name">${s.name}</span><span class="chip ${RARITY[s.rarity][1]}">${RARITY[s.rarity][0]}</span><span class="serial">${fmt(s)}</span>` +
       (isNew ? '<span class="new">NEW</span>' : ''));
-    cell.addEventListener('click', () => { if (!dragged) open(s); });
+    cell.addEventListener('click', () => { if (!dragged && !justReordered) open(s); });
+    cell.s = s;
     if (isNew) book.prepend(cell); else book.append(cell);
     live.push(st);
     s.cell = cell;
@@ -1715,10 +1736,149 @@
     renderOnline();
   });
 
+  // ---------- シール帳の並べ替え（長押しで持ち上げる） ----------
+  let justReordered = false;
+  function syncOwnedFromBook() {
+    owned.length = 0;
+    [...book.children].forEach(c => owned.push(c.s));
+    saveOwned();
+  }
+  function moveOwned(s, delta) {
+    const cells = [...book.children];
+    const i = cells.indexOf(s.cell), j = i + delta;
+    if (i < 0 || j < 0 || j >= cells.length) return;
+    if (delta < 0) book.insertBefore(s.cell, cells[j]); else book.insertBefore(s.cell, cells[j].nextSibling);
+    syncOwnedFromBook();
+    reactAround(s.cell);
+  }
+  let lift = null;
+  book.addEventListener('pointerdown', e => {
+    const cell = e.target.closest('.cell');
+    justReordered = false;
+    if (!cell || !e.target.closest('.st')) return;
+    const timer = setTimeout(() => startLift(cell, e.pointerId), 380);
+    lift = { cell, timer, active: false, x: e.clientX, y: e.clientY };
+  });
+  function startLift(cell, pointerId) {
+    if (!lift || lift.cell !== cell) return;
+    lift.active = true;
+    justReordered = true;
+    try { book.setPointerCapture(pointerId); } catch {}
+    cell.classList.add('placeholder');
+    const ghost = makeSticker(cell.s);
+    ghost.classList.add('reorder-ghost');
+    ghost.idx = 60;
+    ghost.style.left = lift.x + 'px';
+    ghost.style.top = lift.y + 'px';
+    document.body.append(ghost);
+    lift.ghost = ghost;
+    if (navigator.vibrate) try { navigator.vibrate(15); } catch {}
+  }
+  book.addEventListener('pointermove', e => {
+    if (!lift) return;
+    if (!lift.active) {
+      if (Math.hypot(e.clientX - lift.x, e.clientY - lift.y) > 8) { clearTimeout(lift.timer); lift = null; }
+      return;
+    }
+    lift.ghost.style.left = e.clientX + 'px';
+    lift.ghost.style.top = e.clientY + 'px';
+    const over = document.elementFromPoint(e.clientX, e.clientY);
+    const target = over && over.closest && over.closest('#book .cell');
+    if (!target || target === lift.cell) return;
+    const cells = [...book.children];
+    if (cells.indexOf(target) > cells.indexOf(lift.cell)) book.insertBefore(lift.cell, target.nextSibling);
+    else book.insertBefore(lift.cell, target);
+  });
+  function endLift() {
+    if (!lift) return;
+    clearTimeout(lift.timer);
+    if (lift.active) {
+      lift.ghost.remove();
+      lift.cell.classList.remove('placeholder');
+      syncOwnedFromBook();
+      reactAround(lift.cell);
+    }
+    lift = null;
+  }
+  book.addEventListener('pointerup', endLift);
+  book.addEventListener('pointercancel', endLift);
+
+  // ---------- となりリアクション ----------
+  function tagsOf(s) {
+    const t = new Set(['any']);
+    if (s.art === 'rikishi') t.add(s.species === 'cat' ? 'cat' : s.species === 'dog' ? 'dog' : 'rikishi');
+    if (s.yokozuna) t.add('yokozuna');
+    if (['mochi', 'ichigo', 'mikan', 'jelly'].includes(s.code)) t.add('food');
+    if (['kumo', 'mint', 'nagare', 'prism', 'himitsu', 'aurora'].includes(s.code)) t.add('sky');
+    if (s.rarity === 'secret') t.add('shiny');
+    if (s.kind === 'jelly') t.add('jelly');
+    return t;
+  }
+  // [自分, となり, セリフ]。上から順に最初に当てはまったものを言う
+  const RULES = [
+    ['cat', 'rikishi', ['ちょっと怖いにゃ…', 'おすもうさん、大きいにゃ…']],
+    ['cat', 'dog', ['ワンコはあっち行ってにゃ', 'シャーッ！']],
+    ['dog', 'cat', ['あそぼワン！', 'ネコさん、こっち向いてワン']],
+    ['dog', 'rikishi', ['いっしょに四股ふむワン！', 'ごっつぁんですワン']],
+    ['food', 'rikishi', ['た、食べないで…', 'ちゃんこにしないで〜']],
+    ['yokozuna', 'rikishi', ['胸を貸そう', 'かかってきなさい']],
+    ['rikishi', 'food', ['おいしそう…', 'ちゃんこにしたい']],
+    ['rikishi', 'cat', ['ネコちゃん、怖くないよ〜', 'なでてもいい？']],
+    ['rikishi', 'dog', ['よし、稽古だ！', 'いい当たりだ！']],
+    ['rikishi', 'rikishi', ['どすこい！', 'はっけよい！']],
+    ['cat', 'cat', ['なかまだにゃ〜', 'にゃんにゃん']],
+    ['dog', 'dog', ['なかまだワン！', 'わんわん！']],
+    ['any', 'shiny', ['まぶしい…！', 'キラキラしてる〜']],
+    ['sky', 'sky', ['いっしょに夜空だね', 'ふわふわ〜']],
+    ['jelly', 'any', ['ぷるぷる']],
+    ['any', 'jelly', ['ぷにぷにしてる']]
+  ];
+  function neighbors(cell) {
+    const r = cell.getBoundingClientRect();
+    return [...book.children].filter(c => {
+      if (c === cell) return false;
+      const q = c.getBoundingClientRect();
+      const dx = Math.abs(q.left - r.left), dy = Math.abs(q.top - r.top);
+      return (dy < r.height / 2 && dx < r.width * 1.5) || (dx < r.width / 2 && dy < r.height * 1.5);
+    });
+  }
+  function lineFor(cell) {
+    const mine = tagsOf(cell.s);
+    const near = neighbors(cell).map(c => tagsOf(c.s));
+    for (const [a, b, lines] of RULES) {
+      if (mine.has(a) && near.some(t => t.has(b))) return pick(lines);
+    }
+    return null;
+  }
+  function speak(cell, text) {
+    cell.querySelector('.say')?.remove();
+    const b = document.createElement('span');
+    b.className = 'say';
+    b.setAttribute('role', 'status');
+    b.textContent = text;
+    cell.append(b);
+    setTimeout(() => b.remove(), 2800);
+  }
+  function reactAround(cell) {
+    [cell, ...neighbors(cell)].forEach((c, i) => {
+      const line = lineFor(c);
+      if (line) setTimeout(() => speak(c, line), i * 260);
+    });
+  }
+  // ときどき誰かがつぶやく
+  setInterval(() => {
+    if (document.hidden || document.querySelector('dialog[open]') || lift) return;
+    const talkers = [...book.children].map(c => [c, lineFor(c)]).filter(([, l]) => l);
+    if (talkers.length) { const [c, l] = pick(talkers); speak(c, l); }
+  }, 5000);
+
   // ---------- 拡大表示 ----------
   const dlg = document.getElementById('dlg');
   let big = null;
+  let openS = null;
   function open(s, preview) {
+    openS = preview ? null : s;
+    document.getElementById('dMove').hidden = !!preview;
     const holder = document.getElementById('dSticker');
     holder.innerHTML = '';
     big = makeSticker(s);
@@ -1737,6 +1897,8 @@
     dlg.showModal();
   }
   document.getElementById('dClose').addEventListener('click', () => dlg.close());
+  document.getElementById('dPrev').addEventListener('click', () => openS && moveOwned(openS, -1));
+  document.getElementById('dNext').addEventListener('click', () => openS && moveOwned(openS, 1));
   dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
   dlg.addEventListener('close', () => { big = null; });
 

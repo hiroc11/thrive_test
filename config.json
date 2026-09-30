@@ -1,0 +1,37 @@
+{
+  "channel_name": "AIビジネス10分解説",
+  "fonts": [
+    "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf",
+    "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
+    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+    "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc",
+    "C:/Windows/Fonts/meiryob.ttc"
+  ],
+  "fps": 30,
+  "chars_per_sec": 6.5,
+  "subtitle_max_chars": 28,
+  "segment_pad_sec": 0.35,
+  "tts": {
+    "provider": "auto",
+    "elevenlabs_model": "eleven_multilingual_v2",
+    "voice_id_env": "ELEVENLABS_VOICE_ID"
+  },
+  "images": {
+    "provider": "auto",
+    "fal_model": "fal-ai/flux/schnell",
+    "style_suffix": ", cinematic lighting, highly detailed, clean composition, no text, no watermark"
+  },
+  "bgm": {
+    "path": "assets/bgm.mp3",
+    "volume": 0.08
+  },
+  "colors": {
+    "bg": "#0f172a",
+    "panel": "#1e293b",
+    "text": "#f8fafc",
+    "muted": "#94a3b8",
+    "accent": "#facc15",
+    "accent2": "#38bdf8"
+  },
+  "disclosure": "※本動画はAI音声・AI生成画像を使用しています。内容は出典をもとに制作者が確認・編集しています。"
+}

@@ -1,0 +1,60 @@
+{
+  "title": "【検証】顔出しなし・AIだけで解説動画は作れるのか？制作フローを全部見せます",
+  "format": "experiment",
+  "review_status": "draft",
+  "description": "台本・ナレーション・画像・編集をAIでどこまで自動化できるのかを検証します。※これはパイプライン動作確認用のサンプル台本です。数値はサンプル値なので、公開前に自分の実測値に差し替えてください。",
+  "tags": ["AI動画", "自動化", "YouTube", "副業", "生成AI"],
+  "sources": [],
+  "thumbnail": {
+    "text": "AIだけで動画制作",
+    "sub": "全工程を公開",
+    "image_prompt": "a laptop on a desk showing a video editing timeline, futuristic holographic AI interface, dark blue and yellow color scheme"
+  },
+  "segments": [
+    {
+      "id": "s1",
+      "chapter": "オープニング",
+      "narration": "顔出しなし、声も出さずに、AIだけで解説動画は作れるのか。今回は、台本づくりから書き出しまでの流れを、実際に動かしながら検証していきます。",
+      "visual": {"type": "title", "text": "AIだけで解説動画は作れるのか？", "sub": "制作フローを全部見せます"}
+    },
+    {
+      "id": "s2",
+      "chapter": "検証のルール",
+      "narration": "ルールは三つです。台本はAIが下書きし、人は事実確認と自分の意見だけを書く。映像と音声はAIで作る。そして、公開ボタンだけは必ず人が押す。この三つです。",
+      "visual": {"type": "text", "heading": "検証のルール", "bullets": ["台本はAIが下書き、人は事実確認と意見だけ", "映像・音声はAIで生成", "公開ボタンは必ず人が押す"]}
+    },
+    {
+      "id": "s3",
+      "chapter": "やったこと",
+      "narration": "流れはシンプルです。まずAIがニュースを調べて台本を書きます。次に、音声と画像を自動で作り、字幕を付けて一本の動画にまとめます。同時にショート動画とサムネイルも書き出します。",
+      "visual": {"type": "image", "prompt": "an automated video production pipeline visualized as glowing conveyor belts, script pages turning into video frames, isometric illustration"}
+    },
+    {
+      "id": "s4",
+      "chapter": "結果（数字）",
+      "narration": "作業時間を比べると、手作業では一本あたり約四時間かかっていたのに対し、自動化後は人の作業が約三十分になりました。ただし、この数字はテスト用のサンプル値です。",
+      "visual": {"type": "chart", "chart": {"kind": "bar", "title": "1本あたりの人の作業時間", "labels": ["手作業", "自動化後"], "values": [240, 30], "unit": "分", "highlight": 1, "source": "サンプル値（公開前に実測値へ差し替え）"}}
+    },
+    {
+      "id": "s5",
+      "chapter": "私の見解",
+      "opinion": true,
+      "narration": "正直なところ、全部をAIに任せると、どこかで見たような動画になります。だからこそ、自分で確かめた事実と、自分の意見を入れる部分だけは、人がやるべきだと考えています。",
+      "visual": {"type": "text", "heading": "私の見解", "bullets": ["全自動だと「どこかで見た動画」になる", "事実確認と意見だけは人がやる", "作業はAI、判断は人"]}
+    },
+    {
+      "id": "s6",
+      "chapter": "まとめ",
+      "narration": "作業はAI、判断は人。この分担なら、一人でも毎週続けられます。次回は、実際に一か月運用した数字を公開します。チャンネル登録して待っていてください。",
+      "visual": {"type": "title", "text": "作業はAI、判断は人", "sub": "次回：1か月運用した結果を公開"}
+    }
+  ],
+  "shorts": [
+    {
+      "title": "AIだけで解説動画を作ったら、人の作業は30分になった",
+      "hook": "動画制作、\n人の作業は30分だけ",
+      "segments": ["s3", "s4"],
+      "hashtags": ["#AI動画", "#自動化", "#Shorts"]
+    }
+  ]
+}

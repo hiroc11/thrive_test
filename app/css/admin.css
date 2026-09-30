@@ -1,0 +1,40 @@
+/* 運営画面。棒の色は検証済み（ライト #d6407f／ダーク #e05592） */
+:root { --bar: #d6407f; --grid: #eadff0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bar: #e05592; --grid: #342b3e; } }
+:root[data-theme="dark"] { --bar: #e05592; --grid: #342b3e; }
+
+.admin { max-width: 720px; }
+.admin h2 { margin: 0 0 6px; font-size: 16px; font-weight: 900; }
+.admin section { display: grid; gap: 8px; }
+#board { display: grid; gap: 26px; }
+#board[hidden] { display: none; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.tile { display: grid; gap: 2px; padding: 12px 14px; border-radius: 14px; background: var(--page); }
+.tile span { font-size: 12px; color: var(--muted); }
+.tile b { font-size: 26px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.tile small { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* 棒グラフ：棒は24px以下、上だけ4px丸め、2px以上のすき間、細い目盛り線 */
+.chart { position: relative; height: 180px; display: grid; grid-template-columns: repeat(14, 1fr); align-items: end; gap: 2px;
+  padding: 18px 0 22px; border-bottom: 1px solid var(--grid);
+  background: linear-gradient(var(--grid) 1px, transparent 1px) 0 18px / 100% 50% no-repeat,
+              linear-gradient(var(--grid) 1px, transparent 1px) 0 calc(18px + 70px) / 100% 50% no-repeat; }
+.col { position: relative; height: 100%; display: flex; align-items: flex-end; justify-content: center; outline: none; cursor: default; }
+.col i { display: block; width: min(24px, 70%); min-height: 1px; border-radius: 4px 4px 0 0; background: var(--bar); }
+.col:hover i, .col:focus-visible i { filter: brightness(1.1); }
+.col:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.col .x-label { position: absolute; bottom: -20px; font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.col .v-label { position: absolute; top: -16px; font-size: 11px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.tip { position: fixed; z-index: 5; padding: 6px 10px; border-radius: 8px; background: var(--ink); color: var(--page); font-size: 12px; font-weight: 700;
+  pointer-events: none; transform: translate(-50%, -120%); white-space: nowrap; }
+.table-view summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.table-view table { border-collapse: collapse; margin-top: 6px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.table-view td, .table-view th { padding: 3px 14px 3px 0; text-align: left; }
+
+.list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.list li { display: grid; gap: 4px; padding: 10px 12px; border-radius: 12px; background: var(--page); font-size: 13px; line-height: 1.6; }
+.list .meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--muted); }
+.list .pill { padding: 1px 8px; border-radius: 999px; background: var(--chip-normal); color: var(--chip-normal-ink); font-weight: 700; }
+.list .empty { color: var(--muted); background: none; padding: 0; }
+.list p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -113,6 +113,15 @@ CREATE TABLE IF NOT EXISTS trades (
 );
 CREATE INDEX IF NOT EXISTS trades_pair ON trades(a, b, status);
 
+-- ご意見（アカウントを消しても内容は残し、誰のものかは消す）
+CREATE TABLE IF NOT EXISTS feedback (
+  id TEXT PRIMARY KEY,
+  user_id TEXT,
+  category TEXT NOT NULL,
+  text TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
 -- 分析用のイベント（継続率・毎日の利用者数）
 CREATE TABLE IF NOT EXISTS events (
   user_id TEXT NOT NULL,

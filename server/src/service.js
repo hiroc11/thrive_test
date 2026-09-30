@@ -17,6 +17,8 @@ const forbidden = (message = 'できません') => new AppError(403, 'forbidden'
 
 export const STAMPS = ['おねがい', 'ほしい！', 'むり〜', 'かわいい', 'いいよ！', 'ありがとう'];
 export const REPORT_REASONS = ['いやなことをされた', 'なりすまし', 'ふさわしくない名前', 'そのほか'];
+export const FEEDBACK_CATEGORIES = ['うまく動かない', 'こうしてほしい', 'たのしかった', 'そのほか'];
+const FEEDBACK_MAX = 500;
 const MAX_OFFER = 6;
 const STARTER = { normal: 3, rare: 1 };
 const FRIEND_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -310,6 +312,33 @@ export function createService({ db, now = () => Date.now(), random = Math.random
     return { ok: true };
   }
 
+  // ---------- ご意見 ----------
+  function feedback(userId, category, raw) {
+    if (!FEEDBACK_CATEGORIES.includes(category)) throw bad('bad_category', '種類を選んでね');
+    const text = String(raw ?? '').normalize('NFKC').replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '').trim();
+    if (!text) throw bad('empty', '内容を書いてね');
+    if ([...text].length > FEEDBACK_MAX) throw bad('too_long', `${FEEDBACK_MAX}文字までだよ`);
+    q('INSERT INTO feedback (id, user_id, category, text, created_at) VALUES (?, ?, ?, ?, ?)').run(crypto.randomUUID(), userId, category, text, now());
+    return { ok: true };
+  }
+
+  // ---------- アカウント削除 ----------
+  // シール・友達・交換・利用記録を消す。ご意見と通報は運営の確認用に残すが、誰のものかは外す
+  function deleteAccount(userId) {
+    const friendsBefore = friendIds(userId);
+    tx(db, () => {
+      getUser(userId);
+      q("UPDATE trades SET status = 'cancelled', updated_at = ? WHERE status = 'open' AND (a = ? OR b = ?)").run(now(), userId, userId);
+      q('UPDATE feedback SET user_id = NULL WHERE user_id = ?').run(userId);
+      q("UPDATE reports SET reporter_id = '' WHERE reporter_id = ?").run(userId);
+      q('DELETE FROM blocks WHERE user_id = ? OR blocked_id = ?').run(userId, userId);
+      q('DELETE FROM events WHERE user_id = ?').run(userId);
+      q('DELETE FROM users WHERE id = ?').run(userId); // シール・友達・申請・トークンなどは一緒に消える
+    });
+    publish(friendsBefore, { type: 'friends' });
+    return { ok: true };
+  }
+
   function friendStickers(userId, friendId) {
     if (!areFriends(userId, friendId)) throw forbidden('友達のシール帳だけ見られます');
     return listStickers(friendId);
@@ -337,7 +366,7 @@ export function createService({ db, now = () => Date.now(), random = Math.random
   function tradeView(userId, id) {
     const t = getTrade(id);
     const [me, them] = side(t, userId);
-    const other = getUser(t[them]);
+    const other = q('SELECT id, nickname FROM users WHERE id = ?').get(t[them]) || { id: t[them], nickname: '（退会したユーザー）' };
     const myOffer = parse(t[me + '_offer']);
     const theirOffer = parse(t[them + '_offer']);
     const hidden = t.mode === 'blind' && t.status === 'open';
@@ -489,6 +518,7 @@ export function createService({ db, now = () => Date.now(), random = Math.random
       return { day: n, cohort: cohort.length, returned: back, rate: cohort.length ? back / cohort.length : null };
     });
     const totals = {
+      feedback: q('SELECT COUNT(*) AS n FROM feedback').get().n,
       users: q('SELECT COUNT(*) AS n FROM users').get().n,
       stickers: q('SELECT COUNT(*) AS n FROM stickers').get().n,
       trades: q("SELECT COUNT(*) AS n FROM trades WHERE status = 'done'").get().n,
@@ -497,11 +527,23 @@ export function createService({ db, now = () => Date.now(), random = Math.random
     return { dau, retention, totals };
   }
 
+  // 運営用：新しい順に。通報は相手のニックネームつき（消えたアカウントは「削除済み」）
+  function adminFeedback(limit = 100) {
+    return q('SELECT category, text, created_at FROM feedback ORDER BY created_at DESC LIMIT ?').all(limit)
+      .map(r => ({ category: r.category, text: r.text, at: r.created_at }));
+  }
+  function adminReports(limit = 100) {
+    const name = id => (id && q('SELECT nickname FROM users WHERE id = ?').get(id)?.nickname) || '削除済み';
+    return q('SELECT reporter_id, target_id, reason, created_at FROM reports ORDER BY created_at DESC LIMIT ?').all(limit)
+      .map(r => ({ reporter: name(r.reporter_id), target: name(r.target_id), targetId: r.target_id, reason: r.reason, at: r.created_at }));
+  }
+
   return {
     signup, auth, me, rename, transferIssue, transferClaim,
     listStickers, reorder, zukan, checkin, freePack,
     requestFriend, respondFriend, listFriends, unfriend, block, report, friendStickers,
     openTrade, tradeView, setOffer, setAsk, setMode, stamp, cancel, ready,
-    metrics
+    feedback, deleteAccount,
+    metrics, adminFeedback, adminReports
   };
 }

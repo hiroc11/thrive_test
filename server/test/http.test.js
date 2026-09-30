@@ -37,6 +37,12 @@ test('api: signup, auth, errors, static and security headers', async () => {
     assert.equal((await call('GET', '/api/admin/metrics')).status, 404);
     const m = await fetch(base + '/api/admin/metrics', { headers: { 'x-admin-token': 'admin-secret-token' } });
     assert.equal((await m.json()).totals.users, 1);
+    assert.equal((await fetch(base + '/api/admin/feedback', { headers: { 'x-admin-token': 'wrong-secret-tokenxx' } })).status, 404);
+    assert.equal((await call('POST', '/api/feedback', { category: 'たのしかった', text: 'たのしい' }, ok.body.token)).status, 200);
+    const fb = await fetch(base + '/api/admin/feedback', { headers: { 'x-admin-token': 'admin-secret-token' } });
+    assert.equal((await fb.json())[0].text, 'たのしい');
+    assert.equal((await call('POST', '/api/me/delete', {}, ok.body.token)).status, 200);
+    assert.equal((await call('GET', '/api/me', null, ok.body.token)).status, 401);
   } finally { server.close(); }
 });
 

@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDb } from './db.js';
-import { createService, AppError, STAMPS, REPORT_REASONS } from './service.js';
+import { createService, AppError, STAMPS, REPORT_REASONS, FEEDBACK_CATEGORIES } from './service.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const MAX_BODY = 16 * 1024;
@@ -80,11 +80,13 @@ export function createApp({ dbFile = ':memory:', appDir = path.join(here, '../..
 
   // [メソッド, パス, ログインが必要か, 処理]。:id は URL の一部
   const routes = [
-    ['GET', '/api/meta', false, () => ({ stamps: STAMPS, reportReasons: REPORT_REASONS })],
+    ['GET', '/api/meta', false, () => ({ stamps: STAMPS, reportReasons: REPORT_REASONS, feedbackCategories: FEEDBACK_CATEGORIES })],
     ['POST', '/api/signup', false, (u, b) => svc.signup(b), 'strict'],
     ['POST', '/api/transfer/claim', false, (u, b) => svc.transferClaim(b.code), 'strict'],
     ['GET', '/api/me', true, u => svc.me(u)],
     ['POST', '/api/me/nickname', true, (u, b) => svc.rename(u, b.nickname)],
+    ['POST', '/api/me/delete', true, u => svc.deleteAccount(u), 'strict'],
+    ['POST', '/api/feedback', true, (u, b) => svc.feedback(u, b.category, b.text), 'strict'],
     ['POST', '/api/transfer/issue', true, u => svc.transferIssue(u), 'strict'],
     ['GET', '/api/stickers', true, u => svc.listStickers(u)],
     ['POST', '/api/stickers/order', true, (u, b) => svc.reorder(u, b.ids)],
@@ -129,11 +131,16 @@ export function createApp({ dbFile = ':memory:', appDir = path.join(here, '../..
       req.on('close', () => streams.get(t.userId)?.delete(res));
       return;
     }
-    if (url.pathname === '/api/admin/metrics' && req.method === 'GET') {
-      const given = String(req.headers['x-admin-token'] || '');
-      const ok = adminToken && given.length === adminToken.length && crypto.timingSafeEqual(Buffer.from(given), Buffer.from(adminToken));
-      if (!ok) return send(res, 404, { error: 'not_found' });
-      return send(res, 200, svc.metrics(Number(url.searchParams.get('days')) || 14));
+    // 運営用：合言葉（x-admin-token）が合うときだけ。合わなければ存在しないふりをする
+    if (url.pathname.startsWith('/api/admin/') && req.method === 'GET') {
+      const given = Buffer.from(String(req.headers['x-admin-token'] || ''));
+      const want = Buffer.from(adminToken);
+      const ok = adminToken && given.length === want.length && crypto.timingSafeEqual(given, want);
+      if (!ok || !strict(ipOf(req) + 'admin')) return send(res, 404, { error: 'not_found' });
+      if (url.pathname === '/api/admin/metrics') return send(res, 200, svc.metrics(Math.min(60, Number(url.searchParams.get('days')) || 14)));
+      if (url.pathname === '/api/admin/feedback') return send(res, 200, svc.adminFeedback());
+      if (url.pathname === '/api/admin/reports') return send(res, 200, svc.adminReports());
+      return send(res, 404, { error: 'not_found' });
     }
 
     for (const r of routes) {

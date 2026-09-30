@@ -611,6 +611,74 @@ $('transferBtn').addEventListener('click', async () => {
   } catch (e) { showError(e); }
 });
 
+// ご意見
+$('fbForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.disabled = true;
+  try {
+    await api('POST', '/api/feedback', { category: $('fbCat').value, text: $('fbText').value });
+    $('fbText').value = '';
+    toast('送ったよ。ありがとう！');
+  } catch (x) { showError(x); }
+  btn.disabled = false;
+});
+
+// アカウント削除（確認のチェックを入れないと押せない）
+const delDlg = $('delDlg');
+$('delOpen').addEventListener('click', () => {
+  $('delAgree').checked = false;
+  $('delGo').disabled = true;
+  $('delErr').hidden = true;
+  delDlg.showModal();
+});
+$('delAgree').addEventListener('change', () => { $('delGo').disabled = !$('delAgree').checked; });
+$('delCancel').addEventListener('click', () => delDlg.close());
+$('delGo').addEventListener('click', async () => {
+  $('delGo').disabled = true;
+  try {
+    await api('POST', '/api/me/delete');
+    token.clear();
+    location.replace(location.pathname);
+  } catch (x) {
+    $('delErr').textContent = x.message;
+    $('delErr').hidden = false;
+    $('delGo').disabled = false;
+  }
+});
+
+// ホーム画面に追加の案内（アプリとして開いているとき・閉じたあとは出さない）
+let installEvent = null;
+addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  installEvent = e;
+  renderA2hs();
+});
+function renderA2hs() {
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem('puku-a2hs') === 'closed'; } catch {}
+  const box = $('a2hs');
+  box.hidden = standalone || dismissed;
+  if (box.hidden) return;
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  $('a2hsInstall').hidden = !installEvent;
+  $('a2hsHow').textContent = installEvent ? '' : ios
+    ? 'Safari の下にある共有ボタン（□に↑）→「ホーム画面に追加」を押してね'
+    : 'ブラウザのメニュー（︙）→「ホーム画面に追加」または「アプリをインストール」を押してね';
+}
+$('a2hsInstall').addEventListener('click', async () => {
+  if (!installEvent) return;
+  installEvent.prompt();
+  await installEvent.userChoice.catch(() => null);
+  installEvent = null;
+  renderA2hs();
+});
+$('a2hsClose').addEventListener('click', () => {
+  try { localStorage.setItem('puku-a2hs', 'closed'); } catch {}
+  $('a2hs').hidden = true;
+});
+
 // ---------- リアルタイム ----------
 let trade;
 function onEvent(msg) {
@@ -636,6 +704,8 @@ async function boot() {
     connectEvents(onEvent);
   }
   checkIn().catch(() => {});
+  $('fbCat').innerHTML = (S.meta.feedbackCategories || ['そのほか']).map(c => `<option>${c}</option>`).join('');
+  renderA2hs();
   const invite = new URLSearchParams(location.search).get('invite');
   if (invite) {
     try { history.replaceState(null, '', location.pathname); } catch {}

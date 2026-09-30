@@ -179,3 +179,33 @@ test('metrics count retention', () => {
   assert.equal(d1.returned, 1);
   assert.equal(m.totals.users, 2);
 });
+
+test('feedback is validated and kept after the account is deleted, without the user', () => {
+  const { svc, user } = setup();
+  const a = user('a');
+  rejects(() => svc.feedback(a.id, 'なにか', 'x'), 'bad_category');
+  rejects(() => svc.feedback(a.id, 'たのしかった', '   '), 'empty');
+  rejects(() => svc.feedback(a.id, 'たのしかった', 'あ'.repeat(501)), 'too_long');
+  svc.feedback(a.id, 'たのしかった', 'シールがかわいい');
+  svc.deleteAccount(a.id);
+  const list = svc.adminFeedback();
+  assert.equal(list.length, 1);
+  assert.equal(list[0].text, 'シールがかわいい');
+});
+
+test('deleting an account removes stickers, friendships and login, and cancels trades', () => {
+  const { svc, user } = setup();
+  const a = user('a'), b = user('b');
+  befriend(svc, a, b);
+  const t = svc.openTrade(a.id, b.id);
+  svc.report(b.id, a.id, 'なりすまし');
+  svc.deleteAccount(a.id);
+  assert.equal(svc.auth(a.token), null);
+  assert.equal(svc.listStickers(a.id).length, 0);
+  assert.equal(svc.listFriends(b.id).friends.length, 0);
+  assert.equal(svc.tradeView(b.id, t.id).status, 'cancelled');
+  assert.equal(svc.adminReports()[0].target, '削除済み');
+  rejects(() => svc.me(a.id), 'not_found');
+  // 消えたアカウントのフレンドコードでは申請できない
+  rejects(() => svc.requestFriend(b.id, a.code), 'not_found');
+});

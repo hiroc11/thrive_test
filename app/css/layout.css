@@ -52,7 +52,15 @@ a { color: var(--accent); }
 .invites:empty { display: none; }
 .inbox span { flex: 1; }
 
-#friendDlg, #shareDlg { border: 0; border-radius: 22px; padding: 18px 16px; width: min(420px, calc(100vw - 16px));
+textarea { min-width: 0; padding: 10px 12px; border: 2px solid var(--page-line); border-radius: 12px; resize: vertical;
+  background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; line-height: 1.6; }
+textarea:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.btn.danger { background: #c9364f; color: #fff; }
+.btn.ghost.danger { background: transparent; color: #c9364f; border-color: #c9364f; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.a2hs { position: relative; padding-right: 48px; }
+.a2hs-close { position: absolute; top: 8px; right: 8px; }
+#delDlg, #friendDlg, #shareDlg { border: 0; border-radius: 22px; padding: 18px 16px; width: min(420px, calc(100vw - 16px));
   max-height: calc(100dvh - 16px); overflow: auto; background: var(--page); color: var(--ink); box-shadow: 0 30px 60px -20px var(--shadow); }
 #shImg { width: 100%; border-radius: 12px; border: 1px solid var(--page-line); }
 .reasons { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; }

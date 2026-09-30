@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ぷくホロ運営画面</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=DM+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/admin.css">
+<script type="module" src="js/admin.js"></script>
+</head>
+<body>
+<main class="wrap admin">
+  <header class="top">
+    <h1>ぷく<span>ホロ</span>運営画面</h1>
+    <button type="button" class="btn ghost small" id="reload" hidden>更新</button>
+  </header>
+
+  <form class="card form" id="login" novalidate>
+    <label for="token">運営用の合言葉（ADMIN_TOKEN）</label>
+    <div class="row"><input id="token" type="password" autocomplete="current-password"><button class="btn small" type="submit">見る</button></div>
+    <p class="note">合言葉はこのタブを閉じるまでだけ覚えます。</p>
+    <p class="warn" id="loginErr" role="alert" hidden></p>
+  </form>
+
+  <div id="board" hidden>
+    <section aria-labelledby="retTitle">
+      <h2 id="retTitle">戻ってきた人の割合</h2>
+      <p class="note">登録した日から数えて、その日にもう一度開いた人の割合。まだその日数がたっていない人は数えません。</p>
+      <div class="tiles" id="retention"></div>
+    </section>
+
+    <section aria-labelledby="dauTitle">
+      <h2 id="dauTitle">毎日の利用者数（直近14日）</h2>
+      <div class="chart" id="dau" role="img" aria-label="毎日の利用者数の棒グラフ"></div>
+      <div class="tip" id="tip" role="status" hidden></div>
+      <details class="table-view"><summary>表で見る</summary><table id="dauTable"><thead><tr><th>日付</th><th>人数</th></tr></thead><tbody></tbody></table></details>
+    </section>
+
+    <section aria-labelledby="totTitle">
+      <h2 id="totTitle">合計</h2>
+      <div class="tiles" id="totals"></div>
+    </section>
+
+    <section aria-labelledby="fbTitle">
+      <h2 id="fbTitle">ご意見</h2>
+      <ul class="list" id="feedback"></ul>
+    </section>
+
+    <section aria-labelledby="repTitle">
+      <h2 id="repTitle">通報</h2>
+      <ul class="list" id="reports"></ul>
+    </section>
+  </div>
+</main>
+</body>
+</html>

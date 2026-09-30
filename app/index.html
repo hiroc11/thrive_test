@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5eff8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ぷくホロ">
 <title>ぷくホロシール帳</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,6 +50,12 @@
   <main>
     <!-- ホーム：毎日のスタンプと無料パック -->
     <section class="view" data-view="home">
+      <div class="card a2hs" id="a2hs" hidden>
+        <button type="button" class="x a2hs-close" id="a2hsClose" aria-label="案内を閉じる">×</button>
+        <p class="label">ホーム画面に追加すると、アプリみたいに毎日すぐ開けるよ</p>
+        <p class="note" id="a2hsHow"></p>
+        <button type="button" class="btn small" id="a2hsInstall" hidden>ホーム画面に追加</button>
+      </div>
       <div class="invites" id="invites"></div>
       <div class="daily">
         <div class="stamp-card">
@@ -151,6 +162,20 @@
         <button type="button" class="btn small" id="transferBtn">引き継ぎコードを作る</button>
         <p class="code-big" id="transferCode" hidden></p>
       </div>
+      <form class="card form" id="fbForm" novalidate>
+        <p class="label">ご意見・不具合の報告</p>
+        <label for="fbCat">種類</label>
+        <select id="fbCat"></select>
+        <label for="fbText">内容（500文字まで）</label>
+        <textarea id="fbText" maxlength="500" rows="4" placeholder="例：交換のボタンが分かりにくかった"></textarea>
+        <p class="note">運営だけが読みます。名前や住所など、個人が分かることは書かないでね。</p>
+        <button class="btn small" type="submit">送る</button>
+      </form>
+      <div class="card">
+        <p class="label">アカウントを削除する</p>
+        <p class="note">シール・友達・交換の記録がすべて消えて、もとに戻せません。</p>
+        <button type="button" class="btn ghost small danger" id="delOpen">アカウントを削除する</button>
+      </div>
       <div class="card links">
         <a href="terms.html" target="_blank">利用規約</a>
         <a href="privacy.html" target="_blank">プライバシーポリシー</a>
@@ -230,6 +255,20 @@
     <div class="got" id="tGot"></div>
     <p id="tGotText"></p>
     <button type="button" class="btn" id="tFinish">シール帳を見る</button>
+  </div>
+</dialog>
+
+<!-- アカウント削除の確認 -->
+<dialog id="delDlg" aria-labelledby="delTitle">
+  <div class="sheet">
+    <h2 id="delTitle">本当に削除する？</h2>
+    <p>持っているシール、友達、交換の記録がすべて消えます。引き継ぎコードでも戻せません。</p>
+    <label class="check"><input type="checkbox" id="delAgree"> <span>全部消えることを分かりました</span></label>
+    <p class="warn" id="delErr" role="alert" hidden></p>
+    <div class="row">
+      <button type="button" class="btn danger" id="delGo" disabled>削除する</button>
+      <button type="button" class="btn ghost" id="delCancel">やめる</button>
+    </div>
   </div>
 </dialog>
 

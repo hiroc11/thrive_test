@@ -349,6 +349,8 @@ def camera(scene, mode, t, dur):
         z, cx, cy = 1.0 + 0.22 * k, SW / 2, SH * 0.45
     elif mode == "push13":
         z, cx, cy = 1.0 + 1.1 * min(1.0, k * 1.6), 290, 700
+    elif mode == "tiltdown":
+        z, cx, cy = 1.3, SW / 2, SH * (0.30 + 0.42 * k)
     elif mode == "tilt":
         z, cx, cy = 1.3, SW / 2, SH * (0.72 - 0.42 * k)
     elif mode == "shake":

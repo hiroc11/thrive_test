@@ -1,7 +1,8 @@
 """第1話B1「前世の死」のVコンテ（仮映像）を生成する。
 
 部品（キャラの配置、カメラ、字幕・テロップ）は make_vconte.py のものを使う。
-蓮は基準画像の切り抜き、少年は図形で代用する。
+assets/stills/b1/<カット番号>.* に生成した静止画があればそれを使い、
+なければ蓮は基準画像の切り抜き、少年は図形で代用する。
 
 出力: assets/vconte/b1_vconte.mp4（540x960、24fps、無音）
 使い方: python3 tools/make_vconte_b1.py
@@ -206,9 +207,28 @@ def c12(t):
     return im
 
 
+STILLS = vc.ROOT / "assets" / "stills" / "b1"
+_still_cache = {}
+
+
+def still(cut):
+    """生成した静止画があれば、シーンの大きさに合わせて返す（なければ None）。"""
+    if cut not in _still_cache:
+        path = next((p for p in sorted(STILLS.glob(f"{cut}.*"))), None)
+        im = None
+        if path is not None:
+            src = Image.open(path).convert("RGBA")
+            k = max(SW / src.width, SH / src.height)
+            src = src.resize((int(src.width * k + 0.5), int(src.height * k + 0.5)), Image.LANCZOS)
+            x0, y0 = (src.width - SW) // 2, (src.height - SH) // 2
+            im = src.crop((x0, y0, x0 + SW, y0 + SH))
+        _still_cache[cut] = im
+    return _still_cache[cut]
+
+
 # (番号, 秒, シーン, カメラ, セリフ, SE/メモ)
 CUTS = [
-    ("C01", 5, c01, "tilt", "蓮（M）「他人の死は、\nだいたい見抜けた」", "夕暮れの歩道橋"),
+    ("C01", 5, c01, "tiltdown", "蓮（M）「他人の死は、\nだいたい見抜けた」", "夕暮れの歩道橋"),
     ("C02", 7, c02, "static", "蓮（M）「俺の仕事は損害保険の\nリスク査定。人の『もしも』に\n値段をつけること」", "ひび割れを指でなぞる"),
     ("C03", 6, c03, "push", "蓮（M）「この橋の事故確率、\n年0.3%。……高いな」", ""),
     ("C04", 5, c04, "static", "", "SE：少年の足音"),
@@ -235,7 +255,9 @@ def main():
     for cut, dur, fn, cam, line, memo in CUTS:
         for i in range(int(dur * FPS)):
             t = i / FPS
-            frame = vc.camera(fn(t), cam, t, dur).convert("RGBA")
+            st = still(cut)
+            scene = st.copy() if st is not None else fn(t)
+            frame = vc.camera(scene, cam, t, dur).convert("RGBA")
             frame = vc.overlay(frame, cut, start, t, line, memo)
             proc.stdin.write(frame.convert("RGB").tobytes())
         start += dur

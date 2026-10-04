@@ -226,6 +226,18 @@ def still(cut):
     return _still_cache[cut]
 
 
+def prob_box(im):
+    """C03：タブレットの画面が浮かんでいるような「事故確率」の表示。静止画の上にも重ねる。"""
+    d = ImageDraw.Draw(im)
+    d.rounded_rectangle([410, 420, 690, 590], radius=18, fill=(30, 34, 40, 230), outline="#9FD3FF", width=3)
+    d.text((550, 466), "事故確率", font=font(34), fill="#9FD3FF", anchor="mm")
+    d.text((550, 540), "年 0.3%", font=font(56), fill="#FFFFFF", anchor="mm")
+
+
+# 静止画にも重ねる編集用の要素
+EXTRAS = {"C03": prob_box}
+
+
 # (番号, 秒, シーン, カメラ, セリフ, SE/メモ)
 CUTS = [
     ("C01", 5, c01, "tiltdown", "蓮（M）「他人の死は、\nだいたい見抜けた」", "夕暮れの歩道橋"),
@@ -256,7 +268,12 @@ def main():
         for i in range(int(dur * FPS)):
             t = i / FPS
             st = still(cut)
-            scene = st.copy() if st is not None else fn(t)
+            if st is not None:
+                scene = st.copy()
+                if cut in EXTRAS:
+                    EXTRAS[cut](scene)
+            else:
+                scene = fn(t)
             frame = vc.camera(scene, cam, t, dur).convert("RGBA")
             frame = vc.overlay(frame, cut, start, t, line, memo)
             proc.stdin.write(frame.convert("RGB").tobytes())

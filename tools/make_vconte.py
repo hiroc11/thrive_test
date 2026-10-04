@@ -1,6 +1,6 @@
 """第1話B4「ざまぁ回収」のVコンテ（仮映像）を生成する。
 
-絵の代わりに簡単な図形でキャラと背景を置き、カット表どおりの尺・カメラ・
+基準画像から切り抜いたキャラ（なければ簡単な図形）と簡単な背景を置き、カット表どおりの尺・カメラ・
 セリフ字幕・旗・テロップを入れた縦型動画を作る。テンポと構図の確認用。
 
 出力: assets/vconte/b4_vconte.mp4（540x960、24fps、無音）
@@ -16,6 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "vconte"
 FLAGS = ROOT / "assets" / "flags"
+SPRITES = ROOT / "assets" / "design" / "sprites"
 FONT = "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf"
 
 FW, FH = 540, 960  # 出力フレーム
@@ -76,6 +77,37 @@ def draw_char(d, key, x, y, s=1.0, back=False, label=True, bandage=False):
                anchor="mt", stroke_width=2, stroke_fill="#000000")
 
 
+_sprite_cache = {}
+
+
+def sprite(key, view):
+    """基準画像から切り抜いたキャラ。なければ None（図形で代用する）。"""
+    name = f"{key}_{view}"
+    if name not in _sprite_cache:
+        path = SPRITES / f"{name}.png"
+        _sprite_cache[name] = Image.open(path).convert("RGBA") if path.exists() else None
+    return _sprite_cache[name]
+
+
+def place(im, key, x, y, s=1.0, view="front", label=True, bandage=False, lying=False):
+    """キャラを置く。(x, y) は頭の中心。切り抜きがあればそれを、なければ図形を使う。"""
+    sp = sprite(key, view)
+    if sp is None:
+        draw_char(ImageDraw.Draw(im), key, x, y, s, back=(view == "back"), label=label, bandage=bandage)
+        return
+    h = int(450 * s)
+    w = max(1, int(sp.width * h / sp.height))
+    sp = sp.resize((w, h), Image.LANCZOS)
+    if lying:
+        sp = sp.rotate(90, expand=True)
+        im.alpha_composite(sp, (int(x - sp.width * 0.15), int(y - sp.height * 0.6)))
+        return
+    im.alpha_composite(sp, (int(x - w / 2), int(y - 60 * s)))
+    if label:
+        ImageDraw.Draw(im).text((x, y - 60 * s + h + 8 * s), CHAR[key]["name"], font=font(max(14, int(22 * s))),
+                                fill="#FFFFFF", anchor="mt", stroke_width=2, stroke_fill="#000000")
+
+
 _flag_cache = {}
 
 
@@ -124,7 +156,7 @@ def scene_c01(t):
     d = ImageDraw.Draw(im)
     d.rectangle([150, 250, 570, 1150], fill="#3A2A1C", outline=LINE, width=4)
     d.rectangle([180, 280, 540, 1150], fill="#C9A06A")
-    draw_char(d, "alto", 360, 560, 1.6)
+    place(im, "alto", 360, 560, 1.6)
     return sepia(im)
 
 
@@ -148,7 +180,7 @@ def scene_c03(t):
         d.ellipse([360 - r, 420 - r, 360 + r, 420 + r], outline="#8C6D1F", width=6)
     d.rectangle([0, 1050, SW, SH], fill="#26302C")
     for i, k in enumerate(["pipi", "gald", "doran"]):
-        draw_char(d, k, 230 + i * 130, 1000, 0.55, back=True)
+        place(im, k, 230 + i * 130, 1000, 0.55, view="back")
     return im
 
 
@@ -156,7 +188,7 @@ def scene_c04(t):
     im = bg("#1C2A27")
     d = ImageDraw.Draw(im)
     d.ellipse([60, 200, 200, 340], fill="#E0A040")
-    draw_char(d, "pipi", 360, 600, 1.8)
+    place(im, "pipi", 360, 600, 1.8)
     d.text((470, 520), "汗", font=font(36), fill="#9FD3FF")
     return im
 
@@ -215,7 +247,7 @@ def scene_c09(t):
     d.rectangle([360 - split, 0, 360 + split, SH], fill="#0E0E0E")
     for i, k in enumerate(["pipi", "gald", "doran"]):
         x = 230 + i * 130
-        draw_char(d, k, x, 700, 0.8, back=False, label=True)
+        place(im, k, x, 700, 0.8)
     return im
 
 
@@ -248,7 +280,7 @@ def scene_c11(t):
         r = 40 + cloud * 160
         d.ellipse([140 - r, 500 - r * 1.3, 140 + r, 520], fill="#9A8A70")
     walk = math.sin(t * 6) * 6
-    draw_char(d, "alto", 360, 760 + walk + t * 18, 1.1 + t * 0.05)
+    place(im, "alto", 360, 760 + walk + t * 18, 1.1 + t * 0.05)
     return im
 
 
@@ -262,7 +294,7 @@ def scene_c12(t):
     for i, k in enumerate(["gald", "pipi", "doran"]):
         x = 220 + i * 230 + shift
         d.rounded_rectangle([x - 100, 880 + i * 40, x + 100, 940 + i * 40], radius=12, fill="#C8B48A", outline=LINE)
-        draw_char(d, k, x - 60, 860 + i * 40, 0.5, label=False, bandage=(k == "gald"))
+        place(im, k, x - 60, 860 + i * 40, 0.5, label=False, bandage=(k == "gald"), lying=True)
     return im
 
 

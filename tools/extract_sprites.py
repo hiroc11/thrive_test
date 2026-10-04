@@ -25,6 +25,9 @@ SPRITES = {
     "lize_front": ("lize_ref.png", 0),
     "lize_side": ("lize_ref.png", 1),
     "lize_back": ("lize_ref.png", 2),
+    "ren_front": ("ren_ref.png", 0),
+    "ren_side": ("ren_ref.png", 1),
+    "ren_back": ("ren_ref.png", 2),
 }
 
 WHITE = 232  # これより明るい画素を背景候補とみなす

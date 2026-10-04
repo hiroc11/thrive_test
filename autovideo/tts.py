@@ -17,7 +17,7 @@ class DummyTTS:
     def cache_key(self):
         return [self.name, self.cfg["chars_per_sec"]]
 
-    def synth(self, text, out_wav):
+    def synth(self, text, out_wav, voice_id=None):
         duration = max(1.0, len(text) / self.cfg["chars_per_sec"]) + self.cfg["segment_pad_sec"]
         ffmpeg.silence(out_wav, duration)
 
@@ -36,9 +36,9 @@ class ElevenLabsTTS:
     def cache_key(self):
         return [self.name, self.voice_id, self.model]
 
-    def synth(self, text, out_wav):
+    def synth(self, text, out_wav, voice_id=None):
         resp = requests.post(
-            f"https://api.elevenlabs.io/v1/text-to-speech/{self.voice_id}",
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id or self.voice_id}",
             params={"output_format": "mp3_44100_128"},
             headers={"xi-api-key": self.api_key, "accept": "audio/mpeg"},
             json={"text": text, "model_id": self.model},

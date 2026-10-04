@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 
-DEFAULT_CONFIG = Path(__file__).resolve().parent.parent / "config.json"
+ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_CONFIG = ROOT / "config.json"
 
 
 def load_config(path=None):

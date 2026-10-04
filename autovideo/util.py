@@ -1,5 +1,7 @@
+import base64
 import hashlib
 import json
+import mimetypes
 
 
 def digest(*parts):
@@ -14,3 +16,13 @@ def fmt_timestamp(sec):
     h, rem = divmod(sec, 3600)
     m, s = divmod(rem, 60)
     return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+
+
+def data_uri(path):
+    """ローカル画像を API に直接渡すための data URI。"""
+    mime = mimetypes.guess_type(str(path))[0] or "image/png"
+    return f"data:{mime};base64," + base64.b64encode(open(path, "rb").read()).decode()
+
+
+def file_digest(path):
+    return hashlib.sha1(open(path, "rb").read()).hexdigest()[:12]

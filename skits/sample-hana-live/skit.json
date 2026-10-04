@@ -1,0 +1,40 @@
+{
+  "series": "anime_vs_live",
+  "title": "うちのオリジナルキャラ「ハナ」を実写化してみた",
+  "hook": "オリジナルキャラを\n実写化してみた",
+  "review_status": "draft",
+  "characters": ["hana"],
+  "cuts": [
+    {
+      "id": "c0", "style": "split", "shot": "still",
+      "scene": "a girl standing in front of a Japanese school gate with cherry blossoms, smiling, waist-up shot",
+      "characters": ["hana"],
+      "telop": "アニメ → 実写",
+      "min_sec": 3.0,
+      "lines": []
+    },
+    {
+      "id": "c1", "style": "anime", "shot": "still",
+      "scene": "a girl winking and making a peace sign in a classroom, close-up",
+      "characters": ["hana"],
+      "lines": [{"who": "hana", "text": "アニメのわたし、どう？"}]
+    },
+    {
+      "id": "c2", "style": "live", "shot": "still",
+      "scene": "a girl winking and making a peace sign in a classroom, close-up",
+      "characters": ["hana"],
+      "lines": [{"who": "hana", "text": "で、こっちが実写のわたし！"}]
+    },
+    {
+      "id": "c3", "style": "live", "shot": "video",
+      "scene": "a girl in a classroom covering her blushing face with both hands, embarrassed",
+      "characters": ["hana"],
+      "motion": "she slowly covers her face with both hands and laughs shyly",
+      "telop": "どっちが好き？コメントで！",
+      "min_sec": 3.0,
+      "lines": [{"who": "hana", "text": "……ちょっと恥ずかしいかも！"}]
+    }
+  ],
+  "caption": "オリジナルキャラ「ハナ」のアニメ版と実写版。次は誰を実写化する？",
+  "hashtags": ["#オリジナルキャラ", "#実写化", "#Shorts", "#AIアニメ"]
+}

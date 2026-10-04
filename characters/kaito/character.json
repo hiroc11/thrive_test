@@ -1,0 +1,9 @@
+{
+  "name": "カイト",
+  "profile": "ハナのクラスの転校生。クールで現実主義。お約束をことごとく冷静に潰す役。",
+  "color": "#3b82f6",
+  "anime_prompt": "teenage boy, messy silver-gray short hair, sleepy half-closed blue eyes, navy blazer school uniform worn loosely, black headphones around his neck",
+  "live_prompt": "Japanese teenage boy around 17, messy short hair dyed silver gray, calm sleepy expression, navy blazer school uniform worn loosely, black headphones around his neck",
+  "voice_id": "",
+  "voice_id_env": "VOICE_ID_KAITO"
+}

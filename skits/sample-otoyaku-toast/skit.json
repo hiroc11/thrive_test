@@ -1,0 +1,43 @@
+{
+  "series": "otoyaku",
+  "trope": "食パンをくわえて遅刻ダッシュ → 曲がり角で転校生とぶつかる",
+  "title": "【実写化】食パンくわえて遅刻ダッシュ、現実だとこうなる",
+  "hook": "アニメのお約束、\n実写でやるとこうなる",
+  "review_status": "draft",
+  "characters": ["hana", "kaito"],
+  "cuts": [
+    {
+      "id": "c1", "style": "live", "shot": "video",
+      "scene": "a girl running fast down a quiet Japanese residential street in the morning with a slice of toast in her mouth, school bag swinging",
+      "characters": ["hana"],
+      "motion": "she sprints toward the camera, hair bouncing, toast in mouth, handheld camera follows",
+      "lines": [{"who": "hana", "text": "遅刻遅刻〜！"}]
+    },
+    {
+      "id": "c2", "style": "live", "shot": "video",
+      "scene": "at a street corner with a concrete wall, a running girl collides with a boy walking around the corner, morning light",
+      "characters": ["hana", "kaito"],
+      "motion": "the two bump into each other at the corner and stumble backwards",
+      "lines": [{"who": "narrator", "text": "曲がり角で、運命の出会い……"}]
+    },
+    {
+      "id": "c3", "style": "live", "shot": "still",
+      "scene": "a girl and a boy sitting on the asphalt after a collision, a slice of toast lying on the ground between them",
+      "characters": ["hana", "kaito"],
+      "lines": [
+        {"who": "kaito", "text": "……前見て走れよ"},
+        {"who": "hana", "text": "わたしのパンが……！"}
+      ]
+    },
+    {
+      "id": "c4", "style": "live", "shot": "still",
+      "scene": "a crow on a residential street flying away holding a slice of toast in its beak, girl in the background reaching out in despair",
+      "characters": ["hana"],
+      "telop": "現実：パンはカラスのもの",
+      "min_sec": 3.0,
+      "lines": [{"who": "narrator", "text": "実写だと、だいたいパンが犠牲になる。"}]
+    }
+  ],
+  "caption": "アニメのお約束を実写でやってみたシリーズ。次にやってほしいお約束はコメントで！",
+  "hashtags": ["#アニメあるある", "#実写化", "#Shorts", "#AIアニメ"]
+}

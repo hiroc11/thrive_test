@@ -19,7 +19,8 @@
   "images": {
     "provider": "auto",
     "fal_model": "fal-ai/flux/schnell",
-    "style_suffix": ", cinematic lighting, highly detailed, clean composition, no text, no watermark"
+    "style_suffix": ", cinematic lighting, highly detailed, clean composition, no text, no watermark",
+    "fal_ref_model": "fal-ai/flux-pro/kontext"
   },
   "bgm": {
     "path": "assets/bgm.mp3",
@@ -33,5 +34,21 @@
     "accent": "#facc15",
     "accent2": "#38bdf8"
   },
-  "disclosure": "※本動画はAI音声・AI生成画像を使用しています。内容は出典をもとに制作者が確認・編集しています。"
+  "disclosure": "※本動画はAI音声・AI生成画像を使用しています。内容は出典をもとに制作者が確認・編集しています。",
+  "skit": {
+    "channel_name": "TODO: アニメ・実写ショートのチャンネル名",
+    "max_sec": 60,
+    "line_pad_sec": 0.15,
+    "video": {
+      "provider": "auto",
+      "fal_model": "fal-ai/kling-video/v2.1/standard/image-to-video",
+      "seconds": "5"
+    },
+    "style_suffix": {
+      "anime": ", Japanese anime style illustration, clean line art, cel shading, vibrant colors, original character design, no text, no watermark",
+      "live": ", photorealistic live-action film still, fictional person, natural skin texture, cinematic lighting, 35mm photo, no text, no watermark"
+    },
+    "banned_terms": [],
+    "disclosure": "※AIで生成した映像です。登場人物はオリジナルキャラクターで、実在の人物・作品とは関係ありません。"
+  }
 }

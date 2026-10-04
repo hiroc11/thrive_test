@@ -1,0 +1,9 @@
+{
+  "name": "ハナ",
+  "profile": "高校2年生。遅刻常習で元気だけが取り柄。アニメのお約束を本気で信じている。口癖は「お約束でしょ！」",
+  "color": "#ec4899",
+  "anime_prompt": "teenage girl, short wavy coral-pink bob hair with a yellow star hairpin on the left side, big amber eyes, navy blazer school uniform with a mint green ribbon, white sneakers",
+  "live_prompt": "Japanese teenage girl around 17, short wavy bob hair dyed coral pink, yellow star hairpin on the left side, amber colored contact lenses, navy blazer school uniform with a mint green ribbon, white sneakers",
+  "voice_id": "",
+  "voice_id_env": "VOICE_ID_HANA"
+}

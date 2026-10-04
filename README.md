@@ -33,6 +33,8 @@ APIキーは環境変数で渡します（Claude Code on the web では環境設
 
 ネットワーク制限のある環境では `api.elevenlabs.io`, `fal.run`, `*.fal.media` への通信許可が必要です。
 
+画像生成の既定モデル: 通常 `fal-ai/flux/schnell`、キャラ参照つき `fal-ai/flux-pro/kontext`、動画 `fal-ai/kling-video/v2.1/standard/image-to-video`（`config.json` で変更可）。
+
 ## 使い方
 
 ```bash
@@ -72,6 +74,30 @@ python -m autovideo build content/2026-10-05-ai-news-1005/script.json
 
 Claude Code のルーティン（定期実行）に「`/make-episode` を実行して」と登録すれば、週2本の下書き（ニュース回＋そのニュースの深掘り回）が自動で上がってきます。
 ショートはニュース回の驚く数字・結論の区間から切り出します。
+
+## アニメ・実写ショート（別チャンネル）
+
+オリジナルキャラで縦型ショートを作ります。2シリーズを交互に投稿します。
+
+- **お約束を実写でやってみた**（`otoyaku`）: 「食パンをくわえて遅刻ダッシュ」などアニメの定番を実写風で再現し、「現実だとこうなる」で落とす
+- **アニメ⇄実写**（`anime_vs_live`）: オリジナルキャラのアニメ版と実写版を見せる（上下比較レイアウトあり）
+
+```bash
+# キャラを作る → 参照画像（アニメ版・実写版）を作って人が採用を決める
+python -m autovideo character-new hana --name ハナ
+python -m autovideo character-refs hana
+
+# スキットを作る → チェック → 書き出し
+python -m autovideo skit-new toast-dash --series otoyaku --chars hana,kaito
+python -m autovideo skit-validate skits/<dir>/skit.json --draft
+python -m autovideo skit-build skits/<dir>/skit.json --draft   # 承認後は --draft なし
+```
+
+出力は `output/skits/<slug>/short.mp4` と `caption.txt`（投稿文＋投稿時チェック）。
+カットごとに静止画（ゆっくりズーム）か、画像から生成した5秒動画（`shot: video`、fal.ai の Kling）を使います。
+キャラ別の声は `character.json` の `voice_id_env`（例: `VOICE_ID_HANA`）で ElevenLabs の voice ID を指定します。
+Claude Code では `/make-skit` で、ネタ選び → 脚本 → 下書き書き出しまで行います。
+サンプル: `skits/sample-otoyaku-toast/`、`skits/sample-hana-live/`、キャラ `characters/hana`・`characters/kaito`。
 
 ## 収益化ポリシーのために組み込んでいる仕組み
 

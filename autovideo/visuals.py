@@ -9,7 +9,7 @@ import requests
 from PIL import Image, ImageDraw
 
 from . import textdraw
-from .util import digest
+from .util import data_uri, digest
 
 LONG_SIZE = (1920, 1080)
 
@@ -22,15 +22,19 @@ class DummyImages:
     def cache_key(self):
         return [self.name, 2]
 
-    def generate(self, prompt, size):
-        """APIキー無しの仮画像。プロンプトから色を決め、内容を文字で表示する。"""
+    def generate(self, prompt, size, ref=None, suffix=None, label="AI画像（仮）"):
+        """APIキー無しの仮画像。プロンプトから色を決め、内容を文字で表示する。参照画像は左上に小さく貼る。"""
         hue = (zlib.crc32(prompt.encode("utf-8")) % 360) / 360
         img = _gradient(size, _hsv(hue, 0.55, 0.45), _hsv((hue + 0.12) % 1, 0.65, 0.18))
         draw = ImageDraw.Draw(img)
         w, h = size
-        textdraw.draw_lines(draw, ["AI画像（仮）"], 44, w / 2, h * 0.28, "#facc15")
-        size_, lines = textdraw.fit_wrap(prompt, 48, 30, w - 360, 5)
-        textdraw.draw_lines(draw, lines, size_, w / 2, h * 0.40, "#e2e8f0")
+        textdraw.draw_lines(draw, [label], 44, w / 2, h * 0.28, "#facc15")
+        size_, lines = textdraw.fit_wrap(prompt, 48, 30, w - min(360, w // 5), 8)
+        textdraw.draw_lines(draw, lines, size_, w / 2, h * 0.36, "#e2e8f0")
+        if ref:
+            thumb = Image.open(ref).convert("RGB")
+            thumb.thumbnail((w // 4, h // 4))
+            img.paste(thumb, (30, 30))
         return img
 
 
@@ -40,16 +44,27 @@ class FalImages:
     def __init__(self, cfg):
         self.key = os.environ["FAL_KEY"]
         self.model = cfg["images"]["fal_model"]
+        self.ref_model = cfg["images"].get("fal_ref_model")
         self.suffix = cfg["images"].get("style_suffix", "")
 
     def cache_key(self):
-        return [self.name, self.model, self.suffix]
+        return [self.name, self.model, self.ref_model, self.suffix]
 
-    def generate(self, prompt, size):
+    def generate(self, prompt, size, ref=None, suffix=None, label=None):
+        """ref（参照画像）があれば参照つき編集モデルでキャラの見た目を保つ。"""
+        portrait = size[1] > size[0]
+        prompt = prompt + (self.suffix if suffix is None else suffix)
+        if ref and self.ref_model:
+            model = self.ref_model
+            payload = {"prompt": prompt, "image_url": data_uri(ref), "aspect_ratio": "9:16" if portrait else "16:9"}
+        else:
+            model = self.model
+            payload = {"prompt": prompt, "image_size": "portrait_16_9" if portrait else "landscape_16_9",
+                       "num_images": 1}
         resp = requests.post(
-            f"https://fal.run/{self.model}",
+            f"https://fal.run/{model}",
             headers={"Authorization": f"Key {self.key}"},
-            json={"prompt": prompt + self.suffix, "image_size": "landscape_16_9", "num_images": 1},
+            json=payload,
             timeout=300,
         )
         if resp.status_code != 200:

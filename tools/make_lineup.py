@@ -30,12 +30,12 @@ CHARS = [
     },
     {
         "key": "lize", "name": "リゼ（19）", "height": 165, "heads": 7.0, "x": 600,
-        "colors": [("髪", "#9C4A32"), ("瞳", "#5BA8E0"), ("軽装鎧", "#DDE2E8"),
-                   ("インナー", "#2E3F5C"), ("マント裏", "#7EC8E3")],
-        "mark": "リボンのポニーテール＋左肩だけ大きい肩当て",
+        "colors": [("髪", "#9C4A32"), ("瞳", "#5BA8E0"), ("トップス", "#F4F4F2"),
+                   ("スカート", "#2B3350"), ("肩当て", "#8D9696")],
+        "mark": "リボンのポニーテール＋左肩だけの肩当て",
     },
     {
-        "key": "nox", "name": "ノクス", "height": 140, "heads": 5.6, "x": 970,
+        "key": "nox", "name": "ノクス（年齢不詳）", "height": 155, "heads": 6.8, "x": 970,
         "colors": [("髪", "#E6E8EE"), ("瞳", "#E0B341"), ("ドレス", "#14141A"),
                    ("ベール", "#1F1F28"), ("帳簿", "#5C4A3A")],
         "mark": "長いベール＋ほどける裾。頭上に旗なし",
@@ -136,7 +136,7 @@ def draw_alto(d, b, c):
             (b.cx + side * b.sw * 1.25, b.knee + b.hh * 0.3), (b.cx + side * b.sw * 0.45, b.knee + b.hh * 0.3),
         ], c["外套"])
     rect(d, [b.cx - b.sw * 0.55, b.waist - 8, b.cx + b.sw * 0.55, b.waist], "#3A302A")
-    rect(d, [b.cx + b.sw * 0.1, b.waist - 2, b.cx + b.sw * 0.42, b.waist + b.hh * 0.38], c["帳面"])
+    rect(d, [b.cx - b.sw * 0.42, b.waist - 2, b.cx - b.sw * 0.1, b.waist + b.hh * 0.38], c["帳面"])  # 右の腰
     # フード（かぶっている）
     hb = b.head_box()
     ellipse(d, [hb[0] - 14, hb[1] - 12, hb[2] + 14, hb[3] + 6], c["外套"])
@@ -148,41 +148,40 @@ def draw_alto(d, b, c):
 
 def draw_lize(d, b, c):
     hb = b.head_box()
-    # 短いマント（背面、裏地が空色）
-    poly(d, [(b.cx - b.sw * 0.8, b.shoulder_y), (b.cx + b.sw * 0.8, b.shoulder_y),
-             (b.cx + b.sw * 1.05, b.waist + b.hh * 0.6), (b.cx - b.sw * 1.05, b.waist + b.hh * 0.6)], c["マント裏"])
     # 長いハイポニーテール
     ellipse(d, [b.cx + b.hh * 0.2, b.top - b.hh * 0.25, b.cx + b.hh * 0.85, b.top + b.hh * 2.1], c["髪"])
-    # 体に沿うインナー（脚・腕・胴）
-    legs(d, b, c["インナー"], boots=c["軽装鎧"])
-    arms(d, b, c["インナー"], 1.4)
-    poly(d, [(b.cx - b.sw * 0.7, b.shoulder_y), (b.cx + b.sw * 0.7, b.shoulder_y),
-             (b.cx + b.sw * 0.42, b.chin + b.hh * 1.5), (b.cx + b.sw * 0.58, b.waist),
-             (b.cx - b.sw * 0.58, b.waist), (b.cx - b.sw * 0.42, b.chin + b.hh * 1.5)], c["インナー"])
-    # 胸当て
-    poly(d, [(b.cx - b.sw * 0.62, b.shoulder_y + 4), (b.cx + b.sw * 0.62, b.shoulder_y + 4),
-             (b.cx + b.sw * 0.48, b.chin + b.hh * 1.25), (b.cx - b.sw * 0.48, b.chin + b.hh * 1.25)], c["軽装鎧"])
-    # 腰当てと白い腰布
-    poly(d, [(b.cx - b.sw * 0.6, b.waist - 8), (b.cx + b.sw * 0.6, b.waist - 8),
-             (b.cx + b.sw * 0.72, b.waist + b.hh * 0.55), (b.cx - b.sw * 0.72, b.waist + b.hh * 0.55)], "#F4F1EA")
-    rect(d, [b.cx - b.sw * 0.6, b.waist - 12, b.cx + b.sw * 0.6, b.waist + 2], c["軽装鎧"])
-    # 左肩だけ大きすぎる借り物の肩当て（画面右側がキャラの左肩）
-    r = b.hh * 0.5
-    sx = b.cx + b.sw * 0.95
-    ellipse(d, [sx - r, b.shoulder_y - r * 0.55, sx + r, b.shoulder_y + r * 0.75], "#B8BEC6")
-    r2 = b.hh * 0.24
-    sx2 = b.cx - b.sw * 0.82
-    ellipse(d, [sx2 - r2, b.shoulder_y - r2 * 0.5, sx2 + r2, b.shoulder_y + r2 * 0.8], c["軽装鎧"])
-    # 折れた剣（右手）
-    hx = b.cx - b.sw * 0.9
-    hy = b.shoulder_y + b.hh * 1.4
-    rect(d, [hx - 4, hy - b.hh * 0.75, hx + 4, hy], "#C9D1D9")
-    rect(d, [hx - 12, hy - 4, hx + 12, hy + 4], "#6B5B4A")
+    # 素足と白いロングブーツ
+    legs(d, b, SKIN, boots="#F2F2F2")
+    lw = b.hh * 0.24
+    for x0 in (b.cx - b.hh * 0.06 - lw, b.cx + b.hh * 0.06):
+        rect(d, [x0 - 2, b.knee + b.hh * 0.2, x0 + lw + 2, GROUND], "#F2F2F2")
+    # 素肌の腕と紺のグローブ
+    arms(d, b, SKIN, 1.3)
+    aw = b.hh * 0.2
+    for side in (-1, 1):
+        xs = sorted([b.cx + side * b.sw * 0.85, b.cx + side * b.sw * 0.85 - side * aw])
+        rect(d, [xs[0], b.shoulder_y + b.hh * 1.0, xs[1], b.shoulder_y + b.hh * 1.35], c["スカート"])
+    # 胴（素肌）と白いチューブトップ
+    poly(d, [(b.cx - b.sw * 0.6, b.shoulder_y), (b.cx + b.sw * 0.6, b.shoulder_y),
+             (b.cx + b.sw * 0.45, b.waist), (b.cx - b.sw * 0.45, b.waist)], SKIN)
+    rect(d, [b.cx - b.sw * 0.6, b.shoulder_y + b.hh * 0.3, b.cx + b.sw * 0.6, b.shoulder_y + b.hh * 0.85],
+         c["トップス"])
+    # 紺の短いプリーツスカートとベルト
+    poly(d, [(b.cx - b.sw * 0.5, b.waist - 6), (b.cx + b.sw * 0.5, b.waist - 6),
+             (b.cx + b.sw * 0.72, b.waist + b.hh * 0.7), (b.cx - b.sw * 0.72, b.waist + b.hh * 0.7)], c["スカート"])
+    rect(d, [b.cx - b.sw * 0.52, b.waist - 12, b.cx + b.sw * 0.52, b.waist], "#6B4A30")
+    # 左肩だけの大きすぎる肩当て（画面右側がキャラの左肩）
+    r = b.hh * 0.45
+    sx = b.cx + b.sw * 0.75
+    ellipse(d, [sx - r, b.shoulder_y - r * 0.55, sx + r, b.shoulder_y + r * 0.75], c["肩当て"])
+    # 折れた剣（左の腰）
+    hx = b.cx + b.sw * 0.7
+    rect(d, [hx - 4, b.waist, hx + 4, b.waist + b.hh * 0.75], "#C9D1D9")
+    rect(d, [hx - 12, b.waist - 4, hx + 12, b.waist + 4], "#6B5B4A")
     face(d, b, c["瞳"])
     ellipse(d, [hb[0] - 2, b.top - 2, hb[2] + 2, b.top + b.hh * 0.42], c["髪"])
-    # 白いリボン
     ellipse(d, [b.cx + b.hh * 0.3, b.top - b.hh * 0.22, b.cx + b.hh * 0.62, b.top + b.hh * 0.05], "#FFFFFF")
-    rect(d, [b.cx - b.hh * 0.32, b.top + b.hh * 0.7, b.cx - b.hh * 0.2, b.top + b.hh * 0.78], "#E8C9A0", width=1)
+    rect(d, [b.cx + b.hh * 0.18, b.top + b.hh * 0.7, b.cx + b.hh * 0.32, b.top + b.hh * 0.78], "#E8C9A0", width=1)
 
 
 def draw_nox(d, b, c, img):

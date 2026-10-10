@@ -38,7 +38,7 @@
   #clock { font-variant-numeric: tabular-nums; }
 
   /* アークリアクター */
-  .reactor { position: relative; width: min(56vw, 260px); aspect-ratio: 1; margin: 8px 0 16px; cursor: pointer; }
+  .reactor { position: relative; width: min(56vw, 260px, 28vh); aspect-ratio: 1; margin: 8px 0 16px; cursor: pointer; }
   .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--cyan); opacity: .8; }
   .r1 { border-style: dashed; animation: spin 18s linear infinite; }
   .r2 { inset: 12%; border-width: 6px; border-color: var(--cyan) transparent var(--cyan) transparent; animation: spin 6s linear infinite reverse; }
@@ -69,6 +69,14 @@
   .user { align-self: flex-end; color: var(--amber); border-color: rgba(255,179,64,.35); }
   .jarvis { align-self: flex-start; background: rgba(63,216,255,.06); }
   .jarvis small { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); letter-spacing: .1em; }
+  .jarvis details { margin-top: 8px; font-size: 12px; }
+  .jarvis summary { cursor: pointer; color: var(--cyan); letter-spacing: .1em; }
+  .jarvis pre {
+    margin: 6px 0 0; padding: 8px; overflow-x: auto; white-space: pre;
+    font: 12px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: rgba(0,0,0,.35); border-left: 2px solid var(--cyan-dim);
+  }
+  .jarvis pre.out { color: var(--amber); border-left-color: rgba(255,179,64,.5); }
   .error { color: #ff7a7a; border-color: rgba(255,122,122,.4); }
 
   form { flex-shrink: 0; width: 100%; max-width: 760px; display: flex; gap: 8px; padding: 12px 16px 20px; }
@@ -123,7 +131,7 @@ function setState(state, label) {
   document.body.className = state;
   $("status").textContent = label;
 }
-function addMsg(text, who, tools) {
+function addMsg(text, who, tools, details) {
   const el = document.createElement("div");
   el.className = "msg " + who;
   el.textContent = text;
@@ -131,6 +139,27 @@ function addMsg(text, who, tools) {
     const s = document.createElement("small");
     s.textContent = "使用ツール: " + [...new Set(tools)].join(", ");
     el.appendChild(s);
+  }
+  if (details && details.length) {
+    // 計算に使ったコードと出力（声では読み上げず、画面だけに出す）
+    const box = document.createElement("details");
+    const sum = document.createElement("summary");
+    sum.textContent = "計算の中身を見る";
+    box.appendChild(sum);
+    for (const d of details) {
+      const code = document.createElement("pre");
+      code.className = "code";
+      code.textContent = d.code;
+      box.appendChild(code);
+      if (d.output) {
+        const out = document.createElement("pre");
+        out.className = "out";
+        out.textContent = d.output;
+        box.appendChild(out);
+      }
+    }
+    box.addEventListener("toggle", () => { if (box.open) box.scrollIntoView({ block: "nearest", behavior: "smooth" }); });
+    el.appendChild(box);
   }
   $("log").appendChild(el);
   $("log").scrollTop = $("log").scrollHeight;
@@ -187,7 +216,7 @@ async function send(text) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || res.statusText);
-    addMsg(data.reply, "jarvis", data.tools);
+    addMsg(data.reply, "jarvis", data.tools, data.details);
     await speak(data.reply);
   } catch (e) {
     addMsg("エラー: " + e.message, "error");

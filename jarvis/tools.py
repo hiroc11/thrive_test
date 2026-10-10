@@ -16,6 +16,9 @@ MEMO_FILE = Path(__file__).resolve().parent.parent / "data" / "memos.json"
 
 # Anthropic 側で実行されるサーバーツール（実装不要）
 WEB_SEARCH = {"type": "web_search_20260209", "name": "web_search", "max_uses": 3}
+# Anthropic のサンドボックスで Python を実行できる（numpy / scipy / sympy / pandas 入り）。
+# 方程式・微積分・行列・統計・金融計算などの高度な計算に使う。
+CODE_EXECUTION = {"type": "code_execution_20260521", "name": "code_execution"}
 
 TOOLS = [
     {
@@ -35,7 +38,10 @@ TOOLS = [
     },
     {
         "name": "calculate",
-        "description": "四則演算・べき乗・剰余の数式を正確に計算する。例: '(12.5 + 3) * 4 ** 2'",
+        "description": (
+            "四則演算・べき乗・剰余だけの簡単な数式を素早く計算する。例: '(12.5 + 3) * 4 ** 2'。"
+            "関数・方程式・微積分・統計などが必要なら code_execution を使う。"
+        ),
         "input_schema": {
             "type": "object",
             "properties": {"expression": {"type": "string", "description": "計算する数式"}},
@@ -69,6 +75,7 @@ TOOLS = [
         "input_schema": {"type": "object", "properties": {}, "required": [], "additionalProperties": False},
     },
     WEB_SEARCH,
+    CODE_EXECUTION,
 ]
 
 

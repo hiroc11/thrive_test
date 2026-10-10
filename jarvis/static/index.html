@@ -148,6 +148,16 @@ if ("speechSynthesis" in window) {
   pickVoice();
   speechSynthesis.onvoiceschanged = pickVoice;
 }
+// iPhone (iOS Safari) は、最初の読み上げをタップ操作の中で行わないと
+// 以降の読み上げが無音になる。最初のタップで無音の発話をして解錠しておく。
+function unlockSpeech() {
+  if (!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(" ");
+  u.volume = 0;
+  speechSynthesis.speak(u);
+}
+document.addEventListener("pointerdown", unlockSpeech, { once: true, capture: true });
+
 function speak(text) {
   return new Promise((resolve) => {
     if (!voiceOn || !("speechSynthesis" in window)) return resolve();
@@ -276,6 +286,9 @@ $("resetBtn").addEventListener("click", async () => {
 });
 
 addMsg("おかえりなさい、ボス。ご用件をどうぞ。", "jarvis");
+if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+  addMsg("iPhoneでは🎙ボタンを押して話しかけてください（ウェイクワードは画面を開いている間だけ・不安定なことがあります）。", "jarvis");
+}
 </script>
 </body>
 </html>

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>J.A.R.V.I.S.</title>
+<style>
+  :root {
+    --bg: #02070d;
+    --cyan: #3fd8ff;
+    --cyan-dim: rgba(63, 216, 255, .25);
+    --amber: #ffb340;
+    --text: #cfefff;
+    --muted: #6d93a8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { height: 100dvh; }
+  body {
+    background: radial-gradient(ellipse at center, #062033 0%, var(--bg) 70%);
+    color: var(--text);
+    font-family: "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    overflow: hidden;
+  }
+  body::before { /* HUDのグリッド */
+    content: ""; position: fixed; inset: 0; pointer-events: none;
+    background-image: linear-gradient(var(--cyan-dim) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--cyan-dim) 1px, transparent 1px);
+    background-size: 48px 48px; opacity: .12;
+  }
+  header {
+    width: 100%; max-width: 900px; padding: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    letter-spacing: .3em; font-size: 13px; color: var(--muted);
+  }
+  header b { color: var(--cyan); font-weight: 600; }
+  #clock { font-variant-numeric: tabular-nums; }
+
+  /* アークリアクター */
+  .reactor { position: relative; width: min(56vw, 260px); aspect-ratio: 1; margin: 8px 0 16px; cursor: pointer; }
+  .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--cyan); opacity: .8; }
+  .r1 { border-style: dashed; animation: spin 18s linear infinite; }
+  .r2 { inset: 12%; border-width: 6px; border-color: var(--cyan) transparent var(--cyan) transparent; animation: spin 6s linear infinite reverse; }
+  .r3 { inset: 26%; border-width: 1px; border-style: dotted; animation: spin 10s linear infinite; }
+  .core {
+    position: absolute; inset: 36%; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, var(--cyan) 45%, rgba(63,216,255,0) 72%);
+    box-shadow: 0 0 40px var(--cyan), 0 0 90px var(--cyan-dim);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 50% { transform: scale(.88); opacity: .75; } }
+  body.listening .core { animation-duration: .8s; }
+  body.listening .ring { border-color: var(--amber); }
+  body.listening .r2 { border-color: var(--amber) transparent var(--amber) transparent; }
+  body.thinking .r2 { animation-duration: 1s; }
+  body.thinking .r1 { animation-duration: 3s; }
+  body.speaking .core { animation-duration: .45s; }
+
+  #status { letter-spacing: .25em; font-size: 12px; color: var(--cyan); min-height: 1.2em; text-transform: uppercase; }
+
+  #log {
+    flex: 1; width: 100%; max-width: 760px; overflow-y: auto;
+    padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;
+    mask-image: linear-gradient(transparent, #000 24px);
+  }
+  .msg { max-width: 85%; padding: 10px 14px; border: 1px solid var(--cyan-dim); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+  .user { align-self: flex-end; color: var(--amber); border-color: rgba(255,179,64,.35); }
+  .jarvis { align-self: flex-start; background: rgba(63,216,255,.06); }
+  .jarvis small { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); letter-spacing: .1em; }
+  .error { color: #ff7a7a; border-color: rgba(255,122,122,.4); }
+
+  form { flex-shrink: 0; width: 100%; max-width: 760px; display: flex; gap: 8px; padding: 12px 16px 20px; }
+  input[type=text] {
+    flex: 1; min-width: 0; background: rgba(2,16,26,.8); color: var(--text);
+    border: 1px solid var(--cyan-dim); padding: 12px; font-size: 16px; outline: none;
+  }
+  input[type=text]:focus { border-color: var(--cyan); }
+  button {
+    background: transparent; color: var(--cyan); border: 1px solid var(--cyan);
+    padding: 0 14px; font-size: 14px; cursor: pointer; letter-spacing: .1em; white-space: nowrap;
+  }
+  button:hover { background: rgba(63,216,255,.12); }
+  button.on { background: var(--amber); color: #000; border-color: var(--amber); }
+  .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 8px 0 4px; padding: 0 16px; }
+  .controls button { padding: 6px 12px; font-size: 12px; }
+</style>
+</head>
+<body>
+  <header><span><b>J.A.R.V.I.S.</b> ONLINE</span><span id="clock"></span></header>
+
+  <div class="reactor" id="reactor" title="クリックで話しかける">
+    <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="core"></div>
+  </div>
+  <div id="status">STANDBY</div>
+  <div class="controls">
+    <button id="wakeBtn" title="「ジャービス」と呼ぶと反応します">ウェイクワード: OFF</button>
+    <button id="muteBtn">音声: ON</button>
+    <button id="resetBtn">会話リセット</button>
+  </div>
+
+  <div id="log"></div>
+
+  <form id="form">
+    <input id="input" type="text" placeholder="話しかけるか、ここに入力…" autocomplete="off">
+    <button type="button" id="micBtn">🎙</button>
+    <button type="submit">送信</button>
+  </form>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const sessionId = crypto.randomUUID();
+const WAKE_WORDS = ["ジャービス", "ジャーヴィス", "jarvis"];
+
+let voiceOn = true;
+let wakeMode = false;
+let busy = false;
+let awaitingCommand = false; // ウェイクワードの直後で、次の発話を命令として受け取る状態
+
+// ---- 表示 ----
+function setState(state, label) {
+  document.body.className = state;
+  $("status").textContent = label;
+}
+function addMsg(text, who, tools) {
+  const el = document.createElement("div");
+  el.className = "msg " + who;
+  el.textContent = text;
+  if (tools && tools.length) {
+    const s = document.createElement("small");
+    s.textContent = "使用ツール: " + [...new Set(tools)].join(", ");
+    el.appendChild(s);
+  }
+  $("log").appendChild(el);
+  $("log").scrollTop = $("log").scrollHeight;
+}
+setInterval(() => { $("clock").textContent = new Date().toLocaleTimeString("ja-JP"); }, 1000);
+
+// ---- 音声合成（話す） ----
+let jaVoice = null;
+function pickVoice() {
+  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith("ja"));
+  // 男性っぽい声を優先（環境によって名前は異なる）
+  jaVoice = voices.find(v => /Otoya|Ichiro|Keita|Male|男性/i.test(v.name)) || voices[0] || null;
+}
+if ("speechSynthesis" in window) {
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text) {
+  return new Promise((resolve) => {
+    if (!voiceOn || !("speechSynthesis" in window)) return resolve();
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "ja-JP";
+    if (jaVoice) u.voice = jaVoice;
+    u.rate = 1.1; u.pitch = 0.9;
+    u.onend = u.onerror = resolve;
+    setState("speaking", "SPEAKING");
+    speechSynthesis.speak(u);
+  });
+}
+
+// ---- 会話 ----
+async function send(text) {
+  text = text.trim();
+  if (!text || busy) return;
+  busy = true;
+  addMsg(text, "user");
+  setState("thinking", "PROCESSING…");
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId, message: text }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+    addMsg(data.reply, "jarvis", data.tools);
+    await speak(data.reply);
+  } catch (e) {
+    addMsg("エラー: " + e.message, "error");
+  } finally {
+    busy = false;
+    setState("", wakeMode ? "「ジャービス」と呼んでください" : "STANDBY");
+    if (wakeMode) startRecognition();
+  }
+}
+
+$("form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  send($("input").value);
+  $("input").value = "";
+});
+
+// ---- 音声認識（聞く） ----
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null;
+let recRunning = false;
+
+function startRecognition() {
+  if (!SR) {
+    addMsg("このブラウザは音声認識に対応していません。Chrome か Edge をお使いください。", "error");
+    return;
+  }
+  if (recRunning || busy) return;
+  rec = new SR();
+  rec.lang = "ja-JP";
+  rec.interimResults = true;
+  rec.continuous = wakeMode && !awaitingCommand;
+  rec.onstart = () => {
+    recRunning = true;
+    setState("listening", wakeMode && !awaitingCommand ? "WAITING FOR “JARVIS”" : "LISTENING…");
+  };
+  rec.onresult = (ev) => {
+    const r = ev.results[ev.results.length - 1];
+    const heard = r[0].transcript;
+    $("input").value = heard;
+    if (!r.isFinal) return;
+    $("input").value = "";
+    if (wakeMode && !awaitingCommand) {
+      const lower = heard.toLowerCase();
+      const hit = WAKE_WORDS.find(w => lower.includes(w.toLowerCase()));
+      if (!hit) return;
+      const command = heard.slice(lower.indexOf(hit.toLowerCase()) + hit.length).replace(/^[、。,.\s]+/, "");
+      rec.stop();
+      if (command) send(command);
+      else {
+        awaitingCommand = true;
+        speak("はい、ボス。").then(startRecognition);
+      }
+    } else {
+      awaitingCommand = false;
+      rec.stop();
+      send(heard);
+    }
+  };
+  rec.onerror = (ev) => {
+    if (ev.error === "not-allowed") {
+      addMsg("マイクの使用が許可されていません。ブラウザの設定を確認してください。", "error");
+      setWake(false);
+    }
+  };
+  rec.onend = () => {
+    recRunning = false;
+    if (!busy && !speechSynthesis.speaking) {
+      awaitingCommand = false;
+      setState("", wakeMode ? "「ジャービス」と呼んでください" : "STANDBY");
+      if (wakeMode) setTimeout(startRecognition, 300); // 待ち受けを継続
+    }
+  };
+  rec.start();
+}
+
+function setWake(on) {
+  wakeMode = on;
+  $("wakeBtn").textContent = "ウェイクワード: " + (on ? "ON" : "OFF");
+  $("wakeBtn").classList.toggle("on", on);
+  if (on) startRecognition();
+  else if (rec) rec.stop();
+}
+
+$("micBtn").addEventListener("click", () => { speechSynthesis.cancel(); if (wakeMode) setWake(false); startRecognition(); });
+$("reactor").addEventListener("click", () => $("micBtn").click());
+$("wakeBtn").addEventListener("click", () => setWake(!wakeMode));
+$("muteBtn").addEventListener("click", () => {
+  voiceOn = !voiceOn;
+  $("muteBtn").textContent = "音声: " + (voiceOn ? "ON" : "OFF");
+  if (!voiceOn) speechSynthesis.cancel();
+});
+$("resetBtn").addEventListener("click", async () => {
+  await fetch("/api/reset", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId }) });
+  $("log").innerHTML = "";
+  addMsg("会話をリセットしました。ご用件をどうぞ、ボス。", "jarvis");
+});
+
+addMsg("おかえりなさい、ボス。ご用件をどうぞ。", "jarvis");
+</script>
+</body>
+</html>

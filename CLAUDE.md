@@ -12,4 +12,5 @@
 
 - `storyboards/` 絵コンテJSON（カットごとのプロンプト、動き、セリフ、尺）
 - `tools/` 素材生成・動画組み立てのスクリプト（`pipeline.py` が声・原画・アニメ化・口パク合成を実行）
+- `webui/` ローカル専用の制作Web UI（FastAPI＋HTML/JS。`python3 webui/app.py` で起動）
 - `assets/` 旗素材、キャラの基準画像、カットの静止画・動画クリップ、仮動画

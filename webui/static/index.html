@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>縦型AIアニメ制作</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='3' width='3' height='27' fill='%235A4A3E'/%3E%3Cpath d='M9 4 L28 11 L9 18 Z' fill='%23EB5757'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>縦型AIアニメ制作</h1>
+    <nav>
+      <button class="tab active" data-tab="characters">キャラクター</button>
+      <button class="tab" data-tab="episode">エピソード</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- 1. キャラクターの基準画像 -->
+    <section id="characters" class="panel active">
+      <h2>キャラクターの基準画像</h2>
+      <form id="char-form" class="card">
+        <input type="hidden" name="id">
+        <div class="char-form-grid">
+          <label class="drop" id="drop">
+            <input type="file" name="image" accept="image/png,image/jpeg,image/webp" hidden>
+            <img id="drop-preview" alt="" hidden>
+            <span id="drop-text">クリックまたはドラッグで画像を選択</span>
+          </label>
+          <div class="fields">
+            <label>名前<input name="name" required placeholder="例：アルト"></label>
+            <label>キャラクターの英語プロンプト（任意）
+              <textarea name="prompt" rows="4" placeholder="17yo boy, messy black hair, sleepy gray eyes, navy hooded cloak ..."></textarea>
+            </label>
+            <div class="row">
+              <button type="submit" class="primary" id="char-submit">登録する</button>
+              <button type="button" id="char-cancel" hidden>編集をやめる</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div id="char-list" class="char-grid"></div>
+    </section>
+
+    <!-- 2. 6カット分の入力 -->
+    <section id="episode" class="panel">
+      <div class="episode-bar card">
+        <label>話数 <input type="number" id="ep-number" min="1" max="999" value="1"></label>
+        <label class="grow">タイトル <input id="ep-title" placeholder="例：その扉、開けないほうがいいですよ"></label>
+        <button id="ep-load">読み込む</button>
+        <button id="ep-save" class="primary">保存する</button>
+        <span id="ep-status" class="status"></span>
+      </div>
+      <div id="cuts" class="cuts"></div>
+    </section>
+  </main>
+
+  <template id="cut-template">
+    <article class="cut card">
+      <div class="cut-head">
+        <h3 class="cut-id"></h3>
+        <div class="cut-chars"></div>
+      </div>
+      <label>話す人
+        <select class="speaker"><option value="">ナレーション・心の声など</option></select>
+      </label>
+      <label>セリフ（日本語）<textarea class="dialogue" rows="2" placeholder="例：その扉、開けないほうがいいですよ"></textarea></label>
+      <label>画像プロンプト（英語）<textarea class="image_prompt" rows="3" placeholder="medium shot, ... anime style, vertical 9:16"></textarea></label>
+      <label>カメラ・動きのプロンプト（英語）<textarea class="motion_prompt" rows="2" placeholder="slow push in, hair moves in the wind"></textarea></label>
+    </article>
+  </template>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

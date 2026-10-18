@@ -51,7 +51,8 @@ async function genreTargets() {
       // 大ジャンル自体も対象に含める（子ジャンルを分類できなくても売れ筋を拾うため）
       targets.push({ id: root.id, name: pick(data.genre ?? data.current)?.name ?? `genre ${root.id}`, category: root.category ?? "yogashi" });
       for (const c of children) {
-        const category = classify(c.name, root.category);
+        // 飲料は日本酒・お茶・コーヒー系だけ（水や炭酸などは手土産にならない）
+        const category = root.category === "drink" ? (/日本酒|焼酎|梅酒|お茶|紅茶|コーヒー|甘酒/.test(c.name) ? "drink" : null) : classify(c.name, root.category);
         if (category) targets.push({ id: c.id, name: c.name, category });
       }
     } catch (e) {

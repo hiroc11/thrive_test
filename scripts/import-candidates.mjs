@@ -24,6 +24,8 @@ const areaLabel = Object.fromEntries(AREAS);
 
 // ---- 正規化 ----
 const NOISE_NAME = /訳あり|わけあり|お試し|業務用|大容量|アウトレット|福袋|ふるさと納税|定期便|まとめ買い|\d+箱セット|ケース販売|ポイント\d+倍|クーポン/;
+// 手土産にならない飲料ジャンル（ランキング取得時に大ジャンル配下として混ざる）
+const OFF_GENRE = /^(水・炭酸水|炭酸飲料|スポーツドリンク|野菜・果実飲料|スムージー|お酢飲料|牛乳|植物性ミルク|フルーツ入り乳飲料|乳性・乳酸菌飲料|ゼリー飲料|希釈用ドリンク|氷|ノンアルコール|ココア・チョコレートドリンク|その他|水・ソフトドリンク)$/;
 const cleanName = (s) =>
   s
     .replace(/【[^】]*】|［[^］]*］|\[[^\]]*\]|《[^》]*》|★[^★]*★|◆[^◆]*◆/g, " ")
@@ -103,6 +105,7 @@ const skipped = { noise: 0, noArea: 0, duplicate: 0, cellFull: 0, brandCap: 0 };
 for (const r of [...ranking].sort((a, b) => a.rank - b.rank)) {
   if (!r.itemName || !r.itemPrice || seenCodes.has(r.itemCode)) continue;
   seenCodes.add(r.itemCode);
+  if (OFF_GENRE.test(r.genre_name)) { skipped.noise++; continue; }
   if (NOISE_NAME.test(r.itemName) || r.itemPrice < 800 || r.itemPrice > 30000) { skipped.noise++; continue; }
   const brand = brandOf(r);
   const name = cleanName(r.itemName);

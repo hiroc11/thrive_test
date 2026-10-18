@@ -37,6 +37,19 @@ FONT_CANDIDATES = [
 ]
 
 
+def _ssl_context():
+    """Mac の python.org 版などで証明書が見つからない問題を避けるため、certifi の証明書を使う。"""
+    import ssl
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
+SSL_CTX = _ssl_context()
+
+
 def fake_mode():
     return os.environ.get("WEBUI_FAKE") == "1"
 
@@ -46,7 +59,7 @@ def stamp():
 
 
 def download(url, dest: Path):
-    with urllib.request.urlopen(url, timeout=600) as r, open(dest, "wb") as f:
+    with urllib.request.urlopen(url, timeout=600, context=SSL_CTX) as r, open(dest, "wb") as f:
         shutil.copyfileobj(r, f)
     return dest
 
@@ -134,7 +147,7 @@ def _post_audio(url, key_name, body, extra_headers=None, dest=None):
     req = urllib.request.Request(url, method="POST", data=json.dumps(body).encode(), headers={
         "authorization": f"Bearer {key}", "content-type": "application/json", **(extra_headers or {})})
     try:
-        with urllib.request.urlopen(req, timeout=180) as r, open(dest, "wb") as f:
+        with urllib.request.urlopen(req, timeout=180, context=SSL_CTX) as r, open(dest, "wb") as f:
             shutil.copyfileobj(r, f)
     except urllib.error.HTTPError as e:  # エラー内容を画面に出せるよう、本文も付けて返す
         detail = e.read().decode("utf-8", "replace")[:300]

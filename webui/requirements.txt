@@ -4,3 +4,4 @@ python-multipart>=0.0.9
 pillow>=10.0
 fal-client>=0.5
 static-ffmpeg>=2.5
+certifi>=2023.0

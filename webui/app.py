@@ -88,6 +88,15 @@ DEFAULT_SETTINGS = {
 }
 
 app = FastAPI(title="縦型AIアニメ制作")
+
+
+@app.middleware("http")
+async def no_cache(request, call_next):
+    """更新後に古い画面が混ざらないよう、画面のファイルはブラウザに保存させない。"""
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 _lock = threading.Lock()  # JSONファイルの読み書きを同時に行わないためのロック
 
 

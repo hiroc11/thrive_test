@@ -468,8 +468,10 @@ def job_image(ep, variant, n):
         if not prev or not (prev_dir / prev).exists():
             raise RuntimeError(f"前のカット（C{n - 1:02d}）の静止画がまだありません。先に生成してください")
         refs.append(prev_dir / prev)
-        prompt += (". The last reference image is the previous shot: keep the same location, background,"
-                   " lighting and color palette, but do not copy its composition")
+        names = ", ".join(c["name"] for c in used) or "no characters"
+        prompt += (". The last reference image is the previous shot: use it ONLY for the location, background,"
+                   " lighting and color palette. Do not copy its composition or its people."
+                   f" The only people in this shot are: {names}")
     prompt += ". Japanese anime style, vertical 9:16 frame, no text."
     d = cut_dir(ep, variant, n)
     d.mkdir(parents=True, exist_ok=True)

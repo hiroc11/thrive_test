@@ -25,7 +25,9 @@ const items = JSON.parse(readFileSync(PATH, "utf8"));
 const force = process.argv.includes("--force");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-for (const item of items) {
+const only = process.argv.find((a) => a.startsWith("--limit="));
+const targets = only ? items.slice(0, Number(only.split("=")[1])) : items;
+for (const item of targets) {
   if (item.image_url && !force) continue;
   const params = new URLSearchParams({
     format: "json",
@@ -42,8 +44,14 @@ for (const item of items) {
     const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`, {
       headers: { Referer: REFERER, Origin: new URL(REFERER).origin },
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error_description ?? data.error ?? res.status);
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(`${res.status} ${text.slice(0, 200)}`);
+    }
+    if (!res.ok) throw new Error(`${res.status} ${data.error ?? ""} ${data.error_description ?? JSON.stringify(data).slice(0, 200)}`);
     const hit = data.Items?.[0];
     if (hit) {
       const img = hit.mediumImageUrls?.[0];

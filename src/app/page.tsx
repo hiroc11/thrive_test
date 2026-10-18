@@ -74,12 +74,10 @@ export default function Home() {
         (!budget || i.price_tier === budget) &&
         [...musts].every((m) => MUST_TEST[m](i)),
     );
-    // おすすめ順: 夕方の買いやすさ × 汎用性(対応シーン数)
-    return list.sort(
-      (a, b) =>
-        EVENING_SCORE[b.evening_availability] * 10 + b.target_scenes.length -
-        (EVENING_SCORE[a.evening_availability] * 10 + a.target_scenes.length),
-    );
+    // おすすめ順: 確認済み優先 → 夕方の買いやすさ × 汎用性(対応シーン数)
+    const score = (i: Item) =>
+      (i.data_status === "curated" ? 100 : 0) + EVENING_SCORE[i.evening_availability] * 10 + i.target_scenes.length;
+    return list.sort((a, b) => score(b) - score(a));
   }, [scene, area, budget, musts]);
 
   const toggleMust = (m: Must) =>

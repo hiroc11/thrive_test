@@ -1,7 +1,9 @@
 export type Scene = "business_exec" | "in_laws" | "female_office" | "casual_party";
 export type Area =
   | "tokyo_station_in" | "tokyo_station_out" | "shinagawa_in" | "roppongi_akasaka"
-  | "shibuya_omotesando" | "ginza" | "shinjuku";
+  | "shibuya_omotesando" | "ginza" | "shinjuku" | "ikebukuro" | "ueno" | "asakusa"
+  | "ningyocho" | "kanda" | "shimbashi" | "kagurazaka" | "ebisu" | "jiyugaoka" | "futako"
+  | "haneda" | "kiyosumi" | "shibamata" | "nippori" | "nakano" | "ryogoku";
 export type PriceTier = "under_3000" | "3000_5000" | "5000_10000" | "over_10000";
 
 export interface Shop {
@@ -36,6 +38,7 @@ export interface Item {
   image_url: string | null;
   rakuten_item_url?: string;
   jan_code: string | null;
+  data_status: "curated" | "draft"; // draft = 店舗・日持ち等が未確認
 }
 
 export interface GiftLog {

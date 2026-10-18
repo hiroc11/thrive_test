@@ -49,6 +49,12 @@ for (const item of items) {
       const img = hit.mediumImageUrls?.[0];
       item.image_url = typeof img === "string" ? img.replace(/\?_ex=\d+x\d+/, "?_ex=300x300") : null;
       item.rakuten_item_url = hit.affiliateUrl || hit.itemUrl;
+      // 未確認データは楽天の実売価格で補正（検索ミス対策で推定値の0.5〜2倍の範囲のみ）
+      const p = Number(hit.itemPrice);
+      if (item.data_status === "draft" && p >= item.price_tax_in * 0.5 && p <= item.price_tax_in * 2) {
+        item.price_tax_in = p;
+        item.price_tier = p < 3000 ? "under_3000" : p < 5000 ? "3000_5000" : p <= 10000 ? "5000_10000" : "over_10000";
+      }
       console.log(`OK  ${item.id} ${item.name}`);
     } else {
       console.log(`--  ${item.id} ${item.name} (該当なし)`);

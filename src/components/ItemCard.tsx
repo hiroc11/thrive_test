@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Circle, MapPin, MessageSquareQuote, Plus, ShoppingCart, ExternalLink } from "lucide-react";
+import { AlertTriangle, Info, Circle, MapPin, MessageSquareQuote, Plus, ShoppingCart, ExternalLink } from "lucide-react";
 import type { Area, Item } from "@/lib/types";
 import { yen } from "@/lib/constants";
 
@@ -53,6 +53,7 @@ export function ItemCard({
           <Badge><Circle size={10} className="fill-accent text-accent" />午前完売注意</Badge>
         )}
         {specs.map((s) => <Badge key={s}>{s}</Badge>)}
+        {item.data_status === "draft" && <Badge><Info size={12} />情報確認中</Badge>}
       </div>
 
       <div className="mt-3 rounded-lg bg-slate-100 p-3">

@@ -37,6 +37,7 @@ npm run fetch:gaps          # 足りないマスを既存ブランドの公式�
 npm run import:candidates -- --dry-run   # 追加される商品を確認だけ
 npm run import:candidates   # items.json に追加して coverage を更新
 npm run fetch:rakuten       # 追加分の画像・リンクを補完（任意）
+npm run annotate:shops      # 「〇〇周辺」の店舗を、公式ショップ一覧に載っている施設の店舗に置き換え（地図の施設ピン用）
 ```
 
 追加の条件は「楽天で販売中」かつ「収録済みブランドの公式店の商品」であることです。エリアはそのブランドの既存エリアと、公式ショップ一覧に名前が載っているエリアです。追加分はすべて `data_status: "draft"` になります。公式の一覧がない商店街中心のエリア（人形町・神楽坂・自由が丘・清澄白河・両国・日暮里/巣鴨・中野）は、この仕組みでは埋まりません。

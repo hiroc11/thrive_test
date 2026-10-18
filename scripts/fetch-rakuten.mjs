@@ -38,6 +38,9 @@ const MODES = {
   bearer: (params, headers) => (headers.Authorization = `Bearer ${ACCESS_KEY}`),
 };
 
+// "API/Backend Service" 型のアプリは許可IPで認証するため Referer/Origin を送らない方式も試す
+let withReferer = (process.env.RAKUTEN_SEND_REFERER ?? env.RAKUTEN_SEND_REFERER ?? "false") === "true";
+
 async function search(keyword, mode) {
   const params = new URLSearchParams({
     format: "json",
@@ -49,7 +52,7 @@ async function search(keyword, mode) {
     sort: "standard",
   });
   if (AFF_ID) params.set("affiliateId", AFF_ID);
-  const headers = { Referer: REFERER, Origin: new URL(REFERER).origin };
+  const headers = withReferer ? { Referer: REFERER, Origin: new URL(REFERER).origin } : {};
   MODES[mode](params, headers);
   const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`, { headers });
   const text = await res.text();
@@ -65,14 +68,18 @@ async function search(keyword, mode) {
 
 let mode = process.env.RAKUTEN_AUTH_MODE ?? env.RAKUTEN_AUTH_MODE ?? "header";
 if (process.argv.includes("--probe")) {
-  for (const m of Object.keys(MODES)) {
-    try {
-      await search("とらや 羊羹", m);
-      console.log(`OK  ${m} 方式で接続できました（.env.local に RAKUTEN_AUTH_MODE=${m} を追加してください）`);
-    } catch (e) {
-      console.log(`NG  ${m}: ${e.message}`);
+  for (const ref of [false, true]) {
+    withReferer = ref;
+    for (const m of ["query", "header"]) {
+      const label = `${m} / Referer${ref ? "あり" : "なし"}`;
+      try {
+        await search("とらや 羊羹", m);
+        console.log(`OK  ${label} で接続できました → .env.local に RAKUTEN_AUTH_MODE=${m} と RAKUTEN_SEND_REFERER=${ref} を追加してください`);
+      } catch (e) {
+        console.log(`NG  ${label}: ${e.message}`);
+      }
+      await sleep(1100);
     }
-    await sleep(1100);
   }
   process.exit(0);
 }

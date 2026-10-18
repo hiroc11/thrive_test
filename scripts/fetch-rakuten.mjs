@@ -18,6 +18,8 @@ const env = existsSync(".env.local")
 const APP_ID = process.env.RAKUTEN_APP_ID ?? env.RAKUTEN_APP_ID;
 const ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY ?? env.RAKUTEN_ACCESS_KEY;
 const REFERER = process.env.RAKUTEN_REFERER ?? env.RAKUTEN_REFERER ?? "http://localhost:3000";
+// 旧版(20220601)は2026/05/13に廃止。新版が出たら .env.local の RAKUTEN_API_VERSION で切替
+const API_VERSION = process.env.RAKUTEN_API_VERSION ?? env.RAKUTEN_API_VERSION ?? "20260701";
 const AFF_ID = process.env.NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID ?? env.NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID;
 if (!APP_ID || !ACCESS_KEY) {
   console.error(".env.local に RAKUTEN_APP_ID と RAKUTEN_ACCESS_KEY を設定してください");
@@ -57,7 +59,7 @@ async function search(keyword, mode) {
   // ブラウザは Referer を "https://example.com/" のように末尾スラッシュ付きで送る
   const headers = withReferer ? { Referer: `${origin}/`, Origin: origin } : {};
   MODES[mode](params, headers);
-  const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`, { headers });
+  const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/${API_VERSION}?${params}`, { headers });
   const text = await res.text();
   let data;
   try {

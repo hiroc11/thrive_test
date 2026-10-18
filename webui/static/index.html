@@ -112,7 +112,14 @@
           <label>動画の解像度
             <select name="video_resolution"><option value="720p">720p</option><option value="480p">480p（安い）</option></select>
           </label>
-          <label>静止画のモデル（キャラ参照あり）<input name="model_image"></label>
+          <label>静止画の作り方（キャラ・前のカットを参照するとき）
+            <select name="image_mode">
+              <option value="multi">参考画像を複数そのまま渡す（おすすめ・一貫性が高い）</option>
+              <option value="kontext">1枚にまとめて FLUX Kontext に渡す（従来の方法）</option>
+            </select>
+          </label>
+          <label>複数参照のモデル<input name="model_image_multi"></label>
+          <label>静止画のモデル（Kontext）<input name="model_image"></label>
           <label>静止画のモデル（キャラ参照なし）<input name="model_image_t2i"></label>
           <label>動画のモデル<input name="model_video"></label>
           <label>字幕の日本語フォントのパス（空なら自動で探す）<input name="font_path" placeholder="例：C:/Windows/Fonts/meiryob.ttc"></label>
@@ -133,6 +140,7 @@
       </label>
       <label>セリフ（日本語）<textarea class="dialogue" rows="2" placeholder="例：その扉、開けないほうがいいですよ"></textarea></label>
       <label>画像プロンプト（英語）<textarea class="image_prompt" rows="3" placeholder="medium shot, ... anime style"></textarea></label>
+      <label class="check"><input type="checkbox" class="use_prev_ref"> 前のカットの静止画を参考にする（場所・色をそろえる）</label>
       <label>カメラ・動きのプロンプト（英語）<textarea class="motion_prompt" rows="2" placeholder="slow push in, hair moves in the wind"></textarea></label>
       <div class="gen-row">
         <button class="gen" data-kind="image">① 静止画生成</button>

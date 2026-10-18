@@ -80,8 +80,10 @@ DEFAULT_SETTINGS = {
     "enable_safety_checker": False,
     "video_resolution": "720p",
     "font_path": "",
+    "image_mode": "multi",                         # 静止画の作り方：multi（参考画像を複数そのまま渡す）／kontext（1枚にまとめる）
     "models": {
         "image": "fal-ai/flux-kontext/dev",
+        "image_multi": "fal-ai/bytedance/seedream/v4/edit",
         "image_t2i": "fal-ai/flux/dev",
         "video": "fal-ai/wan-i2v",
     },
@@ -139,7 +141,9 @@ def put_settings(body: dict):
             s["narrator_voice"][prov] = str(body["narrator_voice"][prov]).strip()
     if "enable_safety_checker" in body:
         s["enable_safety_checker"] = bool(body["enable_safety_checker"])
-    for key in ("image", "image_t2i", "video"):
+    if body.get("image_mode") in ("multi", "kontext"):
+        s["image_mode"] = body["image_mode"]
+    for key in ("image", "image_multi", "image_t2i", "video"):
         if body.get("models", {}).get(key):
             s["models"][key] = str(body["models"][key]).strip()
     write_json(SETTINGS, s)
@@ -272,6 +276,7 @@ class Cut(BaseModel):
     image_prompt: str = ""      # 英語の画像プロンプト
     motion_prompt: str = ""     # 英語のカメラ・動きのプロンプト
     characters: list[str] = Field(default_factory=list)
+    use_prev_ref: bool = False  # 前のカットの静止画を背景・色の参考にする
 
 
 class Episode(BaseModel):
@@ -305,7 +310,8 @@ def read_episode(ep: int, variant: str) -> dict:
         line = (c.get("lines") or [{}])[0]
         cuts.append(Cut(dialogue=line.get("text", ""), speaker=line.get("speaker", ""),
                         image_prompt=c.get("image_prompt") or "", motion_prompt=c.get("motion_prompt") or "",
-                        characters=c.get("characters", [])).model_dump())
+                        characters=c.get("characters", []),
+                        use_prev_ref=bool(c.get("use_prev_ref", False))).model_dump())
     cuts += [Cut().model_dump() for _ in range(CUTS_PER_EPISODE - len(cuts))]
     return {"episode": ep, "variant": variant, "title": data.get("title", ""), "cuts": cuts}
 
@@ -337,6 +343,7 @@ def write_episode(ep: int, variant: str, body: Episode) -> Path:
                     "characters": [k for k in cut.characters if k in chars],
                     "image_prompt": cut.image_prompt.strip(),
                     "motion_prompt": cut.motion_prompt.strip(),
+                    "use_prev_ref": cut.use_prev_ref,
                     "lines": ([{"speaker": cut.speaker, "text": cut.dialogue.strip()}]
                               if cut.dialogue.strip() else []),
                 }
@@ -454,10 +461,19 @@ def job_image(ep, variant, n):
     if used:
         prompt += ". Characters (use the reference image for their exact design): " + "; ".join(
             f"{c['name']}: {c['prompt']}" if c["prompt"] else c["name"] for c in used)
+    refs = [CHAR_DIR / c["image"] for c in used]
+    if cut.get("use_prev_ref") and n > 1:
+        prev_dir = cut_dir(ep, variant, n - 1)
+        prev = load_state(prev_dir).get("image")
+        if not prev or not (prev_dir / prev).exists():
+            raise RuntimeError(f"前のカット（C{n - 1:02d}）の静止画がまだありません。先に生成してください")
+        refs.append(prev_dir / prev)
+        prompt += (". The last reference image is the previous shot: keep the same location, background,"
+                   " lighting and color palette, but do not copy its composition")
     prompt += ". Japanese anime style, vertical 9:16 frame, no text."
     d = cut_dir(ep, variant, n)
     d.mkdir(parents=True, exist_ok=True)
-    path = sv.generate_image(prompt, [CHAR_DIR / c["image"] for c in used], d, load_settings())
+    path = sv.generate_image(prompt, refs, d, load_settings())
     set_state(d, "image", path)
     return "静止画を生成しました"
 

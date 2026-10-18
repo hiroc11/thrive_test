@@ -177,6 +177,7 @@ function fillEpisode(data) {
     $(".dialogue", cut).value = c.dialogue || "";
     $(".image_prompt", cut).value = c.image_prompt || "";
     $(".motion_prompt", cut).value = c.motion_prompt || "";
+    $(".use_prev_ref", cut).checked = !!c.use_prev_ref;
     $$(".chip input", cut).forEach((box) => {
       box.checked = (c.characters || []).includes(box.value);
       box.closest(".chip").classList.toggle("on", box.checked);
@@ -193,6 +194,7 @@ function collectEpisode() {
       speaker: $(".speaker", cut).value,
       image_prompt: $(".image_prompt", cut).value,
       motion_prompt: $(".motion_prompt", cut).value,
+      use_prev_ref: $(".use_prev_ref", cut).checked,
       characters: $$(".chip input:checked", cut).map((b) => b.value),
     })),
   };
@@ -352,6 +354,8 @@ async function loadSettings() {
   sform.elements.fish_model.value = s.fish_model || "";
   sform.elements.enable_safety_checker.checked = !!s.enable_safety_checker;
   sform.elements.video_resolution.value = s.video_resolution;
+  sform.elements.image_mode.value = s.image_mode || "multi";
+  sform.elements.model_image_multi.value = s.models.image_multi;
   sform.elements.model_image.value = s.models.image;
   sform.elements.model_image_t2i.value = s.models.image_t2i;
   sform.elements.model_video.value = s.models.video;
@@ -368,7 +372,9 @@ sform.addEventListener("submit", async (e) => {
       enable_safety_checker: sform.elements.enable_safety_checker.checked,
       video_resolution: sform.elements.video_resolution.value,
       font_path: sform.elements.font_path.value,
+      image_mode: sform.elements.image_mode.value,
       models: {
+        image_multi: sform.elements.model_image_multi.value,
         image: sform.elements.model_image.value,
         image_t2i: sform.elements.model_image_t2i.value,
         video: sform.elements.model_video.value,

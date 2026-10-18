@@ -143,7 +143,13 @@ def generate_image(prompt: str, ref_paths: list[Path], out_dir: Path, settings: 
     if fake_mode():
         return _fake_image(prompt, ref_paths, dest)
     safety = bool(settings.get("enable_safety_checker", False))
-    if ref_paths:
+    if ref_paths and settings.get("image_mode", "multi") == "multi":
+        # 参考画像を1枚ずつそのまま渡す（キャラの服装や背景が崩れにくい）
+        res = _fal(settings["models"]["image_multi"], {
+            "prompt": prompt, "image_urls": [_fal_upload(p) for p in ref_paths[-10:]],
+            "image_size": {"width": 1080, "height": 1920}, "enable_safety_checker": safety,
+            "num_images": 1})
+    elif ref_paths:
         canvas = reference_canvas(ref_paths, out_dir / "_refs.jpg")
         res = _fal(settings["models"]["image"], {
             "prompt": prompt, "image_url": _fal_upload(canvas), "enable_safety_checker": safety,

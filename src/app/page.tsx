@@ -22,6 +22,9 @@ const MapView = dynamic(() => import("@/components/MapView"), {
 const ITEMS = rawItems as Item[];
 const EVENING_SCORE = { high: 2, medium: 1, morning_only: 0 };
 
+const score = (i: Item) =>
+  (i.data_status === "curated" ? 100 : 0) + EVENING_SCORE[i.evening_availability] * 10 + i.target_scenes.length;
+
 const MUST_TEST: Record<Must, (i: Item) => boolean> = {
   wrapped: (i) => i.is_individually_wrapped,
   ambient: (i) => i.temperature === "ambient",
@@ -74,6 +77,7 @@ export default function Home() {
   }, [logs, recipient]);
 
   // エリア以外の条件で絞り込んだ商品（地図のピンの件数に使う）
+  // おすすめ順: 確認済み優先 → 夕方の買いやすさ × 汎用性(対応シーン数)
   const baseResults = useMemo(
     () =>
       ITEMS.filter(
@@ -81,17 +85,14 @@ export default function Home() {
           (!scene || i.target_scenes.includes(scene)) &&
           (!budget || i.price_tier === budget) &&
           [...musts].every((m) => MUST_TEST[m](i)),
-      ),
+      ).sort((a, b) => score(b) - score(a)),
     [scene, budget, musts],
   );
 
-  const results = useMemo(() => {
-    const list = baseResults.filter((i) => !area || area === "online" || i.areas.includes(area));
-    // おすすめ順: 確認済み優先 → 夕方の買いやすさ × 汎用性(対応シーン数)
-    const score = (i: Item) =>
-      (i.data_status === "curated" ? 100 : 0) + EVENING_SCORE[i.evening_availability] * 10 + i.target_scenes.length;
-    return list.sort((a, b) => score(b) - score(a));
-  }, [baseResults, area]);
+  const results = useMemo(
+    () => baseResults.filter((i) => !area || area === "online" || i.areas.includes(area)),
+    [baseResults, area],
+  );
 
   const toggleMust = (m: Must) =>
     setMusts((prev) => {
@@ -157,9 +158,8 @@ export default function Home() {
               <MapView
                 items={baseResults}
                 selected={area}
-                onSelect={(a) => { setArea(a); setView("list"); }}
+                onShowList={(a) => { setArea(a); setView("list"); }}
               />
-              <p className="mt-2 text-xs text-slate-500">数字は今の条件に合う商品数です。ピンをタップするとそのエリアのリストを表示します。</p>
             </div>
           )}
           <div className={`space-y-3 ${view === "map" ? "hidden" : ""}`}>

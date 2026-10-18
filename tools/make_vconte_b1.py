@@ -1,7 +1,8 @@
 """第1話B1「前世の死」のVコンテ（仮映像）を生成する。
 
 部品（キャラの配置、カメラ、字幕・テロップ）は make_vconte.py のものを使う。
-assets/stills/b1/<カット番号>.* に生成した静止画があればそれを使い、
+assets/stills/b1/<カット番号>.mp4（動画クリップ）があれば最優先で使い、
+次に同じ名前の静止画、
 なければ蓮は基準画像の切り抜き、少年は図形で代用する。
 
 出力: assets/vconte/b1_vconte.mp4（540x960、24fps、無音）
@@ -255,6 +256,23 @@ CUTS = [
 ]
 
 
+def clip_frames(cut, n):
+    """<カット>.mp4 があれば、出力サイズに合わせたフレームを n 枚返す（足りなければ最後の絵で止める）。"""
+    path = STILLS / f"{cut}.mp4"
+    if not path.exists():
+        return None
+    raw = subprocess.run(
+        ["ffmpeg", "-loglevel", "error", "-i", str(path), "-an",
+         "-vf", f"fps={FPS},scale={FW}:{FH}:force_original_aspect_ratio=increase,crop={FW}:{FH}",
+         "-frames:v", str(n), "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+        capture_output=True, check=True).stdout
+    size = FW * FH * 3
+    frames = [Image.frombytes("RGB", (FW, FH), raw[i:i + size]) for i in range(0, len(raw) - size + 1, size)]
+    if not frames:
+        return None
+    return frames + [frames[-1]] * (n - len(frames))
+
+
 def main():
     vc.OUT.mkdir(parents=True, exist_ok=True)
     out = vc.OUT / "b1_vconte.mp4"
@@ -265,8 +283,13 @@ def main():
         stdin=subprocess.PIPE)
     start = 0.0
     for cut, dur, fn, cam, line, memo in CUTS:
+        clip = clip_frames(cut, int(dur * FPS))  # 動画クリップはカメラの動きを付けずにそのまま使う
         for i in range(int(dur * FPS)):
             t = i / FPS
+            if clip is not None:
+                frame = vc.overlay(clip[i].convert("RGBA"), cut, start, t, line, memo)
+                proc.stdin.write(frame.convert("RGB").tobytes())
+                continue
             st = still(cut)
             if st is not None:
                 scene = st.copy()

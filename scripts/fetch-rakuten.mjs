@@ -38,8 +38,8 @@ const MODES = {
   bearer: (params, headers) => (headers.Authorization = `Bearer ${ACCESS_KEY}`),
 };
 
-// "API/Backend Service" 型のアプリは許可IPで認証するため Referer/Origin を送らない方式も試す
-let withReferer = (process.env.RAKUTEN_SEND_REFERER ?? env.RAKUTEN_SEND_REFERER ?? "false") === "true";
+// Referer なしだと "API Configuration not found" になるため既定で送る
+let withReferer = (process.env.RAKUTEN_SEND_REFERER ?? env.RAKUTEN_SEND_REFERER ?? "true") !== "false";
 
 async function search(keyword, mode) {
   const params = new URLSearchParams({

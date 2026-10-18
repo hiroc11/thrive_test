@@ -39,6 +39,7 @@ const MODES = {
 };
 
 // Referer なしだと "API Configuration not found" になるため既定で送る
+let useAffiliate = true;
 let withReferer = (process.env.RAKUTEN_SEND_REFERER ?? env.RAKUTEN_SEND_REFERER ?? "true") !== "false";
 
 async function search(keyword, mode) {
@@ -51,7 +52,7 @@ async function search(keyword, mode) {
     imageFlag: "1",
     sort: "standard",
   });
-  if (AFF_ID) params.set("affiliateId", AFF_ID);
+  if (AFF_ID && useAffiliate) params.set("affiliateId", AFF_ID);
   const origin = new URL(REFERER).origin;
   // ブラウザは Referer を "https://example.com/" のように末尾スラッシュ付きで送る
   const headers = withReferer ? { Referer: `${origin}/`, Origin: origin } : {};
@@ -71,13 +72,13 @@ async function search(keyword, mode) {
 let mode = process.env.RAKUTEN_AUTH_MODE ?? env.RAKUTEN_AUTH_MODE ?? "header";
 if (process.argv.includes("--probe")) {
   console.log(`Referer: ${new URL(REFERER).origin}/`);
-  for (const ref of [true]) {
-    withReferer = ref;
+  for (const aff of [true, false]) {
+    useAffiliate = aff;
     for (const m of ["query", "header"]) {
-      const label = `${m} / Referer${ref ? "あり" : "なし"}`;
+      const label = `${m} / affiliateId${aff ? "あり" : "なし"}`;
       try {
         await search("とらや 羊羹", m);
-        console.log(`OK  ${label} で接続できました → .env.local に RAKUTEN_AUTH_MODE=${m} と RAKUTEN_SEND_REFERER=${ref} を追加してください`);
+        console.log(`OK  ${label} で接続できました → .env.local に RAKUTEN_AUTH_MODE=${m} と RAKUTEN_SEND_REFERER=true を追加してください${aff ? "" : "（affiliateIdが原因のため、楽天管理画面に表示されたAffiliate IDを NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID に入れてください）"}`);
       } catch (e) {
         console.log(`NG  ${label}: ${e.message}`);
       }

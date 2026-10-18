@@ -1,0 +1,1213 @@
+[
+  {
+    "id": "tokyo-001",
+    "name": "空いろ「つき」どら焼き・最中詰合せ",
+    "brand_name": "空いろ",
+    "category": "wagashi",
+    "price_tax_in": 3564,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "12個入",
+    "temperature": "ambient",
+    "shelf_life_days": 7,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "銀座「空也」の新ブランドで、個包装で日持ちもしますので皆様で召し上がってください。",
+    "why_recommended": "空也の知名度がありながら予約不要で改札内で夕方でも買える。箱も小ぶり。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "グランスタ東京",
+        "access_note": "丸の内地下中央口改札付近",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC"
+      },
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "エキュート品川",
+        "access_note": "中央改札内",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A8%E3%82%AD%E3%83%A5%E3%83%BC%E3%83%88%E5%93%81%E5%B7%9D"
+      }
+    ],
+    "search_keyword": "空いろ 空いろ「つき」どら焼き・最中詰合せ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-002",
+    "name": "治一郎のバウムクーヘン",
+    "brand_name": "治一郎",
+    "category": "yogashi",
+    "price_tax_in": 2160,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office",
+      "casual_party"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "tokyo_station_out",
+      "shinagawa_in",
+      "shinjuku",
+      "ginza"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1本(カット可)",
+    "temperature": "ambient",
+    "shelf_life_days": 7,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "しっとり食感で行列ができるバウムクーヘンです。皆様で切り分けてどうぞ。",
+    "why_recommended": "知名度と万人受け。駅ナカ店舗が多く夕方でも確保しやすい。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "グランスタ東京",
+        "access_note": "改札内B1",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "ルミネ新宿",
+        "access_note": "南口",
+        "open_hours": "11:00-21:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%AB%E3%83%9F%E3%83%8D%E6%96%B0%E5%AE%BF"
+      }
+    ],
+    "search_keyword": "治一郎 治一郎のバウムクーヘン",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-003",
+    "name": "とらや 小形羊羹 5本入",
+    "brand_name": "とらや",
+    "category": "wagashi",
+    "price_tax_in": 1620,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza",
+      "roppongi_akasaka",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "5本入",
+    "temperature": "ambient",
+    "shelf_life_days": 365,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "室町時代から続くとらやの羊羹で、日持ちしますのでお時間のある時にどうぞ。",
+    "why_recommended": "格式が高く目上に最適。1年近く日持ちし失敗がない。",
+    "shops": [
+      {
+        "area_id": "roppongi_akasaka",
+        "shop_name": "とらや 赤坂店",
+        "access_note": "赤坂見附駅 徒歩7分",
+        "open_hours": "09:00-18:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E8%B5%A4%E5%9D%82%E5%BA%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "とらや 銀座店",
+        "access_note": "銀座駅 徒歩2分",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E9%8A%80%E5%BA%A7%E5%BA%97"
+      }
+    ],
+    "search_keyword": "とらや とらや 小形羊羹 5本入",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-004",
+    "name": "とらや 夜の梅 竹皮包羊羹",
+    "brand_name": "とらや",
+    "category": "wagashi",
+    "price_tax_in": 3456,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza",
+      "roppongi_akasaka"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1本",
+    "temperature": "ambient",
+    "shelf_life_days": 365,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "とらやの代表銘柄「夜の梅」です。切り口を梅に見立てた羊羹です。",
+    "why_recommended": "会食・謝罪・目上への定番中の定番。",
+    "shops": [
+      {
+        "area_id": "roppongi_akasaka",
+        "shop_name": "とらや 赤坂店",
+        "access_note": "赤坂見附駅 徒歩7分",
+        "open_hours": "09:00-18:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E8%B5%A4%E5%9D%82%E5%BA%97"
+      }
+    ],
+    "search_keyword": "とらや とらや 夜の梅 竹皮包羊羹",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-005",
+    "name": "塩野 季節の上生菓子",
+    "brand_name": "御菓子司 塩野",
+    "category": "wagashi",
+    "price_tax_in": 3000,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "roppongi_akasaka"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "6個入",
+    "temperature": "ambient",
+    "shelf_life_days": 1,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "赤坂の老舗・塩野の季節の生菓子です。本日中にお召し上がりください。",
+    "why_recommended": "料亭御用達の格。季節感で話題が作れる(当日中)。",
+    "shops": [
+      {
+        "area_id": "roppongi_akasaka",
+        "shop_name": "御菓子司 塩野",
+        "access_note": "赤坂駅 徒歩3分",
+        "open_hours": "09:00-18:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%BE%A1%E8%8F%93%E5%AD%90%E5%8F%B8%20%E5%A1%A9%E9%87%8E"
+      }
+    ],
+    "search_keyword": "御菓子司 塩野 塩野 季節の上生菓子",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-006",
+    "name": "麻布十番あげもち屋 あげもち詰合せ",
+    "brand_name": "麻布十番あげもち屋",
+    "category": "savory",
+    "price_tax_in": 2700,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "roppongi_akasaka",
+      "tokyo_station_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "個包装詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "甘くないあげもちなので、お酒のお供にもどうぞ。",
+    "why_recommended": "甘いものが苦手な相手・男性職場向けの塩系定番。",
+    "shops": [
+      {
+        "area_id": "roppongi_akasaka",
+        "shop_name": "麻布十番あげもち屋",
+        "access_note": "麻布十番駅 徒歩3分",
+        "open_hours": "10:00-19:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%BA%BB%E5%B8%83%E5%8D%81%E7%95%AA%E3%81%82%E3%81%92%E3%82%82%E3%81%A1%E5%B1%8B"
+      }
+    ],
+    "search_keyword": "麻布十番あげもち屋 麻布十番あげもち屋 あげもち詰合せ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-007",
+    "name": "エシレ サブレ・エシレ",
+    "brand_name": "エシレ・メゾン デュ ブール",
+    "category": "yogashi",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "female_office",
+      "in_laws"
+    ],
+    "areas": [
+      "tokyo_station_out"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "缶入",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": true,
+    "evening_availability": "morning_only",
+    "bag_size": "standard",
+    "handoff_script": "フランスAOP発酵バターのエシレのサブレです。",
+    "why_recommended": "知る人ぞ知るブランド感。缶で見栄え◎。人気で夕方は品薄注意。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "エシレ・メゾン デュ ブール",
+        "access_note": "丸の内ブリックスクエア1F",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A8%E3%82%B7%E3%83%AC%E3%83%BB%E3%83%A1%E3%82%BE%E3%83%B3%20%E3%83%87%E3%83%A5%20%E3%83%96%E3%83%BC%E3%83%AB"
+      }
+    ],
+    "search_keyword": "エシレ・メゾン デュ ブール エシレ サブレ・エシレ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-008",
+    "name": "オードリー グレイシア ミルク",
+    "brand_name": "オードリー",
+    "category": "yogashi",
+    "price_tax_in": 1296,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "shinjuku",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "8本入",
+    "temperature": "ambient",
+    "shelf_life_days": 30,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "いちごの花束をイメージしたお菓子で、行列ができる人気店のものです。",
+    "why_recommended": "見た目が華やかで女性職場に刺さる。夕方は品薄、取置推奨。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "グランスタ東京",
+        "access_note": "改札内B1",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "新宿高島屋",
+        "access_note": "B1",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E5%AE%BF%E9%AB%98%E5%B3%B6%E5%B1%8B"
+      }
+    ],
+    "search_keyword": "オードリー オードリー グレイシア ミルク",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-009",
+    "name": "呼きつね(よきつね)",
+    "brand_name": "呼きつね",
+    "category": "wagashi",
+    "price_tax_in": 1404,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party"
+    ],
+    "areas": [
+      "tokyo_station_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "6個入",
+    "temperature": "ambient",
+    "shelf_life_days": 5,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "狐のお面の形をしたいなり風の和スイーツで、東京駅限定なんです。",
+    "why_recommended": "東京駅限定の話題性。小ぶりでバラマキに。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "グランスタ東京",
+        "access_note": "改札内",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC"
+      }
+    ],
+    "search_keyword": "呼きつね 呼きつね(よきつね)",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-010",
+    "name": "東京ばな奈「見ぃつけたっ」",
+    "brand_name": "東京ばな奈",
+    "category": "yogashi",
+    "price_tax_in": 1296,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "tokyo_station_out",
+      "shinagawa_in",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "8個入",
+    "temperature": "ambient",
+    "shelf_life_days": 9,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "定番ですが、やっぱり東京といえばこれかと思いまして。",
+    "why_recommended": "圧倒的知名度。どこでも夜まで買える保険枠。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "東京ギフトパレット",
+        "access_note": "八重洲地下",
+        "open_hours": "09:00-21:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%82%AE%E3%83%95%E3%83%88%E3%83%91%E3%83%AC%E3%83%83%E3%83%88"
+      }
+    ],
+    "search_keyword": "東京ばな奈 東京ばな奈「見ぃつけたっ」",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-011",
+    "name": "ねんりん家 マウントバーム しっかり芽",
+    "brand_name": "ねんりん家",
+    "category": "yogashi",
+    "price_tax_in": 1620,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1本",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "外はカリッと中はしっとりのバームクーヘンです。",
+    "why_recommended": "銀座発の品格。日持ち2週間で渡すタイミングを選ばない。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "ねんりん家 銀座本店",
+        "access_note": "銀座駅 徒歩3分",
+        "open_hours": "11:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AD%E3%82%93%E3%82%8A%E3%82%93%E5%AE%B6%20%E9%8A%80%E5%BA%A7%E6%9C%AC%E5%BA%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "大丸東京店",
+        "access_note": "1F",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%B8%B8%E6%9D%B1%E4%BA%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "ねんりん家 ねんりん家 マウントバーム しっかり芽",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-012",
+    "name": "銀のぶどう シュガーバターの木",
+    "brand_name": "シュガーバターの木",
+    "category": "yogashi",
+    "price_tax_in": 1080,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "tokyo_station_out",
+      "shinjuku",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "10袋入",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "個包装で配りやすいので、皆様でどうぞ。",
+    "why_recommended": "価格控えめで個数多く、職場バラマキの鉄板。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "グランスタ東京",
+        "access_note": "改札内",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC"
+      }
+    ],
+    "search_keyword": "シュガーバターの木 銀のぶどう シュガーバターの木",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-013",
+    "name": "PRESS BUTTER SAND バターサンド〈焼きたて〉",
+    "brand_name": "PRESS BUTTER SAND",
+    "category": "yogashi",
+    "price_tax_in": 1296,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "shinagawa_in",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "5個入",
+    "temperature": "ambient",
+    "shelf_life_days": 10,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "クッキーにバターキャラメルが挟まった人気のバターサンドです。",
+    "why_recommended": "若い世代に人気。個包装で配りやすい。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "グランスタ東京",
+        "access_note": "改札内",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC"
+      }
+    ],
+    "search_keyword": "PRESS BUTTER SAND PRESS BUTTER SAND バターサンド〈焼きたて〉",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-014",
+    "name": "資生堂パーラー チーズケーキ",
+    "brand_name": "資生堂パーラー",
+    "category": "yogashi",
+    "price_tax_in": 2700,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ginza",
+      "tokyo_station_out",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "6個入",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "銀座の資生堂パーラーのチーズケーキで、日持ちもします。",
+    "why_recommended": "銀座の老舗ブランド。上品で年配にも喜ばれる。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "資生堂パーラー 銀座本店ショップ",
+        "access_note": "銀座駅 徒歩5分",
+        "open_hours": "11:00-21:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E9%8A%80%E5%BA%A7%E6%9C%AC%E5%BA%97%E3%82%B7%E3%83%A7%E3%83%83%E3%83%97"
+      }
+    ],
+    "search_keyword": "資生堂パーラー 資生堂パーラー チーズケーキ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-015",
+    "name": "銀座 菊廼舎 冨貴寄",
+    "brand_name": "銀座 菊廼舎",
+    "category": "wagashi",
+    "price_tax_in": 1620,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "female_office",
+      "business_exec"
+    ],
+    "areas": [
+      "ginza",
+      "tokyo_station_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "缶入",
+    "temperature": "ambient",
+    "shelf_life_days": 90,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "和三盆の干菓子や金平糖を詰めた、銀座の菊廼舎の冨貴寄です。",
+    "why_recommended": "缶が可愛く日持ちも長い。和の華やかさ。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座 菊廼舎 本店",
+        "access_note": "銀座駅 徒歩3分",
+        "open_hours": "09:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%20%E8%8F%8A%E5%BB%BC%E8%88%8E%20%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "銀座 菊廼舎 銀座 菊廼舎 冨貴寄",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-016",
+    "name": "銀座 たまや 東京たまご ごまたまご",
+    "brand_name": "ごまたまご",
+    "category": "wagashi",
+    "price_tax_in": 1080,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "9個入",
+    "temperature": "ambient",
+    "shelf_life_days": 20,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "黒ごまの東京銘菓です。",
+    "why_recommended": "定番の安心感と手頃さ。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "東京ギフトパレット",
+        "access_note": "八重洲地下",
+        "open_hours": "09:00-21:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%82%AE%E3%83%95%E3%83%88%E3%83%91%E3%83%AC%E3%83%83%E3%83%88"
+      }
+    ],
+    "search_keyword": "ごまたまご 銀座 たまや 東京たまご ごまたまご",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-017",
+    "name": "豆源 おかき詰合せ",
+    "brand_name": "豆源",
+    "category": "savory",
+    "price_tax_in": 2160,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "roppongi_akasaka",
+      "tokyo_station_out",
+      "ginza"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "麻布十番の豆源のおかきで、甘くないのでお酒にも合います。",
+    "why_recommended": "老舗の塩系。甘いもの苦手な目上向け。",
+    "shops": [
+      {
+        "area_id": "roppongi_akasaka",
+        "shop_name": "豆源 麻布十番本店",
+        "access_note": "麻布十番駅 徒歩2分",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B1%86%E6%BA%90%20%E9%BA%BB%E5%B8%83%E5%8D%81%E7%95%AA%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "豆源 豆源 おかき詰合せ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-018",
+    "name": "かきたねキッチン 詰合せ",
+    "brand_name": "かきたねキッチン",
+    "category": "savory",
+    "price_tax_in": 1620,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office",
+      "business_exec"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "小袋入",
+    "temperature": "ambient",
+    "shelf_life_days": 90,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "色々な味の柿の種なので、選ぶのも楽しいと思います。",
+    "why_recommended": "甘くない・軽い・日持ち長いの三拍子。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "グランスタ東京",
+        "access_note": "改札内",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B0%E3%83%A9%E3%83%B3%E3%82%B9%E3%82%BF%E6%9D%B1%E4%BA%AC"
+      }
+    ],
+    "search_keyword": "かきたねキッチン かきたねキッチン 詰合せ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-019",
+    "name": "ザ・メープルマニア メープルバタークッキー",
+    "brand_name": "ザ・メープルマニア",
+    "category": "yogashi",
+    "price_tax_in": 1296,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "9枚入",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "メープルの香りのバタークッキーで、すごく人気なんです。",
+    "why_recommended": "行列の定番。夜まで買える。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "東京ギフトパレット",
+        "access_note": "八重洲地下",
+        "open_hours": "09:00-21:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%82%AE%E3%83%95%E3%83%88%E3%83%91%E3%83%AC%E3%83%83%E3%83%88"
+      }
+    ],
+    "search_keyword": "ザ・メープルマニア ザ・メープルマニア メープルバタークッキー",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-020",
+    "name": "鎌倉紅谷 クルミッ子",
+    "brand_name": "鎌倉紅谷",
+    "category": "yogashi",
+    "price_tax_in": 1404,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party",
+      "in_laws"
+    ],
+    "areas": [
+      "tokyo_station_in",
+      "shinagawa_in",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "8個入",
+    "temperature": "ambient",
+    "shelf_life_days": 30,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "キャラメルとくるみの人気のお菓子です。",
+    "why_recommended": "若年〜年配まで好評の万能品。",
+    "shops": [
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "エキュート品川",
+        "access_note": "改札内",
+        "open_hours": "08:00-22:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A8%E3%82%AD%E3%83%A5%E3%83%BC%E3%83%88%E5%93%81%E5%B7%9D"
+      }
+    ],
+    "search_keyword": "鎌倉紅谷 鎌倉紅谷 クルミッ子",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-021",
+    "name": "千疋屋総本店 フルーツクーヘン",
+    "brand_name": "千疋屋総本店",
+    "category": "yogashi",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "in_laws",
+      "business_exec"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "8個入",
+    "temperature": "ambient",
+    "shelf_life_days": 30,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "千疋屋のフルーツを使った焼き菓子です。",
+    "why_recommended": "果物の千疋屋ブランドで格がある。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "千疋屋総本店 日本橋本店",
+        "access_note": "三越前駅 徒歩1分",
+        "open_hours": "10:00-19:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "千疋屋総本店 千疋屋総本店 フルーツクーヘン",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-022",
+    "name": "銀座ウエスト リーフパイ",
+    "brand_name": "銀座ウエスト",
+    "category": "yogashi",
+    "price_tax_in": 2700,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ginza",
+      "tokyo_station_out",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "缶入",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "銀座ウエストのリーフパイで、昔からの定番なんです。",
+    "why_recommended": "老舗の信頼。年配への手土産に強い。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座ウエスト 本店",
+        "access_note": "銀座駅 徒歩5分",
+        "open_hours": "09:00-21:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%20%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "銀座ウエスト 銀座ウエスト リーフパイ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-023",
+    "name": "新宿中村屋 月餅",
+    "brand_name": "新宿中村屋",
+    "category": "wagashi",
+    "price_tax_in": 1944,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "business_exec"
+    ],
+    "areas": [
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "6個入",
+    "temperature": "ambient",
+    "shelf_life_days": 30,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "新宿中村屋の月餅で、日持ちもしますのでどうぞ。",
+    "why_recommended": "新宿の老舗。目上・親族向け。",
+    "shops": [
+      {
+        "area_id": "shinjuku",
+        "shop_name": "新宿中村屋 本店",
+        "access_note": "新宿駅東口 徒歩2分",
+        "open_hours": "11:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E5%AE%BF%E4%B8%AD%E6%9D%91%E5%B1%8B%20%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "新宿中村屋 新宿中村屋 月餅",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-024",
+    "name": "ヨックモック シガール",
+    "brand_name": "ヨックモック",
+    "category": "yogashi",
+    "price_tax_in": 2160,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "shibuya_omotesando",
+      "tokyo_station_out",
+      "ginza",
+      "shinjuku"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "20本入",
+    "temperature": "ambient",
+    "shelf_life_days": 90,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "ヨックモックのシガールです。定番ですが皆様で召し上がってください。",
+    "why_recommended": "迷ったらこれの王道。個包装・長期保存。",
+    "shops": [
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "ヨックモック 青山本店",
+        "access_note": "表参道駅 徒歩5分",
+        "open_hours": "10:00-18:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E9%9D%92%E5%B1%B1%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "ヨックモック ヨックモック シガール",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-025",
+    "name": "GMT ガトーフェスタ ハラダ グーテ・デ・ロワ",
+    "brand_name": "ガトーフェスタ ハラダ",
+    "category": "yogashi",
+    "price_tax_in": 1188,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza",
+      "shinjuku",
+      "shibuya_omotesando"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "10枚入",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "人気のラスクで個包装なので配りやすいです。",
+    "why_recommended": "コスパと知名度。バラマキ向け。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座三越",
+        "access_note": "B2",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      }
+    ],
+    "search_keyword": "ガトーフェスタ ハラダ GMT ガトーフェスタ ハラダ グーテ・デ・ロワ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-026",
+    "name": "バターバトラー バターフィナンシェ",
+    "brand_name": "BUTTER BUTLER",
+    "category": "yogashi",
+    "price_tax_in": 2500,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party"
+    ],
+    "areas": [
+      "shibuya_omotesando"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 30,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "発酵バターを使ったフィナンシェで、しっとりしていて人気なんです。",
+    "why_recommended": "渋谷エリアのおしゃれ枠。",
+    "shops": [
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "BUTTER BUTLER",
+        "access_note": "渋谷駅直結 B2",
+        "open_hours": "10:00-21:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B8%8B%E8%B0%B7%E3%83%92%E3%82%AB%E3%83%AA%E3%82%A8%20ShinQs"
+      }
+    ],
+    "search_keyword": "渋谷ヒカリエ ShinQs バターバトラー バターフィナンシェ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-027",
+    "name": "叶 匠壽庵 あも",
+    "brand_name": "叶 匠壽庵",
+    "category": "wagashi",
+    "price_tax_in": 1512,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "business_exec"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "shinjuku",
+      "ginza"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1棹",
+    "temperature": "ambient",
+    "shelf_life_days": 10,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "丹波大納言を使った羊羹のような餅菓子です。",
+    "why_recommended": "上品な和菓子で目上・親族向け。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "大丸東京店",
+        "access_note": "B1",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%B8%B8%E6%9D%B1%E4%BA%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "叶 匠壽庵 叶 匠壽庵 あも",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-028",
+    "name": "赤坂柿山 おかき詰合せ",
+    "brand_name": "赤坂柿山",
+    "category": "savory",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "roppongi_akasaka",
+      "ginza"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 90,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "赤坂の老舗のおかきで、甘くないのでどなたにも喜ばれます。",
+    "why_recommended": "会食手土産の塩系最上位。",
+    "shops": [
+      {
+        "area_id": "roppongi_akasaka",
+        "shop_name": "赤坂柿山 赤坂本店",
+        "access_note": "赤坂見附駅 徒歩3分",
+        "open_hours": "10:00-19:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B5%A4%E5%9D%82%E6%9F%BF%E5%B1%B1%20%E8%B5%A4%E5%9D%82%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "赤坂柿山 赤坂柿山 おかき詰合せ",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-029",
+    "name": "銀座 千疋屋 フルーツゼリー",
+    "brand_name": "銀座千疋屋",
+    "category": "yogashi",
+    "price_tax_in": 5400,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "ginza",
+      "tokyo_station_out"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "10個入",
+    "temperature": "ambient",
+    "shelf_life_days": 90,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "large",
+    "handoff_script": "銀座千疋屋のフルーツゼリーで、夏場も日持ちしますのでどうぞ。",
+    "why_recommended": "5千円超の格。重めの手土産・お詫び向け。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座千疋屋 本店",
+        "access_note": "銀座駅 徒歩1分",
+        "open_hours": "10:00-19:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "銀座千疋屋 銀座 千疋屋 フルーツゼリー",
+    "image_url": null,
+    "jan_code": null
+  },
+  {
+    "id": "tokyo-030",
+    "name": "獺祭 純米大吟醸45 720ml",
+    "brand_name": "旭酒造",
+    "category": "drink",
+    "price_tax_in": 1980,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "casual_party"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "shinjuku",
+      "ginza"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1本",
+    "temperature": "ambient",
+    "shelf_life_days": 365,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "standard",
+    "handoff_script": "山口の獺祭で、日本酒好きの方には特に喜ばれると思います。",
+    "why_recommended": "酒好きの取引先・ホムパに強い。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "大丸東京店",
+        "access_note": "B1",
+        "open_hours": "10:00-20:00",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%A4%A7%E4%B8%B8%E6%9D%B1%E4%BA%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "旭酒造 獺祭 純米大吟醸45 720ml",
+    "image_url": null,
+    "jan_code": null
+  }
+]

@@ -33,10 +33,26 @@ async function genreTargets() {
         ? { url: genreUrl, data: await rakutenGet(genreUrl, { genreId: String(root.id) }) }
         : await firstWorking("genre", GENRE_URLS, { genreId: String(root.id) });
       genreUrl = url;
-      const children = (data.children ?? []).map((c) => c.child ?? c);
+      mkdirSync("scripts/out", { recursive: true });
+      writeFileSync(`scripts/out/genre-${root.id}.json`, JSON.stringify(data, null, 2)); // 応答の形の確認用
+      // 版によって children の形が違うので、名前とIDを持つオブジェクトを探して読む
+      const pick = (o) => {
+        if (!o || typeof o !== "object") return null;
+        const id = o.genreId ?? o.id;
+        const name = o.genreName ?? o.name;
+        if (id && name) return { id, name };
+        for (const v of Object.values(o)) {
+          const r = pick(v);
+          if (r) return r;
+        }
+        return null;
+      };
+      const children = (data.children ?? data.Children ?? []).map(pick).filter(Boolean);
+      // 大ジャンル自体も対象に含める（子ジャンルを分類できなくても売れ筋を拾うため）
+      targets.push({ id: root.id, name: pick(data.current ?? data.parents?.[0])?.name ?? `genre ${root.id}`, category: root.category ?? "yogashi" });
       for (const c of children) {
-        const category = classify(c.genreName, root.category);
-        if (category) targets.push({ id: c.genreId, name: c.genreName, category });
+        const category = classify(c.name, root.category);
+        if (category) targets.push({ id: c.id, name: c.name, category });
       }
     } catch (e) {
       console.log(`ジャンル検索APIが使えないため大ジャンル ${root.id} のランキングだけ使います (${e.message.slice(0, 80)})`);

@@ -128,3 +128,47 @@ textarea { resize: vertical; }
   .drop { max-width: 200px; }
   .cuts { grid-template-columns: 1fr; }
 }
+
+/* 動作確認モードの帯 */
+.banner { background: #f2c94c; color: #1f1c19; padding: 8px 24px; font-size: 13px; }
+
+/* 版の切り替え */
+.variant-switch { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.variant-switch .variant { border: 0; border-radius: 0; }
+.variant-switch .variant.active { background: var(--ink); color: var(--card); }
+.episode-bar .ep-num { width: 90px; }
+
+/* カットごとの生成とプレビュー */
+.gen-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.gen-row button { padding: 8px 6px; font-size: 13px; }
+button:disabled { opacity: 0.5; cursor: wait; }
+.job-status { min-height: 1.2em; }
+.previews { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pv { position: relative; aspect-ratio: 9 / 16; background: var(--bg); border: 1px dashed var(--line);
+  border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.pv > span { color: var(--muted); font-size: 12px; }
+.pv img, .pv video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.pv-voice { width: 100%; }
+
+/* 書き出し */
+.export { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.export h2 { margin: 0; }
+.export-btn { white-space: nowrap; flex-shrink: 0; }
+.hint { color: var(--muted); font-size: 13px; margin: 0; }
+.export-results { display: flex; gap: 16px; flex-wrap: wrap; }
+.export-results figure { margin: 0; display: flex; flex-direction: column; gap: 6px; width: 220px; }
+.export-results figcaption { font-size: 13px; color: var(--muted); }
+.export-results video { width: 100%; aspect-ratio: 9 / 16; background: #000; border-radius: 8px; }
+
+/* 設定 */
+.settings-grid { display: grid; grid-template-columns: 320px 1fr; gap: 24px; }
+.status-list { list-style: none; padding: 0; margin: 8px 0; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.status-list .ok { color: #2e7d4f; }
+.status-list .ng { color: var(--accent); }
+label.check { flex-direction: row; align-items: center; gap: 8px; color: var(--ink); }
+label.check input { width: auto; }
+code { background: var(--bg); padding: 1px 4px; border-radius: 4px; }
+.char-card .voice { color: var(--muted); font-size: 12px; }
+@media (max-width: 640px) {
+  .settings-grid { grid-template-columns: 1fr; }
+}

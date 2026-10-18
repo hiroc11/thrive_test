@@ -13,8 +13,10 @@
     <nav>
       <button class="tab active" data-tab="characters">キャラクター</button>
       <button class="tab" data-tab="episode">エピソード</button>
+      <button class="tab" data-tab="settings">設定</button>
     </nav>
   </header>
+  <div id="fake-banner" class="banner" hidden>動作確認モード（WEBUI_FAKE=1）：外部APIは呼ばず、仮の画像・動画・音声を作ります。</div>
 
   <main>
     <!-- 1. キャラクターの基準画像 -->
@@ -31,7 +33,13 @@
           <div class="fields">
             <label>名前<input name="name" required placeholder="例：アルト"></label>
             <label>キャラクターの英語プロンプト（任意）
-              <textarea name="prompt" rows="4" placeholder="17yo boy, messy black hair, sleepy gray eyes, navy hooded cloak ..."></textarea>
+              <textarea name="prompt" rows="3" placeholder="17yo boy, messy black hair, sleepy gray eyes, navy hooded cloak ..."></textarea>
+            </label>
+            <label>にじボイスの声優
+              <div class="row">
+                <select name="voice_actor_select" class="actor-select"><option value="">（一覧から選ぶ）</option></select>
+                <input name="voice_actor_id" placeholder="声優IDを直接入力してもよい">
+              </div>
             </label>
             <div class="row">
               <button type="submit" class="primary" id="char-submit">登録する</button>
@@ -43,16 +51,65 @@
       <div id="char-list" class="char-grid"></div>
     </section>
 
-    <!-- 2. 6カット分の入力 -->
+    <!-- 2〜4. エピソード -->
     <section id="episode" class="panel">
       <div class="episode-bar card">
-        <label>話数 <input type="number" id="ep-number" min="1" max="999" value="1"></label>
+        <label class="ep-num">話数 <input type="number" id="ep-number" min="1" max="999" value="1"></label>
+        <div class="variant-switch" role="group" aria-label="版">
+          <button class="variant active" data-variant="sns">SNS版</button>
+          <button class="variant" data-variant="full">完全版</button>
+        </div>
         <label class="grow">タイトル <input id="ep-title" placeholder="例：その扉、開けないほうがいいですよ"></label>
         <button id="ep-load">読み込む</button>
+        <button id="ep-copy" title="今表示している版の入力内容を、もう一方の版に上書きコピーします">もう一方の版にコピー</button>
         <button id="ep-save" class="primary">保存する</button>
         <span id="ep-status" class="status"></span>
       </div>
       <div id="cuts" class="cuts"></div>
+
+      <div class="export card">
+        <h2>書き出し</h2>
+        <p class="hint">全カットの動画・音声・セリフ字幕を結合して、縦型MP4（1080×1920）を出力します。動画がないカットは静止画、何もないカットは黒画面になります。</p>
+        <div class="row">
+          <button class="primary export-btn" data-variant="sns">SNS版書き出し</button>
+          <button class="primary export-btn" data-variant="full">完全版書き出し</button>
+          <span id="export-status" class="status"></span>
+        </div>
+        <div class="export-results">
+          <figure data-variant="sns"><figcaption>SNS版</figcaption><video controls hidden></video><a download hidden>ダウンロード</a></figure>
+          <figure data-variant="full"><figcaption>完全版</figcaption><video controls hidden></video><a download hidden>ダウンロード</a></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 設定 -->
+    <section id="settings" class="panel">
+      <h2>設定</h2>
+      <div class="card settings-grid">
+        <div>
+          <h3>接続状況</h3>
+          <ul id="status-list" class="status-list"></ul>
+          <p class="hint">APIキーは画面には保存しません。起動前に環境変数 <code>FAL_KEY</code> と <code>NIJIVOICE_API_KEY</code> を設定してください。</p>
+        </div>
+        <form id="settings-form" class="fields">
+          <label>ナレーション・心の声に使う声優
+            <div class="row">
+              <select name="narrator_select" class="actor-select"><option value="">（一覧から選ぶ）</option></select>
+              <input name="narrator_voice_actor_id" placeholder="声優ID">
+            </div>
+          </label>
+          <label>話す速さ（0.4〜3.0）<input name="voice_speed" type="number" step="0.1" min="0.4" max="3.0"></label>
+          <label class="check"><input type="checkbox" name="enable_safety_checker"> fal.ai のセーフティチェッカーを有効にする（enable_safety_checker）</label>
+          <label>動画の解像度
+            <select name="video_resolution"><option value="720p">720p</option><option value="480p">480p（安い）</option></select>
+          </label>
+          <label>静止画のモデル（キャラ参照あり）<input name="model_image"></label>
+          <label>静止画のモデル（キャラ参照なし）<input name="model_image_t2i"></label>
+          <label>動画のモデル<input name="model_video"></label>
+          <label>字幕の日本語フォントのパス（空なら自動で探す）<input name="font_path" placeholder="例：C:/Windows/Fonts/meiryob.ttc"></label>
+          <div class="row"><button type="submit" class="primary">設定を保存</button></div>
+        </form>
+      </div>
     </section>
   </main>
 
@@ -66,8 +123,19 @@
         <select class="speaker"><option value="">ナレーション・心の声など</option></select>
       </label>
       <label>セリフ（日本語）<textarea class="dialogue" rows="2" placeholder="例：その扉、開けないほうがいいですよ"></textarea></label>
-      <label>画像プロンプト（英語）<textarea class="image_prompt" rows="3" placeholder="medium shot, ... anime style, vertical 9:16"></textarea></label>
+      <label>画像プロンプト（英語）<textarea class="image_prompt" rows="3" placeholder="medium shot, ... anime style"></textarea></label>
       <label>カメラ・動きのプロンプト（英語）<textarea class="motion_prompt" rows="2" placeholder="slow push in, hair moves in the wind"></textarea></label>
+      <div class="gen-row">
+        <button class="gen" data-kind="image">① 静止画生成</button>
+        <button class="gen" data-kind="video">② 5秒動画生成</button>
+        <button class="gen" data-kind="voice">③ 音声生成</button>
+      </div>
+      <div class="job-status status"></div>
+      <div class="previews">
+        <div class="pv pv-image"><span>静止画</span><img alt="" hidden></div>
+        <div class="pv pv-video"><span>動画</span><video controls muted loop playsinline hidden></video></div>
+      </div>
+      <audio class="pv-voice" controls hidden></audio>
     </article>
   </template>
 

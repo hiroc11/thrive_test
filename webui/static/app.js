@@ -1,14 +1,17 @@
 // 縦型AIアニメ制作 Web UI
 const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const CUTS = 6;
 let characters = [];
+let variant = "sns";
+let dirty = false;
 
 function toast(msg) {
   const el = $("#toast");
   el.textContent = msg;
   el.hidden = false;
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => (el.hidden = true), 2500);
+  toast.timer = setTimeout(() => (el.hidden = true), 3000);
 }
 
 async function api(url, opts = {}) {
@@ -18,11 +21,39 @@ async function api(url, opts = {}) {
   return data;
 }
 
+const jsonOpts = (method, body) => ({
+  method, headers: { "content-type": "application/json" }, body: JSON.stringify(body),
+});
+
 // ---------- タブ ----------
-document.querySelectorAll(".tab").forEach((btn) =>
+$$(".tab").forEach((btn) =>
   btn.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b === btn));
-    document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === btn.dataset.tab));
+    $$(".tab").forEach((b) => b.classList.toggle("active", b === btn));
+    $$(".panel").forEach((p) => p.classList.toggle("active", p.id === btn.dataset.tab));
+    if (btn.dataset.tab === "settings") loadStatus();
+  })
+);
+
+// ---------- 声優一覧（にじボイス） ----------
+async function loadVoiceActors() {
+  let actors = [];
+  try {
+    actors = await api("/api/voice-actors");
+  } catch {
+    return; // キー未設定などのときは、IDの直接入力だけ使える
+  }
+  $$(".actor-select").forEach((sel) => {
+    sel.replaceChildren(new Option("（一覧から選ぶ）", ""));
+    for (const a of actors) {
+      const extra = [a.gender, a.age].filter(Boolean).join("・");
+      sel.append(new Option(`${a.name}${extra ? `（${extra}）` : ""}`, a.id));
+    }
+  });
+}
+// 一覧から選ぶと、隣のID欄に入る
+$$(".actor-select").forEach((sel) =>
+  sel.addEventListener("change", () => {
+    if (sel.value) sel.nextElementSibling.value = sel.value;
   })
 );
 
@@ -31,15 +62,13 @@ const form = $("#char-form");
 const drop = $("#drop");
 const fileInput = form.elements.image;
 
-function showPreview(file) {
+function showPreview(src) {
   const img = $("#drop-preview");
-  if (file) {
-    img.src = URL.createObjectURL(file);
-    img.hidden = false;
-    $("#drop-text").hidden = true;
-  }
+  img.src = src;
+  img.hidden = false;
+  $("#drop-text").hidden = true;
 }
-fileInput.addEventListener("change", () => showPreview(fileInput.files[0]));
+fileInput.addEventListener("change", () => fileInput.files[0] && showPreview(URL.createObjectURL(fileInput.files[0])));
 ["dragenter", "dragover"].forEach((ev) =>
   drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach((ev) =>
@@ -50,7 +79,7 @@ drop.addEventListener("drop", (e) => {
   const dt = new DataTransfer();
   dt.items.add(file);
   fileInput.files = dt.files;
-  showPreview(file);
+  showPreview(URL.createObjectURL(file));
 });
 
 function resetForm() {
@@ -70,6 +99,7 @@ form.addEventListener("submit", async (e) => {
   const body = new FormData();
   body.append("name", form.elements.name.value);
   body.append("prompt", form.elements.prompt.value);
+  body.append("voice_actor_id", form.elements.voice_actor_id.value);
   if (fileInput.files.length) body.append("image", fileInput.files[0]);
   try {
     await api(id ? `/api/characters/${id}` : "/api/characters", { method: id ? "PUT" : "POST", body });
@@ -85,10 +115,8 @@ function editCharacter(c) {
   form.elements.id.value = c.id;
   form.elements.name.value = c.name;
   form.elements.prompt.value = c.prompt;
-  const img = $("#drop-preview");
-  img.src = `/files/characters/${c.image}`;
-  img.hidden = false;
-  $("#drop-text").hidden = true;
+  form.elements.voice_actor_id.value = c.voice_actor_id || "";
+  showPreview(`/files/characters/${c.image}`);
   $("#char-submit").textContent = "更新する";
   $("#char-cancel").hidden = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -105,17 +133,16 @@ async function loadCharacters() {
   characters = await api("/api/characters");
   const list = $("#char-list");
   list.replaceChildren();
-  if (!characters.length) {
-    list.innerHTML = '<p class="empty">まだキャラクターが登録されていません。</p>';
-  }
+  if (!characters.length) list.innerHTML = '<p class="empty">まだキャラクターが登録されていません。</p>';
   for (const c of characters) {
     const card = document.createElement("div");
     card.className = "char-card card";
-    card.innerHTML = `<img alt=""><div class="name"></div><div class="prompt"></div>
+    card.innerHTML = `<img alt=""><div class="name"></div><div class="prompt"></div><div class="voice"></div>
       <div class="row"><button class="edit">編集</button><button class="danger del">削除</button></div>`;
     $("img", card).src = `/files/characters/${c.image}`;
     $(".name", card).textContent = c.name;
     $(".prompt", card).textContent = c.prompt || "（プロンプト未入力）";
+    $(".voice", card).textContent = c.voice_actor_id ? `声優ID：${c.voice_actor_id}` : "声優：未設定";
     $(".edit", card).addEventListener("click", () => editCharacter(c));
     $(".del", card).addEventListener("click", () => deleteCharacter(c));
     list.append(card);
@@ -129,15 +156,17 @@ function buildCuts() {
   const tpl = $("#cut-template");
   for (let i = 0; i < CUTS; i++) {
     const node = tpl.content.firstElementChild.cloneNode(true);
+    node.dataset.n = i + 1;
     $(".cut-id", node).textContent = `C${String(i + 1).padStart(2, "0")}`;
+    $$(".gen", node).forEach((btn) => btn.addEventListener("click", () => generate(i + 1, btn.dataset.kind, node)));
     wrap.append(node);
   }
 }
 
 // 各カットの「出るキャラ」と「話す人」の選択肢を、登録済みキャラに合わせて作り直す
 function refreshCutCharacters() {
-  document.querySelectorAll(".cut").forEach((cut) => {
-    const selected = new Set([...cut.querySelectorAll(".chip input:checked")].map((i) => i.value));
+  $$(".cut").forEach((cut) => {
+    const selected = new Set($$(".chip input:checked", cut).map((i) => i.value));
     const chips = $(".cut-chars", cut);
     chips.replaceChildren();
     for (const c of characters) {
@@ -148,7 +177,7 @@ function refreshCutCharacters() {
       box.value = c.id;
       box.checked = selected.has(c.id);
       chip.classList.toggle("on", box.checked);
-      box.addEventListener("change", () => chip.classList.toggle("on", box.checked));
+      box.addEventListener("change", () => { chip.classList.toggle("on", box.checked); dirty = true; });
       $("img", chip).src = `/files/characters/${c.image}`;
       $("span", chip).textContent = c.name;
       chips.append(chip);
@@ -163,12 +192,12 @@ function refreshCutCharacters() {
 
 function fillEpisode(data) {
   $("#ep-title").value = data.title || "";
-  document.querySelectorAll(".cut").forEach((cut, i) => {
+  $$(".cut").forEach((cut, i) => {
     const c = data.cuts[i] || {};
     $(".dialogue", cut).value = c.dialogue || "";
     $(".image_prompt", cut).value = c.image_prompt || "";
     $(".motion_prompt", cut).value = c.motion_prompt || "";
-    cut.querySelectorAll(".chip input").forEach((box) => {
+    $$(".chip input", cut).forEach((box) => {
       box.checked = (c.characters || []).includes(box.value);
       box.closest(".chip").classList.toggle("on", box.checked);
     });
@@ -179,58 +208,217 @@ function fillEpisode(data) {
 function collectEpisode() {
   return {
     title: $("#ep-title").value,
-    cuts: [...document.querySelectorAll(".cut")].map((cut) => ({
+    cuts: $$(".cut").map((cut) => ({
       dialogue: $(".dialogue", cut).value,
       speaker: $(".speaker", cut).value,
       image_prompt: $(".image_prompt", cut).value,
       motion_prompt: $(".motion_prompt", cut).value,
-      characters: [...cut.querySelectorAll(".chip input:checked")].map((b) => b.value),
+      characters: $$(".chip input:checked", cut).map((b) => b.value),
     })),
   };
 }
 
-function epNumber() {
-  return Math.max(1, Math.min(999, parseInt($("#ep-number").value, 10) || 1));
-}
+const epNumber = () => Math.max(1, Math.min(999, parseInt($("#ep-number").value, 10) || 1));
+const epUrl = (v = variant) => `/api/episodes/${epNumber()}/${v}`;
+const variantName = (v = variant) => (v === "sns" ? "SNS版" : "完全版");
 
 async function loadEpisode() {
   try {
-    fillEpisode(await api(`/api/episodes/${epNumber()}`));
-    $("#ep-status").textContent = `第${epNumber()}話を読み込みました`;
+    fillEpisode(await api(epUrl()));
+    $("#ep-status").textContent = `第${epNumber()}話・${variantName()}を読み込みました`;
     dirty = false;
+    await loadMedia();
   } catch (err) {
     toast(err.message);
   }
 }
 
-async function saveEpisode() {
+async function saveEpisode(quiet = false) {
+  const res = await api(epUrl(), jsonOpts("PUT", collectEpisode()));
+  $("#ep-status").textContent = `保存しました（${res.path}）`;
+  if (!quiet) toast("保存しました");
+  dirty = false;
+}
+
+async function switchVariant(v) {
+  if (v === variant) return;
+  if (dirty && !confirm(`${variantName()}の入力が保存されていません。保存してから切り替えますか？（キャンセルで切り替えをやめる）`)) return;
+  if (dirty) await saveEpisode(true);
+  variant = v;
+  $$(".variant").forEach((b) => b.classList.toggle("active", b.dataset.variant === v));
+  await loadEpisode();
+}
+$$(".variant").forEach((b) => b.addEventListener("click", () => switchVariant(b.dataset.variant)));
+
+$("#ep-copy").addEventListener("click", async () => {
+  const other = variant === "sns" ? "full" : "sns";
+  if (!confirm(`今の${variantName()}の入力内容を、${variantName(other)}に上書きコピーします。よろしいですか？`)) return;
   try {
-    const res = await api(`/api/episodes/${epNumber()}`, {
-      method: "PUT",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(collectEpisode()),
-    });
-    $("#ep-status").textContent = `保存しました（${res.path}）`;
-    toast("保存しました");
-    dirty = false;
+    await api(epUrl(other), jsonOpts("PUT", collectEpisode()));
+    toast(`${variantName(other)}にコピーしました`);
   } catch (err) {
     toast(err.message);
   }
-}
+});
 
-let dirty = false;
 $("#cuts").addEventListener("input", () => (dirty = true));
 $("#ep-title").addEventListener("input", () => (dirty = true));
 window.addEventListener("beforeunload", (e) => { if (dirty) e.preventDefault(); });
 $("#ep-load").addEventListener("click", loadEpisode);
-$("#ep-save").addEventListener("click", saveEpisode);
+$("#ep-save").addEventListener("click", () => saveEpisode().catch((err) => toast(err.message)));
 document.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === "s" && $("#episode").classList.contains("active")) {
     e.preventDefault();
-    saveEpisode();
+    saveEpisode().catch((err) => toast(err.message));
   }
 });
 
+// ---------- 3. カットごとの生成とプレビュー ----------
+function setPreview(cut, media) {
+  const img = $(".pv-image img", cut);
+  const video = $(".pv-video video", cut);
+  const audio = $(".pv-voice", cut);
+  img.hidden = !media.image;
+  if (media.image) img.src = media.image;
+  video.hidden = !media.video;
+  if (media.video && video.getAttribute("src") !== media.video) video.src = media.video;
+  audio.hidden = !media.voice;
+  if (media.voice && audio.getAttribute("src") !== media.voice) audio.src = media.voice;
+  $(".gen[data-kind=video]", cut).title = media.image ? "" : "先に静止画を生成してください";
+}
+
+async function loadMedia() {
+  const data = await api(`${epUrl()}/media`);
+  $$(".cut").forEach((cut, i) => setPreview(cut, data.cuts[i] || {}));
+  for (const v of ["sns", "full"]) {
+    // 書き出し結果はどちらの版を表示中でも見られるようにする
+    const res = v === variant ? data : await api(`${epUrl(v)}/media`).catch(() => ({}));
+    const fig = $(`.export-results figure[data-variant=${v}]`);
+    const video = $("video", fig);
+    const link = $("a", fig);
+    video.hidden = link.hidden = !res.export;
+    if (res.export) {
+      video.src = res.export;
+      link.href = res.export;
+    }
+  }
+}
+
+async function waitJob(job, onTick) {
+  while (job.status === "running") {
+    await new Promise((r) => setTimeout(r, 2000));
+    job = await api(`/api/jobs/${job.id}`);
+    onTick?.(job);
+  }
+  if (job.status === "error") throw new Error(job.error);
+  return job;
+}
+
+const KIND_NAME = { image: "静止画", video: "動画", voice: "音声" };
+
+async function generate(n, kind, cut) {
+  const status = $(".job-status", cut);
+  const buttons = $$(".gen", cut);
+  buttons.forEach((b) => (b.disabled = true));
+  const started = Date.now();
+  try {
+    await saveEpisode(true); // 入力中の内容で生成するため、先に保存する
+    status.textContent = `${KIND_NAME[kind]}を生成中…`;
+    const job = await api(`${epUrl()}/cuts/${n}/${kind}`, { method: "POST" });
+    const done = await waitJob(job, () => {
+      status.textContent = `${KIND_NAME[kind]}を生成中…（${Math.round((Date.now() - started) / 1000)}秒）`;
+    });
+    status.textContent = done.message;
+    await loadMedia();
+  } catch (err) {
+    status.textContent = `失敗：${err.message}`;
+  } finally {
+    buttons.forEach((b) => (b.disabled = false));
+  }
+}
+
+// ---------- 4. 書き出し ----------
+$$(".export-btn").forEach((btn) =>
+  btn.addEventListener("click", async () => {
+    const v = btn.dataset.variant;
+    const status = $("#export-status");
+    $$(".export-btn").forEach((b) => (b.disabled = true));
+    const started = Date.now();
+    try {
+      if (dirty && v === variant) await saveEpisode(true);
+      const job = await api(`${epUrl(v)}/export`, { method: "POST" });
+      status.textContent = `${variantName(v)}を書き出し中…`;
+      const done = await waitJob(job, () => {
+        status.textContent = `${variantName(v)}を書き出し中…（${Math.round((Date.now() - started) / 1000)}秒）`;
+      });
+      status.textContent = done.message;
+      await loadMedia();
+    } catch (err) {
+      status.textContent = `失敗：${err.message}`;
+    } finally {
+      $$(".export-btn").forEach((b) => (b.disabled = false));
+    }
+  })
+);
+
+// ---------- 設定 ----------
+const sform = $("#settings-form");
+
+async function loadSettings() {
+  const s = await api("/api/settings");
+  sform.elements.narrator_voice_actor_id.value = s.narrator_voice_actor_id || "";
+  sform.elements.voice_speed.value = s.voice_speed;
+  sform.elements.enable_safety_checker.checked = !!s.enable_safety_checker;
+  sform.elements.video_resolution.value = s.video_resolution;
+  sform.elements.model_image.value = s.models.image;
+  sform.elements.model_image_t2i.value = s.models.image_t2i;
+  sform.elements.model_video.value = s.models.video;
+  sform.elements.font_path.value = s.font_path || "";
+}
+
+sform.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    await api("/api/settings", jsonOpts("PUT", {
+      narrator_voice_actor_id: sform.elements.narrator_voice_actor_id.value,
+      voice_speed: parseFloat(sform.elements.voice_speed.value) || 1.0,
+      enable_safety_checker: sform.elements.enable_safety_checker.checked,
+      video_resolution: sform.elements.video_resolution.value,
+      font_path: sform.elements.font_path.value,
+      models: {
+        image: sform.elements.model_image.value,
+        image_t2i: sform.elements.model_image_t2i.value,
+        video: sform.elements.model_video.value,
+      },
+    }));
+    toast("設定を保存しました");
+    loadStatus();
+  } catch (err) {
+    toast(err.message);
+  }
+});
+
+async function loadStatus() {
+  const s = await api("/api/status");
+  $("#fake-banner").hidden = !s.fake_mode;
+  const fake = (ok) => (!ok && s.fake_mode ? "（動作確認モードなので不要）" : "");
+  const items = [
+    [`fal.ai（FAL_KEY）${fake(s.fal_key)}`, s.fal_key || s.fake_mode],
+    [`にじボイス（NIJIVOICE_API_KEY）${fake(s.nijivoice_key)}`, s.nijivoice_key || s.fake_mode],
+    ["FFmpeg", s.ffmpeg],
+    [`字幕フォント${s.font ? `：${s.font}` : ""}`, !!s.font],
+  ];
+  $("#status-list").replaceChildren(...items.map(([label, ok]) => {
+    const li = document.createElement("li");
+    li.className = ok ? "ok" : "ng";
+    li.textContent = `${ok ? "OK" : "未設定"}　${label}`;
+    return li;
+  }));
+}
+
 // ---------- 起動 ----------
 buildCuts();
+loadStatus();
+loadSettings();
+loadVoiceActors();
 loadCharacters().then(loadEpisode);

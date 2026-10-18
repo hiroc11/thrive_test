@@ -39,7 +39,7 @@ async function genreTargets() {
       const pick = (o) => {
         if (!o || typeof o !== "object") return null;
         const id = o.genreId ?? o.id;
-        const name = o.genreName ?? o.name;
+        const name = o.genreName ?? o.nameJa ?? o.name;
         if (id && name) return { id, name };
         for (const v of Object.values(o)) {
           const r = pick(v);
@@ -49,7 +49,7 @@ async function genreTargets() {
       };
       const children = (data.children ?? data.Children ?? []).map(pick).filter(Boolean);
       // 大ジャンル自体も対象に含める（子ジャンルを分類できなくても売れ筋を拾うため）
-      targets.push({ id: root.id, name: pick(data.current ?? data.parents?.[0])?.name ?? `genre ${root.id}`, category: root.category ?? "yogashi" });
+      targets.push({ id: root.id, name: pick(data.genre ?? data.current)?.name ?? `genre ${root.id}`, category: root.category ?? "yogashi" });
       for (const c of children) {
         const category = classify(c.name, root.category);
         if (category) targets.push({ id: c.id, name: c.name, category });

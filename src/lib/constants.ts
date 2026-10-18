@@ -122,5 +122,6 @@ export const FACILITIES: Facility[] = [
   { id: "mitsukoshi_ebisu", name: "恵比寿三越", area: "ebisu", pos: [35.6421, 139.7136], match: ["恵比寿三越"] },
   { id: "takashimaya_tamagawa", name: "玉川髙島屋S・C", area: "futako", pos: [35.6115, 139.6268], match: ["玉川髙島屋", "玉川高島屋"] },
   { id: "marui_kitasenju", name: "北千住マルイ", area: "shibamata", pos: [35.7493, 139.8046], match: ["北千住マルイ"] },
+  { id: "haneda", name: "羽田空港", area: "haneda", pos: [35.5494, 139.7798], match: ["羽田空港"] },
   { id: "lumine_kitasenju", name: "ルミネ北千住", area: "shibamata", pos: [35.7488, 139.8049], match: ["ルミネ北千住"] },
 ];

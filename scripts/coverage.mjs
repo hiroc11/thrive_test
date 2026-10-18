@@ -2,7 +2,7 @@
 // 使い方: npm run coverage            (比較の基準は docs/coverage-baseline.json)
 //         npm run coverage -- --baseline   (今の状態を基準として保存し直す)
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
-import { AREAS, GENRES, TIERS, TARGET_PER_CELL, countCells, isMajorCell } from "./lib/catalog.mjs";
+import { AREAS, GENRES, TIERS, TARGET_PER_CELL, LOCAL_AREAS, countCells, isMajorCell } from "./lib/catalog.mjs";
 
 const items = JSON.parse(readFileSync("src/data/items.json", "utf8"));
 const grid = countCells(items);
@@ -19,7 +19,7 @@ const cell = (n, b, major) => {
   return mark + diff;
 };
 
-const majorCells = (g) => AREAS.flatMap(([a]) => GENRES.flatMap(([ge]) => TIERS.filter(([t]) => isMajorCell(ge, t)).map(([t]) => g[a][ge][t])));
+const majorCells = (g) => AREAS.flatMap(([a]) => GENRES.flatMap(([ge]) => TIERS.filter(([t]) => isMajorCell(ge, t, a)).map(([t]) => g[a][ge][t])));
 const summarize = (g) => {
   const m = majorCells(g);
   return { empty: m.filter((n) => n === 0).length, one: m.filter((n) => n === 1).length, ok: m.filter((n) => n >= TARGET_PER_CELL).length, total: m.length };
@@ -36,7 +36,7 @@ lines.push(`| 主要マス数 | ${before.total} | ${now.total} |`);
 lines.push(`| 目標（${TARGET_PER_CELL}品以上）を満たすマス | ${before.ok} | ${now.ok} |`);
 lines.push(`| 1品しかないマス | ${before.one} | ${now.one} |`);
 lines.push(`| 空のマス | ${before.empty} | ${now.empty} |`, "");
-lines.push("主要マス = 予算1万円未満のマス（お酒・お茶の5千〜1万を除く）。", "");
+lines.push("主要マス = 予算1万円未満のマス（お酒・お茶の5千〜1万を除く）。ただし商店街・老舗中心のエリア（" + AREAS.filter(([a]) => LOCAL_AREAS.has(a)).map(([, l]) => l).join("・") + "）は和菓子・甘くない系の5千円未満のみ。基準時点の数字も同じ定義で数え直しています。", "");
 lines.push("## 表の見方", "");
 lines.push("- 数字はそのマスに入る商品数（1商品が複数エリアで買える場合は各エリアで数える）");
 lines.push("- **0** = 主要マスで空、*1* = 主要マスで1品のみ、(+n) = 基準時点からの増加");
@@ -45,8 +45,8 @@ lines.push("");
 // エリアごとの不足一覧
 lines.push("## 不足している主要マス（エリア別）", "");
 for (const [a, label] of AREAS) {
-  const gaps = GENRES.flatMap(([g, gl]) => TIERS.filter(([t]) => isMajorCell(g, t) && grid[a][g][t] < TARGET_PER_CELL).map(([t, tl]) => `${gl} ${tl}(${grid[a][g][t]})`));
-  lines.push(`- **${label}**: ${gaps.length ? gaps.join(" / ") : "不足なし"}`);
+  const gaps = GENRES.flatMap(([g, gl]) => TIERS.filter(([t]) => isMajorCell(g, t, a) && grid[a][g][t] < TARGET_PER_CELL).map(([t, tl]) => `${gl} ${tl}(${grid[a][g][t]})`));
+  lines.push(`- **${label}**${LOCAL_AREAS.has(a) ? "（地元エリア）" : ""}: ${gaps.length ? gaps.join(" / ") : "不足なし"}`);
 }
 lines.push("");
 
@@ -55,7 +55,7 @@ lines.push("| エリア | ジャンル | " + TIERS.map(([, l]) => l).join(" | ")
 lines.push("|---|---|" + TIERS.map(() => "---:").join("|") + "|");
 for (const [a, label] of AREAS) {
   GENRES.forEach(([g, gl], idx) => {
-    const cells = TIERS.map(([t]) => cell(grid[a][g][t], base.grid[a]?.[g]?.[t] ?? 0, isMajorCell(g, t)));
+    const cells = TIERS.map(([t]) => cell(grid[a][g][t], base.grid[a]?.[g]?.[t] ?? 0, isMajorCell(g, t, a)));
     lines.push(`| ${idx === 0 ? `**${label}**` : ""} | ${gl} | ${cells.join(" | ")} |`);
   });
 }

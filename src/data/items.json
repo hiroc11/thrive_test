@@ -13569,5 +13569,700 @@
     "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00pan5o.l2rs8d1c.g00pan5o.l2rs9ded/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsembikiya%2F0854-33sm%2F&rafcid=wsc_i_ra_406b30cb-09e7-4cee-b890-d76cdbe2e222",
     "jan_code": null,
     "data_status": "draft"
+  },
+  {
+    "id": "tokyo-199",
+    "name": "寿堂 黄金芋 詰合せ",
+    "brand_name": "寿堂",
+    "category": "wagashi",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "ningyocho"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 10,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "人形町の寿堂の黄金芋です。ニッキの香りがする焼き菓子で、年配の方にも喜ばれるんです。",
+    "why_recommended": "人形町の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "ningyocho",
+        "shop_name": "寿堂(人形町周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%AF%BF%E5%A0%82"
+      }
+    ],
+    "search_keyword": "寿堂 黄金芋 詰合せ",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft",
+    "talk_topic": "黄金芋は、お芋の形をしていますが、中身は白あんの焼き菓子なんです。"
+  },
+  {
+    "id": "tokyo-200",
+    "name": "板倉屋 人形焼",
+    "brand_name": "板倉屋",
+    "category": "wagashi",
+    "price_tax_in": 1200,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "ningyocho"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "10個入",
+    "temperature": "ambient",
+    "shelf_life_days": 3,
+    "is_sweet": true,
+    "evening_availability": "morning_only",
+    "bag_size": "compact_a4",
+    "handoff_script": "人形町の板倉屋の人形焼です。焼きたてを買ってきたので、お早めにどうぞ。",
+    "why_recommended": "人形町の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "ningyocho",
+        "shop_name": "板倉屋(人形町周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%9D%BF%E5%80%89%E5%B1%8B"
+      }
+    ],
+    "search_keyword": "板倉屋 人形焼",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-201",
+    "name": "森乃園 ほうじ茶",
+    "brand_name": "森乃園",
+    "category": "drink",
+    "price_tax_in": 1080,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ningyocho"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1袋",
+    "temperature": "ambient",
+    "shelf_life_days": 180,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "人形町のほうじ茶専門店、森乃園のほうじ茶です。香ばしくて、どんなお菓子にも合うんです。",
+    "why_recommended": "人形町の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "ningyocho",
+        "shop_name": "森乃園(人形町周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A3%AE%E4%B9%83%E5%9C%92"
+      }
+    ],
+    "search_keyword": "森乃園 ほうじ茶",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft",
+    "talk_topic": "森乃園はほうじ茶の専門店で、お店の前を通るとほうじ茶のいい香りがするんです。"
+  },
+  {
+    "id": "tokyo-202",
+    "name": "人形町亀井堂 瓦せんべい",
+    "brand_name": "人形町亀井堂",
+    "category": "wagashi",
+    "price_tax_in": 1500,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "ningyocho"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 30,
+    "is_sweet": true,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "人形町の亀井堂の瓦せんべいです。素朴な甘さで、お茶うけにちょうどいいんです。",
+    "why_recommended": "人形町の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "ningyocho",
+        "shop_name": "人形町亀井堂(人形町周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BA%80%E4%BA%95%E5%A0%82"
+      }
+    ],
+    "search_keyword": "人形町亀井堂 瓦せんべい",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-203",
+    "name": "不二家 ペコちゃん焼",
+    "brand_name": "不二家",
+    "category": "wagashi",
+    "price_tax_in": 1200,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "kagurazaka"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "6個入",
+    "temperature": "ambient",
+    "shelf_life_days": 1,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "神楽坂のペコちゃん焼です。かわいいので、皆さんで召し上がってください。",
+    "why_recommended": "神楽坂の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "kagurazaka",
+        "shop_name": "不二家(神楽坂周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%8D%E4%BA%8C%E5%AE%B6"
+      }
+    ],
+    "search_keyword": "不二家 ペコちゃん焼",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft",
+    "talk_topic": "ペコちゃん焼は、不二家の飯田橋神楽坂店でしか買えない人形焼なんです。"
+  },
+  {
+    "id": "tokyo-204",
+    "name": "お茶の楽山 煎茶",
+    "brand_name": "楽山",
+    "category": "drink",
+    "price_tax_in": 1620,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "kagurazaka"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1袋",
+    "temperature": "ambient",
+    "shelf_life_days": 180,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "神楽坂のお茶屋さん、楽山の煎茶です。お茶好きの方に喜ばれるかと思いまして。",
+    "why_recommended": "神楽坂の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "kagurazaka",
+        "shop_name": "楽山(神楽坂周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A5%BD%E5%B1%B1"
+      }
+    ],
+    "search_keyword": "お茶の楽山 煎茶",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-205",
+    "name": "深川 伊勢屋 豆大福",
+    "brand_name": "深川 伊勢屋",
+    "category": "wagashi",
+    "price_tax_in": 1200,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "kiyosumi"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "6個入",
+    "temperature": "ambient",
+    "shelf_life_days": 1,
+    "is_sweet": true,
+    "evening_availability": "morning_only",
+    "bag_size": "compact_a4",
+    "handoff_script": "門前仲町の伊勢屋の豆大福です。地元で長く愛されているお店なので、今日中にどうぞ。",
+    "why_recommended": "清澄白河の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "kiyosumi",
+        "shop_name": "深川 伊勢屋(清澄白河周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B7%B1%E5%B7%9D%20%E4%BC%8A%E5%8B%A2%E5%B1%8B"
+      }
+    ],
+    "search_keyword": "深川 伊勢屋 豆大福",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-206",
+    "name": "ARiSE COFFEE ROASTERS コーヒー豆",
+    "brand_name": "ARiSE COFFEE ROASTERS",
+    "category": "drink",
+    "price_tax_in": 1800,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party"
+    ],
+    "areas": [
+      "kiyosumi"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "200g",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "清澄白河のARiSE COFFEEの豆です。コーヒーの街の小さな焙煎所のものなんです。",
+    "why_recommended": "清澄白河の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "kiyosumi",
+        "shop_name": "ARiSE COFFEE ROASTERS(清澄白河周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=ARiSE%20COFFEE%20ROASTERS"
+      }
+    ],
+    "search_keyword": "ARiSE COFFEE ROASTERS コーヒー豆",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft",
+    "talk_topic": "清澄白河は焙煎所が多くて、「コーヒーの街」と呼ばれているんです。"
+  },
+  {
+    "id": "tokyo-207",
+    "name": "志\"満ん草餅 草餅",
+    "brand_name": "志\"満ん草餅",
+    "category": "wagashi",
+    "price_tax_in": 1400,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "ryogoku"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "8個入",
+    "temperature": "ambient",
+    "shelf_life_days": 1,
+    "is_sweet": true,
+    "evening_availability": "morning_only",
+    "bag_size": "compact_a4",
+    "handoff_script": "向島の志\"満ん草餅の草餅です。よもぎの香りがいいので、今日中にどうぞ。",
+    "why_recommended": "両国の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "ryogoku",
+        "shop_name": "志\"満ん草餅(両国周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%BF%97%22%E6%BA%80%E3%82%93%E8%8D%89%E9%A4%85"
+      }
+    ],
+    "search_keyword": "志\"満ん草餅 草餅",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-208",
+    "name": "後藤の飴 詰合せ",
+    "brand_name": "後藤の飴",
+    "category": "wagashi",
+    "price_tax_in": 1100,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "nippori"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 180,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "谷中銀座の後藤の飴です。昔ながらの手作りの飴で、日持ちもするのでどうぞ。",
+    "why_recommended": "日暮里・巣鴨の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "nippori",
+        "shop_name": "後藤の飴(日暮里・巣鴨周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%BE%8C%E8%97%A4%E3%81%AE%E9%A3%B4"
+      }
+    ],
+    "search_keyword": "後藤の飴 詰合せ",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-209",
+    "name": "菊見せんべい総本店 せんべい詰合せ",
+    "brand_name": "菊見せんべい総本店",
+    "category": "savory",
+    "price_tax_in": 1600,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "nippori"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "千駄木の菊見せんべいです。甘くないので、お茶うけにもおつまみにもどうぞ。",
+    "why_recommended": "日暮里・巣鴨の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "nippori",
+        "shop_name": "菊見せんべい総本店(日暮里・巣鴨周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%8F%8A%E8%A6%8B%E3%81%9B%E3%82%93%E3%81%B9%E3%81%84%E7%B7%8F%E6%9C%AC%E5%BA%97"
+      }
+    ],
+    "search_keyword": "菊見せんべい総本店 せんべい詰合せ",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft",
+    "talk_topic": "菊見せんべいは、四角い形のおせんべいで知られる千駄木の老舗なんです。"
+  },
+  {
+    "id": "tokyo-210",
+    "name": "浅草 和泉屋 手焼き煎餅",
+    "brand_name": "和泉屋",
+    "category": "savory",
+    "price_tax_in": 1500,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "asakusa"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "浅草の和泉屋の手焼きせんべいです。甘くないので、お酒のおつまみにもどうぞ。",
+    "why_recommended": "浅草・押上の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "asakusa",
+        "shop_name": "和泉屋(浅草・押上周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%92%8C%E6%B3%89%E5%B1%8B"
+      }
+    ],
+    "search_keyword": "浅草 和泉屋 手焼き煎餅",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-211",
+    "name": "浅草 壹番屋 手焼き煎餅",
+    "brand_name": "壹番屋",
+    "category": "savory",
+    "price_tax_in": 1800,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "asakusa"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 60,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "浅草の壹番屋のおせんべいです。お店で一枚ずつ焼いているんです。",
+    "why_recommended": "浅草・押上の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "asakusa",
+        "shop_name": "壹番屋(浅草・押上周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%A3%B9%E7%95%AA%E5%B1%8B"
+      }
+    ],
+    "search_keyword": "浅草 壹番屋 手焼き煎餅",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-212",
+    "name": "満願堂 芋きん",
+    "brand_name": "満願堂",
+    "category": "wagashi",
+    "price_tax_in": 1300,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "asakusa"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "8個入",
+    "temperature": "ambient",
+    "shelf_life_days": 5,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "浅草の満願堂の芋きんです。さつまいもの味がしっかりしていて、素朴でおいしいんです。",
+    "why_recommended": "浅草・押上の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "asakusa",
+        "shop_name": "満願堂(浅草・押上周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%BA%80%E9%A1%98%E5%A0%82"
+      }
+    ],
+    "search_keyword": "満願堂 芋きん",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-213",
+    "name": "浅草ちょうちんもなか 最中の皮詰合せ",
+    "brand_name": "浅草ちょうちんもなか",
+    "category": "wagashi",
+    "price_tax_in": 1500,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "asakusa"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 30,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "浅草のちょうちんもなかです。形がかわいいので、話のタネにもなると思います。",
+    "why_recommended": "浅草・押上の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "asakusa",
+        "shop_name": "浅草ちょうちんもなか(浅草・押上周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%E3%81%A1%E3%82%87%E3%81%86%E3%81%A1%E3%82%93%E3%82%82%E3%81%AA%E3%81%8B"
+      }
+    ],
+    "search_keyword": "浅草ちょうちんもなか 最中の皮詰合せ",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft",
+    "talk_topic": "ちょうちんもなかは、雷門の大提灯の形をした最中なんです。"
+  },
+  {
+    "id": "tokyo-214",
+    "name": "紀文堂 人形焼",
+    "brand_name": "紀文堂",
+    "category": "wagashi",
+    "price_tax_in": 1200,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "casual_party",
+      "female_office"
+    ],
+    "areas": [
+      "asakusa"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "10個入",
+    "temperature": "ambient",
+    "shelf_life_days": 5,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "浅草の紀文堂の人形焼です。浅草らしいお土産かなと思いまして。",
+    "why_recommended": "浅草・押上の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "asakusa",
+        "shop_name": "紀文堂(浅草・押上周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E7%B4%80%E6%96%87%E5%A0%82"
+      }
+    ],
+    "search_keyword": "紀文堂 人形焼",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-215",
+    "name": "湯島 つる瀬 豆大福",
+    "brand_name": "つる瀬",
+    "category": "wagashi",
+    "price_tax_in": 1400,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "in_laws",
+      "casual_party"
+    ],
+    "areas": [
+      "ueno"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "6個入",
+    "temperature": "ambient",
+    "shelf_life_days": 1,
+    "is_sweet": true,
+    "evening_availability": "morning_only",
+    "bag_size": "compact_a4",
+    "handoff_script": "湯島のつる瀬の豆大福です。人気のお店なので、今日中にどうぞ。",
+    "why_recommended": "上野の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "ueno",
+        "shop_name": "つる瀬(上野周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A4%E3%82%8B%E7%80%AC"
+      }
+    ],
+    "search_keyword": "湯島 つる瀬 豆大福",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-216",
+    "name": "ヱビスビール ギフトセット",
+    "brand_name": "サッポロビール",
+    "category": "drink",
+    "price_tax_in": 3300,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "casual_party"
+    ],
+    "areas": [
+      "ebisu"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "缶セット",
+    "temperature": "ambient",
+    "shelf_life_days": 180,
+    "is_sweet": false,
+    "evening_availability": "high",
+    "bag_size": "compact_a4",
+    "handoff_script": "恵比寿の地名の由来になったヱビスビールです。恵比寿に寄ったので選んでみました。",
+    "why_recommended": "恵比寿の地元の名店。店舗・価格・日持ちは来店前に確認を。",
+    "shops": [
+      {
+        "area_id": "ebisu",
+        "shop_name": "サッポロビール(恵比寿周辺)",
+        "access_note": "最寄り店舗はGoogleマップで確認",
+        "open_hours": "店舗により異なる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B5%E3%83%83%E3%83%9D%E3%83%AD%E3%83%93%E3%83%BC%E3%83%AB"
+      }
+    ],
+    "search_keyword": "ヱビスビール ギフトセット",
+    "image_url": null,
+    "jan_code": null,
+    "data_status": "draft",
+    "talk_topic": "恵比寿という地名は、ヱビスビールの工場があったことから付いたんです。"
   }
 ]

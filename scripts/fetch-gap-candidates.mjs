@@ -24,7 +24,7 @@ for (const i of items) for (const a of i.areas) {
 
 const queries = new Map(); // brand|tier → {brand, category, tier}
 for (const [a] of AREAS) for (const [g] of GENRES) for (const [t] of TIERS) {
-  if (!isMajorCell(g, t) || grid[a][g][t] >= TARGET_PER_CELL) continue;
+  if (!isMajorCell(g, t, a) || grid[a][g][t] >= TARGET_PER_CELL) continue;
   const brands = Object.entries(brandsIn[`${a}|${g}`] ?? {}).sort((x, y) => y[1] - x[1]).map(([b]) => b);
   for (const b of brands.filter((b) => normalize(b).length >= 3).slice(0, BRANDS_PER_CELL)) queries.set(`${b}|${t}`, { brand: b, category: g, tier: t });
 }

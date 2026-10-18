@@ -1,71 +1,166 @@
 {
-  "_comment": "エリアごとの駅ナカ・百貨店の公式ショップ一覧ページ。URLが変わって取得に失敗したら、ここを公式サイトの最新URLに直してください。公式の一覧がない（商店街の個人店中心の）エリアは空にしています。",
+  "_comment": "エリアごとの駅ナカ・百貨店の公式ショップ一覧ページ。url は候補の配列にでき、最初に取得できたものを使う。取得に失敗したら公式サイトの最新URLに直してください。公式の一覧がない（商店街の個人店中心の）エリアは空にしています。",
   "tokyo_station_in": [
-    { "name": "グランスタ東京", "url": "https://www.gransta.jp/shop/" }
+    {
+      "name": "グランスタ東京",
+      "url": [
+        "https://www.gransta.jp/mall/gransta_tokyo/",
+        "https://www.gransta.jp/shop/",
+        "https://www.gransta.jp/"
+      ]
+    }
   ],
   "tokyo_station_out": [
-    { "name": "大丸東京店", "url": "https://www.daimaru.co.jp/tokyo/" },
-    { "name": "東京駅一番街", "url": "https://www.tokyoeki-1bangai.co.jp/" }
+    {
+      "name": "大丸東京店",
+      "url": "https://www.daimaru.co.jp/tokyo/"
+    },
+    {
+      "name": "東京駅一番街",
+      "url": "https://www.tokyoeki-1bangai.co.jp/"
+    }
   ],
   "shinagawa_in": [
-    { "name": "エキュート品川", "url": "https://www.ecute.jp/shinagawa/" }
+    {
+      "name": "エキュート品川",
+      "url": "https://www.ecute.jp/shinagawa/"
+    }
   ],
   "roppongi_akasaka": [
-    { "name": "東京ミッドタウン", "url": "https://www.tokyo-midtown.com/jp/shops/" },
-    { "name": "六本木ヒルズ", "url": "https://www.roppongihills.com/shops_restaurants/" }
+    {
+      "name": "東京ミッドタウン",
+      "url": "https://www.tokyo-midtown.com/jp/shops/"
+    },
+    {
+      "name": "六本木ヒルズ",
+      "url": "https://www.roppongihills.com/shops_restaurants/"
+    }
   ],
   "shibuya_omotesando": [
-    { "name": "渋谷スクランブルスクエア", "url": "https://www.shibuya-scramble-square.com/shops/" },
-    { "name": "渋谷ヒカリエ ShinQs", "url": "https://www.tokyu-dept.co.jp/shinqs/" }
+    {
+      "name": "渋谷スクランブルスクエア",
+      "url": "https://www.shibuya-scramble-square.com/shops/"
+    },
+    {
+      "name": "渋谷ヒカリエ ShinQs",
+      "url": "https://www.tokyu-dept.co.jp/shinqs/"
+    }
   ],
   "ginza": [
-    { "name": "銀座三越", "url": "https://www.mistore.jp/store/ginza.html" },
-    { "name": "日本橋三越本店", "url": "https://www.mistore.jp/store/nihombashi.html" },
-    { "name": "日本橋髙島屋", "url": "https://www.takashimaya.co.jp/nihombashi/" },
-    { "name": "松屋銀座", "url": "https://www.matsuya.com/ginza/" }
+    {
+      "name": "銀座三越",
+      "url": "https://www.mistore.jp/store/ginza.html"
+    },
+    {
+      "name": "日本橋三越本店",
+      "url": "https://www.mistore.jp/store/nihombashi.html"
+    },
+    {
+      "name": "日本橋髙島屋",
+      "url": "https://www.takashimaya.co.jp/nihombashi/"
+    },
+    {
+      "name": "松屋銀座",
+      "url": "https://www.matsuya.com/ginza/"
+    }
   ],
   "shinjuku": [
-    { "name": "伊勢丹新宿店", "url": "https://www.mistore.jp/store/shinjuku.html" },
-    { "name": "新宿髙島屋", "url": "https://www.takashimaya.co.jp/shinjuku/" },
-    { "name": "京王百貨店新宿店", "url": "https://www.keionet.com/info/shinjuku/" }
+    {
+      "name": "伊勢丹新宿店",
+      "url": "https://www.mistore.jp/store/shinjuku.html"
+    },
+    {
+      "name": "新宿髙島屋",
+      "url": "https://www.takashimaya.co.jp/shinjuku/"
+    },
+    {
+      "name": "京王百貨店新宿店",
+      "url": "https://www.keionet.com/info/shinjuku/"
+    }
   ],
   "ikebukuro": [
-    { "name": "東武百貨店池袋本店", "url": "https://www.tobu-dept.jp/ikebukuro/" },
-    { "name": "西武池袋本店", "url": "https://www.sogo-seibu.jp/ikebukuro/" }
+    {
+      "name": "東武百貨店池袋本店",
+      "url": "https://www.tobu-dept.jp/ikebukuro/"
+    },
+    {
+      "name": "西武池袋本店",
+      "url": "https://www.sogo-seibu.jp/ikebukuro/"
+    }
   ],
   "ueno": [
-    { "name": "エキュート上野", "url": "https://www.ecute.jp/ueno/" },
-    { "name": "松坂屋上野店", "url": "https://www.matsuzakaya.co.jp/ueno/" }
+    {
+      "name": "エキュート上野",
+      "url": "https://www.ecute.jp/ueno/"
+    },
+    {
+      "name": "松坂屋上野店",
+      "url": "https://www.matsuzakaya.co.jp/ueno/"
+    }
   ],
   "asakusa": [
-    { "name": "東京ソラマチ", "url": "https://www.tokyo-solamachi.jp/shop/" },
-    { "name": "松屋浅草", "url": "https://www.matsuya.com/asakusa/" }
+    {
+      "name": "東京ソラマチ",
+      "url": "https://www.tokyo-solamachi.jp/shop/"
+    },
+    {
+      "name": "松屋浅草",
+      "url": "https://www.matsuya.com/asakusa/"
+    }
   ],
   "ningyocho": [],
   "kanda": [
-    { "name": "エキュート秋葉原", "url": "https://www.ecute.jp/akihabara/" }
+    {
+      "name": "エキュート秋葉原",
+      "url": "https://www.ecute.jp/akihabara/"
+    }
   ],
   "shimbashi": [
-    { "name": "アトレ浜松町", "url": "https://www.atre.co.jp/store/hamamatsucho" }
+    {
+      "name": "アトレ浜松町",
+      "url": "https://www.atre.co.jp/store/hamamatsucho"
+    }
   ],
   "kagurazaka": [],
   "ebisu": [
-    { "name": "アトレ恵比寿", "url": "https://www.atre.co.jp/store/ebisu" },
-    { "name": "恵比寿三越", "url": "https://www.mistore.jp/store/ebisu.html" }
+    {
+      "name": "アトレ恵比寿",
+      "url": "https://www.atre.co.jp/store/ebisu"
+    },
+    {
+      "name": "恵比寿三越",
+      "url": "https://www.mistore.jp/store/ebisu.html"
+    }
   ],
   "jiyugaoka": [],
   "futako": [
-    { "name": "玉川髙島屋S・C", "url": "https://www.tamagawa-sc.com/" }
+    {
+      "name": "玉川髙島屋S・C",
+      "url": "https://www.tamagawa-sc.com/"
+    }
   ],
   "kiyosumi": [],
   "ryogoku": [],
   "nippori": [],
   "shibamata": [
-    { "name": "北千住マルイ", "url": "https://www.0101.co.jp/015/" },
-    { "name": "ルミネ北千住", "url": "https://www.lumine.ne.jp/kitasenju/" }
+    {
+      "name": "北千住マルイ",
+      "url": "https://www.0101.co.jp/015/"
+    },
+    {
+      "name": "ルミネ北千住",
+      "url": "https://www.lumine.ne.jp/kitasenju/"
+    }
   ],
   "nakano": [],
   "haneda": [
-    { "name": "羽田空港 ショップ", "url": "https://tokyo-haneda.com/shop/" }
+    {
+      "name": "羽田空港",
+      "url": [
+        "https://tokyo-haneda.com/shop_and_dine/",
+        "https://tokyo-haneda.com/shop_and_dine/index.html",
+        "https://tokyo-haneda.com/"
+      ]
+    }
   ]
 }

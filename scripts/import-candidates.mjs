@@ -116,7 +116,7 @@ const isDuplicate = (brand, name) =>
 
 // ---- 追加 ----
 const grid = countCells(items);
-const needs = (cat, tier, areas) => areas.some((a) => isMajorCell(cat, tier) && grid[a][cat][tier] < FILL_UP_TO);
+const needs = (cat, tier, areas) => areas.some((a) => isMajorCell(cat, tier, a) && grid[a][cat][tier] < FILL_UP_TO);
 const seenCodes = new Set();
 const perBrand = {};
 let nextId = Math.max(...items.map((i) => Number(i.id.split("-")[1]))) + 1;

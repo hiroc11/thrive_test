@@ -33,6 +33,7 @@ npm run dev   # http://localhost:3000
 npm run coverage            # docs/coverage.md を作り直す（比較の基準は docs/coverage-baseline.json）
 npm run fetch:ranking       # 楽天ランキングAPI → scripts/out/ranking.json
 npm run fetch:shops         # 公式ショップ一覧（scripts/shop-sources.json）→ scripts/out/shop-directory.json
+                            # 一覧を後から読み込むサイトは -- --browser（初回のみ npm i -D playwright && npx playwright install chromium）
 npm run fetch:gaps          # 足りないマスを既存ブランドの公式店で検索 → scripts/out/gap-search.json
 npm run import:candidates -- --dry-run   # 追加される商品を確認だけ
 npm run import:candidates   # items.json に追加して coverage を更新
@@ -40,4 +41,4 @@ npm run fetch:rakuten       # 追加分の画像・リンクを補完（任意�
 npm run annotate:shops      # 「〇〇周辺」の店舗を、公式ショップ一覧に載っている施設の店舗に置き換え（地図の施設ピン用）
 ```
 
-追加の条件は「楽天で販売中」かつ「収録済みブランドの公式店の商品」であることです。エリアはそのブランドの既存エリアと、公式ショップ一覧に名前が載っているエリアです。追加分はすべて `data_status: "draft"` になります。公式の一覧がない商店街中心のエリア（人形町・神楽坂・自由が丘・清澄白河・両国・日暮里/巣鴨・中野）は、この仕組みでは埋まりません。
+追加の条件は「楽天で販売中」かつ「収録済みブランドの公式店の商品」であることです。エリアはそのブランドの既存エリアと、公式ショップ一覧に名前が載っているエリアです。追加分はすべて `data_status: "draft"` になります。商店街・老舗中心のエリア（人形町・神田・神楽坂・自由が丘・清澄白河・両国・日暮里/巣鴨・柴又/北千住・中野）は、主要マスを「和菓子・甘くない系の5千円未満」に絞っています（`scripts/lib/catalog.mjs` の `LOCAL_AREAS`）。この仕組みでは埋まらないので、地元の店を手で追加します。

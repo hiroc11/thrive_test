@@ -83,12 +83,41 @@ def _fal(model, arguments):
     if not os.environ.get("FAL_KEY"):
         raise RuntimeError("FAL_KEY が設定されていません")
     import fal_client
-    return fal_client.subscribe(model, arguments=arguments)
+    # 動画などは数分かかるので、つなぎっぱなしで待たず、短い問い合わせを繰り返して完了を待つ
+    handle = fal_client.submit(model, arguments=arguments)
+    deadline = time.time() + 30 * 60
+    while True:
+        for attempt in range(5):  # 一時的な通信の失敗は、少し待ってやり直す
+            try:
+                status = handle.status()
+                break
+            except Exception:  # noqa: BLE001
+                if attempt == 4:
+                    raise
+                time.sleep(5)
+        if type(status).__name__ == "Completed":
+            break
+        if time.time() > deadline:
+            raise RuntimeError("30分待っても生成が終わりませんでした。fal.ai の混雑が考えられます。時間をおいて再度お試しください")
+        time.sleep(5)
+    for attempt in range(5):
+        try:
+            return handle.get()
+        except Exception:  # noqa: BLE001
+            if attempt == 4:
+                raise
+            time.sleep(5)
 
 
 def _fal_upload(path: Path) -> str:
     import fal_client
-    return fal_client.upload_file(path)
+    for attempt in range(3):  # アップロードも、一時的な失敗はやり直す
+        try:
+            return fal_client.upload_file(path)
+        except Exception:  # noqa: BLE001
+            if attempt == 2:
+                raise
+            time.sleep(5)
 
 
 def reference_canvas(ref_paths: list[Path], dest: Path) -> Path:

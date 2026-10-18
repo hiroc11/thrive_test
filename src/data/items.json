@@ -1028,7 +1028,7 @@
   },
   {
     "id": "tokyo-025",
-    "name": "GMT ガトーフェスタ ハラダ グーテ・デ・ロワ",
+    "name": "ガトーフェスタ ハラダ グーテ・デ・ロワ",
     "brand_name": "ガトーフェスタ ハラダ",
     "category": "yogashi",
     "price_tax_in": 1188,
@@ -1062,7 +1062,7 @@
         "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
       }
     ],
-    "search_keyword": "ガトーフェスタ ハラダ GMT ガトーフェスタ ハラダ グーテ・デ・ロワ",
+    "search_keyword": "ガトーフェスタ ハラダ グーテ・デ・ロワ",
     "image_url": null,
     "jan_code": null,
     "data_status": "curated"

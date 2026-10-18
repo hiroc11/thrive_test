@@ -32,6 +32,7 @@ export interface Item {
   evening_availability: "high" | "medium" | "morning_only";
   bag_size: "compact_a4" | "standard" | "large";
   handoff_script: string;
+  talk_topic?: string; // 渡したあとの話のネタ（確かな話がある商品のみ）
   why_recommended: string;
   shops: Shop[];
   search_keyword: string;

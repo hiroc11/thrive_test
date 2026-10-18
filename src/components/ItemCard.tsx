@@ -1,5 +1,5 @@
 "use client";
-import { AlertTriangle, Info, Circle, MapPin, MessageSquareQuote, Plus, ShoppingCart, ExternalLink } from "lucide-react";
+import { AlertTriangle, Info, Lightbulb, Circle, MapPin, MessageSquareQuote, Plus, ShoppingCart, ExternalLink } from "lucide-react";
 import type { Area, Item } from "@/lib/types";
 import { yen } from "@/lib/constants";
 
@@ -61,6 +61,14 @@ export function ItemCard({
           <MessageSquareQuote size={14} />渡すときの一言カンペ
         </p>
         <p className="text-sm leading-relaxed">「{item.handoff_script}」</p>
+        {item.talk_topic && (
+          <>
+            <p className="mb-1 mt-3 flex items-center gap-1 text-xs font-bold text-slate-600">
+              <Lightbulb size={14} />話のネタ
+            </p>
+            <p className="text-sm leading-relaxed">{item.talk_topic}</p>
+          </>
+        )}
       </div>
       <p className="mt-2 text-xs text-slate-500">{item.why_recommended}</p>
 

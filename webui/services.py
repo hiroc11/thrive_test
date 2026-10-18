@@ -11,6 +11,7 @@ import os
 import shutil
 import subprocess
 import textwrap
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -84,7 +85,14 @@ def _fal(model, arguments):
         raise RuntimeError("FAL_KEY が設定されていません")
     import fal_client
     # 動画などは数分かかるので、つなぎっぱなしで待たず、短い問い合わせを繰り返して完了を待つ
-    handle = fal_client.submit(model, arguments=arguments)
+    for attempt in range(3):  # 受付も、通信が切れたときはやり直す
+        try:
+            handle = fal_client.submit(model, arguments=arguments)
+            break
+        except Exception:  # noqa: BLE001
+            if attempt == 2:
+                raise
+            time.sleep(10)
     deadline = time.time() + 30 * 60
     while True:
         for attempt in range(5):  # 一時的な通信の失敗は、少し待ってやり直す
@@ -109,15 +117,28 @@ def _fal(model, arguments):
             time.sleep(5)
 
 
+def _shrink(path: Path) -> Path:
+    """アップロードが時間切れにならないよう、大きい画像は長辺1536pxのJPEGに縮めて送る。"""
+    from PIL import Image
+    if path.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp") or path.stat().st_size < 1_000_000:
+        return path
+    small = Path(tempfile.gettempdir()) / f"fal_up_{path.stem}.jpg"
+    img = Image.open(path).convert("RGB")
+    img.thumbnail((1536, 1536))
+    img.save(small, quality=90)
+    return small
+
+
 def _fal_upload(path: Path) -> str:
     import fal_client
-    for attempt in range(3):  # アップロードも、一時的な失敗はやり直す
+    path = _shrink(path)
+    for attempt in range(5):  # アップロードも、一時的な失敗はやり直す
         try:
             return fal_client.upload_file(path)
         except Exception:  # noqa: BLE001
-            if attempt == 2:
-                raise
-            time.sleep(5)
+            if attempt == 4:
+                raise RuntimeError(f"fal.ai への画像のアップロードが時間切れになりました。通信環境を確認して、もう一度お試しください（{path.name}）")
+            time.sleep(10)
 
 
 def reference_canvas(ref_paths: list[Path], dest: Path) -> Path:

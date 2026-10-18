@@ -45,12 +45,16 @@ export class RakutenError extends Error {
   }
 }
 
-export async function rakutenGet(url, params) {
+export async function rakutenGet(url, params, retry = 2) {
   await throttle();
   const q = new URLSearchParams({ format: "json", formatVersion: "2", applicationId: APP_ID, ...params });
   const origin = new URL(REFERER).origin;
   const res = await fetch(`${url}?${q}`, { headers: { accessKey: ACCESS_KEY, Referer: `${origin}/`, Origin: origin } });
   const text = await res.text();
+  if (res.status === 429 && retry > 0) {
+    await sleep(2000); // 1秒あたりの上限超過は待って再試行
+    return rakutenGet(url, params, retry - 1);
+  }
   if (!res.ok) throw new RakutenError(res.status, text);
   return JSON.parse(text);
 }

@@ -28,7 +28,7 @@ const areaLabel = Object.fromEntries(AREAS);
 const NOISE_NAME = /タンブラー|マグカップ|マグ$|ドリッパー|キャニスター|グラス|食器|器具|ポーチ単品|トートバッグ|エコバッグ|ギフト券|カタログギフト|訳あり|わけあり|お試し|業務用|大容量|アウトレット|福袋|ふるさと納税|定期便|まとめ買い|\d+箱セット|ケース販売|ポイント\d+倍|クーポン/;
 // 手土産にならない飲料ジャンル（ランキング取得時に大ジャンル配下として混ざる）
 const OFF_GENRE = /^(水・炭酸水|炭酸飲料|スポーツドリンク|野菜・果実飲料|スムージー|お酢飲料|牛乳|植物性ミルク|フルーツ入り乳飲料|乳性・乳酸菌飲料|ゼリー飲料|希釈用ドリンク|氷|ノンアルコール|ココア・チョコレートドリンク|その他|水・ソフトドリンク)$/;
-const PROMO = /^(?:保存食|惣菜|そうざい|小袋|小分け|お弁当|帰省土産|食品|時短|オフィス|ご家庭料理|おつまみ|七五三|老舗|健康|敬老|グルメ|土産|新生活|祝い|国内生産|定番|ご飯のお供|毎日の食卓|食べ比べセット|単品|贈答用|保存料\S*|日本産|20\d\d|[A-Z]{1,3}-?\d{1,4}|送料込み?|帰省|お年賀|御年賀|贈答品?|お見舞い?|数量|限定|お菓子|洋菓子|和菓子|焼き菓子|東京|銀座|日本橋|誕生日|退職|お世話になりました|お礼|御礼|産休|お供え|御供|供物|菓子折り?|高級|詰め合わせ|お取り寄せ|ハロウィン|クリスマス|新年|年末年始|春|夏|秋|冬|出産|結婚|新築|快気|法事|香典返し|買い回り|買いまわり|酒蔵直送|直送|地酒|人気|おしゃれ|かわいい|プチギフト|ばらまき|個包装|小袋サイズ|※\S*|≪|≫|＜|＞|<|>|\.|\/)$/; // 単語単位で一致したら除く（「銀座あけぼの」の「銀座」は消さない）
+const PROMO = /^(?:の日|入学|粗品|お礼の品|花以外|以外|おすすめ|挨拶|おうちごはん|二次会|サンクス|記念品|ブライダル|限定缶|缶入り|濃厚|なめらか|贅沢|減塩タイプの薄味|うす味|減塩|個箱入り|スナック|保存食|惣菜|そうざい|小袋|小分け|お弁当|帰省土産|食品|時短|オフィス|ご家庭料理|おつまみ|七五三|老舗|健康|敬老|グルメ|土産|新生活|祝い|国内生産|定番|ご飯のお供|毎日の食卓|食べ比べセット|単品|贈答用|保存料\S*|日本産|20\d\d|[A-Z]{1,3}-?\d{1,4}|送料込み?|帰省|お年賀|御年賀|贈答品?|お見舞い?|数量|限定|お菓子|洋菓子|和菓子|焼き菓子|東京|銀座|日本橋|誕生日|退職|お世話になりました|お礼|御礼|産休|お供え|御供|供物|菓子折り?|高級|詰め合わせ|お取り寄せ|ハロウィン|クリスマス|新年|年末年始|春|夏|秋|冬|出産|結婚|新築|快気|法事|香典返し|買い回り|買いまわり|酒蔵直送|直送|地酒|人気|おしゃれ|かわいい|プチギフト|ばらまき|個包装|小袋サイズ|※\S*|≪|≫|＜|＞|<|>|\.|\/)$/; // 単語単位で一致したら除く（「銀座あけぼの」の「銀座」は消さない）
 const PROMO_IN = /お年賀|御年賀|お歳暮|御歳暮|お中元|敬老|七五三|ハロウィン|新生活/g;
 const cleanName = (s) =>
   s
@@ -37,6 +37,7 @@ const cleanName = (s) =>
     .replace(PROMO_IN, "")
     .split(/[\s　]+/)
     .map((w) => w.replace(/[｜|].*$/, "").replace(/[（(][^）)]*[）)]?|^[^（(]*[）)]/g, ""))
+    .map((w) => w.replace(/[.．。、,]+$/, ""))
     .filter((w, i, arr) => w && !PROMO.test(w) && arr.indexOf(w) === i)
     .join(" ")
     .replace(/【[^】]*】|［[^］]*］|\[[^\]]*\]|《[^》]*》|★[^★]*★|◆[^◆]*◆/g, " ")
@@ -64,11 +65,18 @@ function brandOf(r) {
   return knownBrands.find((b) => name.includes(normalize(b)) && shop.includes(normalize(b).slice(0, 4))) ?? null;
 }
 
-function categoryOf(r, name) {
+// ブランドの既存商品で一番多いジャンル（商品名からジャンルが判断できないときに使う）
+const brandCategory = {};
+for (const i of items) ((brandCategory[i.brand_name] ??= {})[i.category] = (brandCategory[i.brand_name]?.[i.category] ?? 0) + 1);
+const mainCategoryOf = (brand) => Object.entries(brandCategory[brand] ?? {}).sort((a, b) => b[1] - a[1])[0]?.[0];
+
+function categoryOf(r, name, brand) {
+  if (/ビスケット|クッキー|サブレ|プリン|ゼリー|ジェリー|ケーキ|チョコ|ショコラ|フィナンシェ|マドレーヌ|バウム|ラスク|ゴーフル/.test(name)) return "yogashi";
   if (/せんべい|煎餅|おかき|あられ|佃煮|つくだ煮|海苔|のり|おつまみ|珍味|かつお節|鰹節|だし|カレー|スープ|和牛|牛肉|すき焼|しゃぶしゃぶ/.test(name)) return "savory";
   if (/羊羹|ようかん|最中|もなか|どら焼|どらやき|大福|団子|だんご|饅頭|まんじゅう|甘納豆|わらび|きんつば|金鍔/.test(name)) return "wagashi";
-  if (/日本茶|緑茶|煎茶|ほうじ茶|抹茶ティー|コーヒー|珈琲|紅茶|日本酒|純米|吟醸|焼酎|梅酒/.test(name)) return "drink";
-  return r.category;
+  if (/日本茶|緑茶|煎茶|ほうじ茶|抹茶ティー|コーヒー|珈琲|紅茶|日本酒|純米|吟醸|焼酎|梅酒|ジュース/.test(name)) return "drink";
+  // 足りないマスを狙った検索の結果は、検索したマスのジャンルではなくブランドの主なジャンルを使う
+  return (r.genre_name?.startsWith("検索:") ? mainCategoryOf(brand) : null) ?? r.category;
 }
 
 function attributesOf(r, name) {
@@ -142,7 +150,7 @@ for (const r of [...ranking].sort((a, b) => a.rank - b.rank)) {
   const hits = [...dirHits, ...known];
   if (!hits.length) { skipped.noArea++; continue; }
   if (isDuplicate(brand, name)) { skipped.duplicate++; continue; }
-  const cat = categoryOf(r, name);
+  const cat = categoryOf(r, name, brand);
   const tier = tierOf(r.itemPrice);
   const areas = hits.map((h) => h.area);
   if (!needs(cat, tier, areas)) { skipped.cellFull++; continue; }

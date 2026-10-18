@@ -1,0 +1,117 @@
+{
+  "episode": 1,
+  "block": "B1",
+  "title": "前世の死",
+  "aspect_ratio": "9:16",
+  "telop": "他人の死は見抜けた。\n自分のだけは無理だった",
+  "out_dir": "assets/stills/b1",
+  "models": {
+    "image": "fal-ai/nano-banana/edit",
+    "video": "fal-ai/kling-video/v2.5-turbo/pro/image-to-video",
+    "lipsync": "fal-ai/kling-video/lipsync/audio-to-video"
+  },
+  "style": "anime style, cel shading, clean bold lineart, muted desaturated colors, warm orange sunset lighting, vertical 9:16 composition, no text",
+  "negative": "flags, text, watermark, extra people, extra fingers, deformed hands, fantasy elements, cloak, armor, glasses, beard, stubble",
+  "background_ref": "assets/stills/b1/C01.jpg",
+  "characters": {
+    "ren": {
+      "name": "蓮",
+      "prompt": "Ren, 28yo Japanese office worker man, clean-shaven, messy black hair, sleepy half-closed gray eyes, tired face with dark circles, loose dark red necktie, worn gray suit jacket, dark brown trousers, white shirt, black leather shoes, tablet in his left hand",
+      "ref": "assets/design/refs/ren_ref.png",
+      "voice_actor_id": null,
+      "voice_note": "低めで淡々とした20〜30代の男性。異世界のアルトと同じ声にする"
+    },
+    "boy": {
+      "name": "少年",
+      "prompt": "Japanese elementary school boy about 8 years old, short black hair, red randoseru school backpack, white t-shirt, navy shorts, red sneakers",
+      "ref": "assets/stills/b1/C04.jpg",
+      "voice_actor_id": null,
+      "voice_note": "8歳くらいの元気な男の子"
+    }
+  },
+  "cuts": [
+    {
+      "id": "C01", "duration": 5, "camera": "tiltdown", "characters": ["ren"], "animate": false,
+      "image_prompt": "wide shot of the old rusty pedestrian overpass in a small Japanese city at orange sunset, Ren standing alone in the middle, looking down at the cracked deck",
+      "motion_prompt": "Slow camera tilt down from the sunset sky to the lonely man standing on the overpass. Only his hair and tie move slightly in the wind.",
+      "lines": [{"speaker": "ren", "text": "他人の死は、だいたい見抜けた", "monologue": true}],
+      "lipsync": false, "se": "", "memo": "夕暮れの歩道橋"
+    },
+    {
+      "id": "C02", "duration": 7, "camera": "push", "characters": [], "animate": false,
+      "image_prompt": "extreme close-up of cracked weathered concrete on the overpass deck, a man's fingertip in a worn gray suit sleeve tracing along a crack, warm sunset light",
+      "motion_prompt": "The man's fingertip slowly traces along the crack in the concrete. Fine dust drifts. Camera still.",
+      "lines": [{"speaker": "ren", "text": "俺の仕事は損害保険のリスク査定。人の『もしも』に値段をつけること", "monologue": true}],
+      "lipsync": false, "se": "", "memo": "ひび割れを指でなぞる"
+    },
+    {
+      "id": "C03", "duration": 6, "camera": "push", "characters": ["ren"], "animate": false,
+      "image_prompt": "medium shot, Ren looking down at the tablet in his left hand with a tired expression, on the old rusty overpass, orange sunset backlight",
+      "motion_prompt": "The tired man looks down at his tablet and slowly breathes out. Subtle slow push in.",
+      "lines": [{"speaker": "ren", "text": "この橋の事故確率、年0.3%。……高いな", "monologue": true}],
+      "lipsync": false, "se": "", "memo": "事故確率の表示を編集で重ねる"
+    },
+    {
+      "id": "C04", "duration": 5, "camera": "push", "characters": ["boy"], "animate": true,
+      "image_prompt": "the boy running happily toward the camera along the cracked overpass, randoseru bouncing, low camera angle",
+      "motion_prompt": "The boy runs happily toward the camera along the overpass, the red school backpack bouncing with each step. Camera slowly moves back.",
+      "lines": [],
+      "lipsync": false, "se": "少年の足音", "memo": ""
+    },
+    {
+      "id": "C05", "duration": 4, "camera": "push", "characters": ["ren"], "animate": false,
+      "image_prompt": "extreme close-up of Ren's tired gray eyes suddenly focusing, sunset reflected in his eyes",
+      "motion_prompt": "The man's half-closed eyes suddenly widen and focus. The sunset reflection shimmers in his eyes. Very slow push in.",
+      "lines": [],
+      "lipsync": false, "se": "", "memo": "蓮の目が足元のひびに向く"
+    },
+    {
+      "id": "C06", "duration": 4, "camera": "static", "characters": ["ren"], "animate": true,
+      "image_prompt": "medium shot, Ren raising his right hand slightly, calm serious face, speaking, on the old rusty overpass",
+      "motion_prompt": "The man raises his right hand slightly and speaks calmly. Camera still.",
+      "lines": [{"speaker": "ren", "text": "そこ、走らないほうがいい", "monologue": false}],
+      "lipsync": true, "se": "", "memo": ""
+    },
+    {
+      "id": "C07", "duration": 5, "camera": "static", "characters": ["boy"], "animate": true,
+      "image_prompt": "the boy stopping abruptly on the overpass with a surprised face, a chunk of concrete breaking off and falling through the deck one step in front of him",
+      "motion_prompt": "The boy stops abruptly in surprise. The chunk of concrete in front of him breaks off and falls down through the hole, dust bursting up.",
+      "lines": [{"speaker": "boy", "text": "え？", "monologue": false}],
+      "lipsync": false, "se": "かすかにポキッ（8話の伏線）", "memo": "セリフが2秒未満なので口パク合成の対象外"
+    },
+    {
+      "id": "C08", "duration": 5, "camera": "static", "characters": ["ren", "boy"], "animate": true,
+      "image_prompt": "on the left in the foreground: Ren seen in profile; in the distance: the boy walking away along the overpass",
+      "motion_prompt": "The boy walks away into the distance along the overpass. The man stays still in the foreground and mutters. Camera still.",
+      "lines": [{"speaker": "ren", "text": "……ほらな", "monologue": false}],
+      "lipsync": true, "se": "", "memo": "少年が引き返す"
+    },
+    {
+      "id": "C09", "duration": 6, "camera": "shake", "characters": ["ren"], "animate": true,
+      "image_prompt": "Ren walking across the overpass, the concrete under his feet cracking and sinking, dust rising, dynamic low angle",
+      "motion_prompt": "The concrete under the man's feet cracks and collapses. He loses his balance with a shocked face. Dust bursts up, strong camera shake.",
+      "lines": [{"speaker": "ren", "text": "他人の死は、だいたい見抜けた", "monologue": true}],
+      "lipsync": false, "se": "ミシッ→床が抜ける", "memo": ""
+    },
+    {
+      "id": "C10", "duration": 7, "camera": "push", "characters": ["ren"], "animate": true,
+      "image_prompt": "seen from below, Ren falling backward through the air below the broken overpass, debris floating around him, tablet slipping from his hand, sunset sky above",
+      "motion_prompt": "Slow motion: the man falls backward through the air below the broken overpass, concrete debris and the tablet tumbling around him.",
+      "lines": [{"speaker": "ren", "text": "自分の以外は", "monologue": true}],
+      "lipsync": false, "se": "風切り音", "memo": "スローモーション"
+    },
+    {
+      "id": "C11", "duration": 6, "camera": "static", "characters": ["ren"], "animate": true,
+      "image_prompt": "close-up of Ren's deadpan expressionless face while falling, hair and necktie blown upward by the wind, sunset sky behind",
+      "motion_prompt": "Close-up while falling: his hair and necktie flutter violently upward in the wind. His face stays completely deadpan. Small debris drifts past.",
+      "lines": [{"speaker": "ren", "text": "……これ、労災おりるかな", "monologue": true}],
+      "lipsync": false, "se": "", "memo": "落下しながら真顔。顔が別人にならないよう基準画像を参照"
+    },
+    {
+      "id": "C12", "duration": 5, "camera": "static", "characters": [], "animate": false,
+      "image_prompt": null, "motion_prompt": null,
+      "lines": [],
+      "lipsync": false, "se": "水音／エンドカードでポキッ", "memo": "暗転→エンドカード（編集で作る）"
+    }
+  ]
+}

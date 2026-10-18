@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+
+# Web UI の実行時データ（生成した素材・書き出した動画・個人設定）
+assets/episodes/
+exports/
+webui/settings.local.json
+
+# APIキー（このPCだけに置く）
+webui/keys.env

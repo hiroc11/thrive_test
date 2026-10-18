@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>縦型AIアニメ制作</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='3' width='3' height='27' fill='%235A4A3E'/%3E%3Cpath d='M9 4 L28 11 L9 18 Z' fill='%23EB5757'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>縦型AIアニメ制作</h1>
+    <nav>
+      <button class="tab active" data-tab="characters">キャラクター</button>
+      <button class="tab" data-tab="episode">エピソード</button>
+      <button class="tab" data-tab="settings">設定</button>
+    </nav>
+  </header>
+  <div id="fake-banner" class="banner" hidden>動作確認モード（WEBUI_FAKE=1）：外部APIは呼ばず、仮の画像・動画・音声を作ります。</div>
+
+  <main>
+    <!-- 1. キャラクターの基準画像 -->
+    <section id="characters" class="panel active">
+      <h2>キャラクターの基準画像</h2>
+      <form id="char-form" class="card">
+        <input type="hidden" name="id">
+        <div class="char-form-grid">
+          <label class="drop" id="drop">
+            <input type="file" name="image" accept="image/png,image/jpeg,image/webp" hidden>
+            <img id="drop-preview" alt="" hidden>
+            <span id="drop-text">クリックまたはドラッグで画像を選択</span>
+          </label>
+          <div class="fields">
+            <label>名前<input name="name" required placeholder="例：アルト"></label>
+            <label>キャラクターの英語プロンプト（任意）
+              <textarea name="prompt" rows="3" placeholder="17yo boy, messy black hair, sleepy gray eyes, navy hooded cloak ..."></textarea>
+            </label>
+            <label>Aivis の声（AivisHub の音声合成モデルのUUID）
+              <input name="voice_aivis" placeholder="例：a59cb814-0083-4369-8542-f51a29e72af7">
+            </label>
+            <label>Fish Audio の声（fish.audio の声のID）
+              <input name="voice_fish" placeholder="例：802e3bc2b27e49c2995d23ef70e6ac89">
+            </label>
+            <p class="hint">声のIDは <a href="https://hub.aivis-project.com/" target="_blank" rel="noopener">AivisHub</a> や <a href="https://fish.audio/" target="_blank" rel="noopener">fish.audio</a> の声のページで確認できます。使う方だけ入力すればOKです。</p>
+            <div class="row">
+              <button type="submit" class="primary" id="char-submit">登録する</button>
+              <button type="button" id="char-cancel" hidden>編集をやめる</button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div id="char-list" class="char-grid"></div>
+    </section>
+
+    <!-- 2〜4. エピソード -->
+    <section id="episode" class="panel">
+      <div class="episode-bar card">
+        <label class="ep-num">話数 <input type="number" id="ep-number" min="1" max="999" value="1"></label>
+        <div class="variant-switch" role="group" aria-label="版">
+          <button class="variant active" data-variant="sns">SNS版</button>
+          <button class="variant" data-variant="full">完全版</button>
+        </div>
+        <label class="grow">タイトル <input id="ep-title" placeholder="例：その扉、開けないほうがいいですよ"></label>
+        <button id="ep-load">読み込む</button>
+        <button id="ep-copy" title="今表示している版の入力内容を、もう一方の版に上書きコピーします">もう一方の版にコピー</button>
+        <button id="ep-save" class="primary">保存する</button>
+        <span id="ep-status" class="status"></span>
+      </div>
+      <div id="cuts" class="cuts"></div>
+
+      <div class="export card">
+        <h2>書き出し</h2>
+        <p class="hint">全カットの動画・音声・セリフ字幕を結合して、縦型MP4（1080×1920）を出力します。動画がないカットは静止画、何もないカットは黒画面になります。</p>
+        <div class="row">
+          <button class="primary export-btn" data-variant="sns">SNS版書き出し</button>
+          <button class="primary export-btn" data-variant="full">完全版書き出し</button>
+          <span id="export-status" class="status"></span>
+        </div>
+        <div class="row bgm-row">
+          <label class="file-btn">BGMを選ぶ（MP3など）<input type="file" id="bgm-file" accept=".mp3,.wav,.m4a,.aac,.ogg" hidden></label>
+          <audio id="bgm-audio" controls hidden></audio>
+          <button type="button" id="bgm-del" hidden>BGMを外す</button>
+        </div>
+        <p class="hint">BGMは書き出しのときに全体に小さく流れます（この版だけに付きます。音量は設定タブで変更）。</p>
+        <div class="export-results">
+          <figure data-variant="sns"><figcaption>SNS版</figcaption><video controls hidden></video><a download hidden>ダウンロード</a></figure>
+          <figure data-variant="full"><figcaption>完全版</figcaption><video controls hidden></video><a download hidden>ダウンロード</a></figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 設定 -->
+    <section id="settings" class="panel">
+      <h2>設定</h2>
+      <div class="card settings-grid">
+        <div>
+          <h3>接続状況</h3>
+          <ul id="status-list" class="status-list"></ul>
+          <form id="keys-form" class="fields keys-form">
+            <label>fal.ai の API キー<input name="FAL_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
+            <label>Aivis Cloud API の API キー<input name="AIVIS_API_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
+            <label>Fish Audio の API キー<input name="FISH_API_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
+            <div class="row"><button type="submit" class="primary">キーを保存</button></div>
+          </form>
+          <p class="hint">保存したキーは、このPCの <code>webui/keys.env</code> にだけ書き込まれます（GitHubには上がりません）。音声は、下の「音声サービス」で選んだ方のキーがあれば使えます。</p>
+        </div>
+        <form id="settings-form" class="fields">
+          <label>音声サービス
+            <select name="tts_provider">
+              <option value="aivis">Aivis Cloud API（日本語に強い）</option>
+              <option value="fish">Fish Audio</option>
+            </select>
+          </label>
+          <label>ナレーション・心の声に使う声（Aivis のモデルUUID）<input name="narrator_aivis"></label>
+          <label>ナレーション・心の声に使う声（Fish Audio の声のID）<input name="narrator_fish"></label>
+          <label>Fish Audio のモデル<input name="fish_model" placeholder="s2-pro"></label>
+          <label class="check"><input type="checkbox" name="enable_safety_checker"> fal.ai のセーフティチェッカーを有効にする（enable_safety_checker）</label>
+          <label>動画の解像度
+            <select name="video_resolution"><option value="720p">720p</option><option value="480p">480p（安い）</option></select>
+          </label>
+          <label>静止画の作り方（キャラ・前のカットを参照するとき）
+            <select name="image_mode">
+              <option value="multi">参考画像を複数そのまま渡す（おすすめ・一貫性が高い）</option>
+              <option value="kontext">1枚にまとめて FLUX Kontext に渡す（従来の方法）</option>
+            </select>
+          </label>
+          <label>複数参照のモデル<input name="model_image_multi"></label>
+          <label>静止画のモデル（Kontext）<input name="model_image"></label>
+          <label>静止画のモデル（キャラ参照なし）<input name="model_image_t2i"></label>
+          <label>動画のモデル<input name="model_video"></label>
+          <label>BGMの音量（0〜1、初期値0.2）<input name="bgm_volume" type="number" min="0" max="1" step="0.05"></label>
+          <label>字幕の日本語フォントのパス（空なら自動で探す）<input name="font_path" placeholder="例：C:/Windows/Fonts/meiryob.ttc"></label>
+          <div class="row"><button type="submit" class="primary">設定を保存</button></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <template id="cut-template">
+    <article class="cut card">
+      <div class="cut-head">
+        <h3 class="cut-id"></h3>
+        <div class="cut-chars"></div>
+      </div>
+      <label>話す人
+        <select class="speaker"><option value="">ナレーション・心の声など</option></select>
+      </label>
+      <label>セリフ（日本語）<textarea class="dialogue" rows="2" placeholder="例：その扉、開けないほうがいいですよ"></textarea></label>
+      <label>画像プロンプト（英語）<textarea class="image_prompt" rows="3" placeholder="medium shot, ... anime style"></textarea></label>
+      <label class="check"><input type="checkbox" class="use_prev_ref"> 前のカットの静止画を参考にする（場所・色をそろえる）</label>
+      <label>カメラ・動きのプロンプト（英語）<textarea class="motion_prompt" rows="2" placeholder="slow push in, hair moves in the wind"></textarea></label>
+      <div class="gen-row">
+        <button class="gen" data-kind="image">① 静止画生成</button>
+        <button class="gen" data-kind="video">② 5秒動画生成</button>
+        <button class="gen" data-kind="voice">③ 音声生成</button>
+      </div>
+      <div class="timing">
+        <label>カットの長さ（秒・0なら自動）<input type="number" class="length" min="0" max="15" step="0.5" value="0"></label>
+        <label>動画の使い始め（秒）<input type="number" class="video_start" min="0" max="10" step="0.5" value="0"></label>
+        <label>効果音を鳴らす秒<input type="number" class="se_start" min="0" max="15" step="0.5" value="0"></label>
+      </div>
+      <div class="row se-row">
+        <label class="file-btn">効果音を選ぶ<input type="file" class="se-file" accept=".mp3,.wav,.m4a,.aac,.ogg" hidden></label>
+        <audio class="pv-se" controls hidden></audio>
+        <button type="button" class="se-del" hidden>効果音を外す</button>
+      </div>
+      <div class="job-status status"></div>
+      <div class="previews">
+        <div class="pv pv-image"><span>静止画</span><img alt="" hidden></div>
+        <div class="pv pv-video"><span>動画</span><video controls muted loop playsinline hidden></video></div>
+      </div>
+      <audio class="pv-voice" controls hidden></audio>
+    </article>
+  </template>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

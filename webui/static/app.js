@@ -398,6 +398,23 @@ sform.addEventListener("submit", async (e) => {
   }
 });
 
+const kform = $("#keys-form");
+kform.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    await api("/api/keys", jsonOpts("PUT", {
+      FAL_KEY: kform.elements.FAL_KEY.value,
+      NIJIVOICE_API_KEY: kform.elements.NIJIVOICE_API_KEY.value,
+    }));
+    kform.reset();
+    toast("キーを保存しました");
+    await loadStatus();
+    loadVoiceActors();
+  } catch (err) {
+    toast(err.message);
+  }
+});
+
 async function loadStatus() {
   const s = await api("/api/status");
   $("#fake-banner").hidden = !s.fake_mode;

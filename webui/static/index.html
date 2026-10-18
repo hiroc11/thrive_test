@@ -89,6 +89,11 @@
         <div>
           <h3>接続状況</h3>
           <ul id="status-list" class="status-list"></ul>
+          <form id="keys-form" class="fields keys-form">
+            <label>fal.ai の API キー<input name="FAL_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
+            <label>にじボイスの API キー<input name="NIJIVOICE_API_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
+            <div class="row"><button type="submit" class="primary">キーを保存</button></div>
+          </form>
           <p class="hint">APIキーは <code>webui/keys.env</code> に書き込み、起動し直してください（環境変数 <code>FAL_KEY</code> / <code>NIJIVOICE_API_KEY</code> でも可）。画面には保存しません。</p>
         </div>
         <form id="settings-form" class="fields">

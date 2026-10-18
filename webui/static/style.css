@@ -172,3 +172,4 @@ code { background: var(--bg); padding: 1px 4px; border-radius: 4px; }
 @media (max-width: 640px) {
   .settings-grid { grid-template-columns: 1fr; }
 }
+.keys-form { margin: 12px 0; }

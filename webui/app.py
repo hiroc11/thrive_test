@@ -145,6 +145,33 @@ def status():
     }
 
 
+KEYS_FILE = Path(__file__).resolve().parent / "keys.env"
+KEY_NAMES = ("FAL_KEY", "NIJIVOICE_API_KEY")
+
+
+@app.put("/api/keys")
+def put_keys(body: dict):
+    """画面から入力されたAPIキーを keys.env（このPCだけ）に保存し、すぐ使えるようにする。空欄の項目は変更しない。"""
+    import os
+    updates = {k: str(body.get(k, "")).strip() for k in KEY_NAMES if str(body.get(k, "")).strip()}
+    if not updates:
+        raise HTTPException(400, "キーが入力されていません")
+    lines = KEYS_FILE.read_text(encoding="utf-8-sig").splitlines() if KEYS_FILE.exists() else []
+    out, done = [], set()
+    for line in lines:
+        key = line.split("=", 1)[0].strip()
+        if key in updates and not line.lstrip().startswith("#"):
+            out.append(f"{key}={updates[key]}")
+            done.add(key)
+        else:
+            out.append(line)
+    out += [f"{k}={v}" for k, v in updates.items() if k not in done]
+    KEYS_FILE.write_text("\n".join(out) + "\n", encoding="utf-8")
+    for k, v in updates.items():
+        os.environ[k] = v  # 起動し直さなくても使えるようにする
+    return {"ok": True, "saved": list(updates)}
+
+
 @app.get("/api/voice-actors")
 def get_voice_actors():
     try:

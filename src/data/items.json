@@ -1938,11 +1938,11 @@
     "shops": [
       {
         "area_id": "asakusa",
-        "shop_name": "常盤堂雷おこし本舗(浅草・押上周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "常盤堂雷おこし本舗（松屋浅草）",
+        "access_note": "松屋浅草内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%B8%B8%E7%9B%A4%E5%A0%82%E9%9B%B7%E3%81%8A%E3%81%93%E3%81%97%E6%9C%AC%E8%88%97%20%E6%B5%85%E8%8D%89%E3%83%BB%E6%8A%BC%E4%B8%8A"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%B8%B8%E7%9B%A4%E5%A0%82%E9%9B%B7%E3%81%8A%E3%81%93%E3%81%97%E6%9C%AC%E8%88%97%20%E6%9D%BE%E5%B1%8B%E6%B5%85%E8%8D%89"
       },
       {
         "area_id": "tokyo_station_in",
@@ -2093,11 +2093,11 @@
       },
       {
         "area_id": "ikebukuro",
-        "shop_name": "浅草 梅園(池袋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "浅草 梅園（西武池袋本店）",
+        "access_note": "西武池袋本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E6%B1%A0%E8%A2%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E8%A5%BF%E6%AD%A6%E6%B1%A0%E8%A2%8B%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_out",
@@ -2338,11 +2338,11 @@
       },
       {
         "area_id": "asakusa",
-        "shop_name": "言問団子(浅草・押上周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "言問団子（松屋浅草）",
+        "access_note": "松屋浅草内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%A8%80%E5%95%8F%E5%9B%A3%E5%AD%90%20%E6%B5%85%E8%8D%89%E3%83%BB%E6%8A%BC%E4%B8%8A"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%A8%80%E5%95%8F%E5%9B%A3%E5%AD%90%20%E6%9D%BE%E5%B1%8B%E6%B5%85%E8%8D%89"
       }
     ],
     "search_keyword": "言問団子 6個入",
@@ -2469,11 +2469,11 @@
       },
       {
         "area_id": "ginza",
-        "shop_name": "人形町今半(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "人形町今半（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "shinjuku",
@@ -2641,11 +2641,19 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "榮太樓總本鋪(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "榮太樓總本鋪（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_in",
@@ -2657,11 +2665,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "榮太樓總本鋪(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "榮太樓總本鋪（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -2730,11 +2738,19 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "榮太樓總本鋪(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "榮太樓總本鋪（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_in",
@@ -2784,11 +2800,19 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "榮太樓總本鋪(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "榮太樓總本鋪（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_in",
@@ -2800,11 +2824,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "榮太樓總本鋪(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "榮太樓總本鋪（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -3332,11 +3356,11 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "山本山(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "山本山（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%B1%B1%E6%9C%AC%E5%B1%B1%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%B1%B1%E6%9C%AC%E5%B1%B1%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "shinjuku",
@@ -3434,11 +3458,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "文明堂東京(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "文明堂東京（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%87%E6%98%8E%E5%A0%82%E6%9D%B1%E4%BA%AC%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%87%E6%98%8E%E5%A0%82%E6%9D%B1%E4%BA%AC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -3531,11 +3555,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "文明堂東京(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "文明堂東京（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%87%E6%98%8E%E5%A0%82%E6%9D%B1%E4%BA%AC%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%87%E6%98%8E%E5%A0%82%E6%9D%B1%E4%BA%AC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -3802,19 +3826,27 @@
       },
       {
         "area_id": "ginza",
-        "shop_name": "千疋屋総本店(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "千疋屋総本店（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "千疋屋総本店（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "千疋屋総本店(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "千疋屋総本店（伊勢丹新宿店）",
+        "access_note": "伊勢丹新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E4%BC%8A%E5%8B%A2%E4%B8%B9%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -4379,11 +4411,11 @@
     "shops": [
       {
         "area_id": "roppongi_akasaka",
-        "shop_name": "とらや(六本木・赤坂周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "とらや（東京ミッドタウン）",
+        "access_note": "東京ミッドタウン内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E5%85%AD%E6%9C%AC%E6%9C%A8%E3%83%BB%E8%B5%A4%E5%9D%82"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E6%9D%B1%E4%BA%AC%E3%83%9F%E3%83%83%E3%83%89%E3%82%BF%E3%82%A6%E3%83%B3"
       },
       {
         "area_id": "ginza",
@@ -4419,11 +4451,11 @@
       },
       {
         "area_id": "shibuya_omotesando",
-        "shop_name": "とらや(渋谷・表参道周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "とらや（渋谷ヒカリエ ShinQs）",
+        "access_note": "渋谷ヒカリエ ShinQs内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E6%B8%8B%E8%B0%B7%E3%83%92%E3%82%AB%E3%83%AA%E3%82%A8%20ShinQs"
       }
     ],
     "search_keyword": "とらや 小形羊羹 10本入",
@@ -4462,11 +4494,11 @@
     "shops": [
       {
         "area_id": "roppongi_akasaka",
-        "shop_name": "とらや(六本木・赤坂周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "とらや（東京ミッドタウン）",
+        "access_note": "東京ミッドタウン内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E5%85%AD%E6%9C%AC%E6%9C%A8%E3%83%BB%E8%B5%A4%E5%9D%82"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E6%9D%B1%E4%BA%AC%E3%83%9F%E3%83%83%E3%83%89%E3%82%BF%E3%82%A6%E3%83%B3"
       },
       {
         "area_id": "ginza",
@@ -4595,11 +4627,11 @@
       },
       {
         "area_id": "ikebukuro",
-        "shop_name": "麻布かりんと(池袋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "麻布かりんと（西武池袋本店）",
+        "access_note": "西武池袋本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%BA%BB%E5%B8%83%E3%81%8B%E3%82%8A%E3%82%93%E3%81%A8%20%E6%B1%A0%E8%A2%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%BA%BB%E5%B8%83%E3%81%8B%E3%82%8A%E3%82%93%E3%81%A8%20%E8%A5%BF%E6%AD%A6%E6%B1%A0%E8%A2%8B%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_out",
@@ -4800,11 +4832,11 @@
       },
       {
         "area_id": "ikebukuro",
-        "shop_name": "赤坂柿山(池袋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "赤坂柿山（西武池袋本店）",
+        "access_note": "西武池袋本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B5%A4%E5%9D%82%E6%9F%BF%E5%B1%B1%20%E6%B1%A0%E8%A2%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B5%A4%E5%9D%82%E6%9F%BF%E5%B1%B1%20%E8%A5%BF%E6%AD%A6%E6%B1%A0%E8%A2%8B%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_out",
@@ -4867,11 +4899,11 @@
     "shops": [
       {
         "area_id": "roppongi_akasaka",
-        "shop_name": "とらや(六本木・赤坂周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "とらや（東京ミッドタウン）",
+        "access_note": "東京ミッドタウン内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E5%85%AD%E6%9C%AC%E6%9C%A8%E3%83%BB%E8%B5%A4%E5%9D%82"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E6%9D%B1%E4%BA%AC%E3%83%9F%E3%83%83%E3%83%89%E3%82%BF%E3%82%A6%E3%83%B3"
       },
       {
         "area_id": "ginza",
@@ -5957,11 +5989,11 @@
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "花園万頭(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "花園万頭（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%8A%B1%E5%9C%92%E4%B8%87%E9%A0%AD%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%8A%B1%E5%9C%92%E4%B8%87%E9%A0%AD%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "shibuya_omotesando",
@@ -6028,11 +6060,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "清月堂本店(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "清月堂本店（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B8%85%E6%9C%88%E5%A0%82%E6%9C%AC%E5%BA%97%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B8%85%E6%9C%88%E5%A0%82%E6%9C%AC%E5%BA%97%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -6208,19 +6240,27 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "銀座あけぼの(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座あけぼの（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座あけぼの（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "銀座あけぼの(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座あけぼの（伊勢丹新宿店）",
+        "access_note": "伊勢丹新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E4%BC%8A%E5%8B%A2%E4%B8%B9%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -6292,19 +6332,27 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "銀座あけぼの(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座あけぼの（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座あけぼの（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "銀座あけぼの(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座あけぼの（伊勢丹新宿店）",
+        "access_note": "伊勢丹新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E4%BC%8A%E5%8B%A2%E4%B8%B9%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -6645,11 +6693,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "銀座千疋屋(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座千疋屋（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -6661,11 +6709,11 @@
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "銀座千疋屋(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座千疋屋（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "shibuya_omotesando",
@@ -6730,11 +6778,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "銀座ウエスト(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座ウエスト（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -6807,19 +6855,19 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "資生堂パーラー(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "資生堂パーラー(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "shinagawa_in",
@@ -6831,11 +6879,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "資生堂パーラー(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -6900,27 +6948,27 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "資生堂パーラー(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "資生堂パーラー(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "資生堂パーラー(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -7019,11 +7067,11 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "帝国ホテル(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "帝国ホテル（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%B8%9D%E5%9B%BD%E3%83%9B%E3%83%86%E3%83%AB%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%B8%9D%E5%9B%BD%E3%83%9B%E3%83%86%E3%83%AB%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
       }
     ],
     "search_keyword": "帝国ホテル ガルガンチュワ クッキー詰合せ",
@@ -7196,11 +7244,11 @@
     "shops": [
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "東京會舘(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "東京會舘（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E6%9C%83%E8%88%98%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E6%9C%83%E8%88%98%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "ginza",
@@ -7534,11 +7582,19 @@
       },
       {
         "area_id": "ginza",
-        "shop_name": "ジャン＝ポール・エヴァン(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ジャン＝ポール・エヴァン（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B8%E3%83%A3%E3%83%B3%EF%BC%9D%E3%83%9D%E3%83%BC%E3%83%AB%E3%83%BB%E3%82%A8%E3%83%B4%E3%82%A1%E3%83%B3%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B8%E3%83%A3%E3%83%B3%EF%BC%9D%E3%83%9D%E3%83%BC%E3%83%AB%E3%83%BB%E3%82%A8%E3%83%B4%E3%82%A1%E3%83%B3%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "ジャン＝ポール・エヴァン（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B8%E3%83%A3%E3%83%B3%EF%BC%9D%E3%83%9D%E3%83%BC%E3%83%AB%E3%83%BB%E3%82%A8%E3%83%B4%E3%82%A1%E3%83%B3%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "shinjuku",
@@ -7705,19 +7761,19 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "ゴディバ(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ゴディバ（新宿髙島屋）",
+        "access_note": "新宿髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B4%E3%83%87%E3%82%A3%E3%83%90%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B4%E3%83%87%E3%82%A3%E3%83%90%20%E6%96%B0%E5%AE%BF%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "ikebukuro",
-        "shop_name": "ゴディバ(池袋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ゴディバ（西武池袋本店）",
+        "access_note": "西武池袋本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B4%E3%83%87%E3%82%A3%E3%83%90%20%E6%B1%A0%E8%A2%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%B4%E3%83%87%E3%82%A3%E3%83%90%20%E8%A5%BF%E6%AD%A6%E6%B1%A0%E8%A2%8B%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_out",
@@ -7886,11 +7942,11 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "アンリ・シャルパンティエ(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "アンリ・シャルパンティエ（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%B3%E3%83%AA%E3%83%BB%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%91%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A8%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%B3%E3%83%AA%E3%83%BB%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%91%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A8%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
       },
       {
         "area_id": "shinjuku",
@@ -7902,19 +7958,19 @@
       },
       {
         "area_id": "ikebukuro",
-        "shop_name": "アンリ・シャルパンティエ(池袋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "アンリ・シャルパンティエ（西武池袋本店）",
+        "access_note": "西武池袋本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%B3%E3%83%AA%E3%83%BB%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%91%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A8%20%E6%B1%A0%E8%A2%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%B3%E3%83%AA%E3%83%BB%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%91%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A8%20%E8%A5%BF%E6%AD%A6%E6%B1%A0%E8%A2%8B%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "アンリ・シャルパンティエ(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "アンリ・シャルパンティエ（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%B3%E3%83%AA%E3%83%BB%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%91%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A8%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%B3%E3%83%AA%E3%83%BB%E3%82%B7%E3%83%A3%E3%83%AB%E3%83%91%E3%83%B3%E3%83%86%E3%82%A3%E3%82%A8%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "shibuya_omotesando",
@@ -8340,11 +8396,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "泉屋東京店(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "泉屋東京店（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B3%89%E5%B1%8B%E6%9D%B1%E4%BA%AC%E5%BA%97%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B3%89%E5%B1%8B%E6%9D%B1%E4%BA%AC%E5%BA%97%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -9516,19 +9572,27 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "たねや(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "たねや（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%9F%E3%81%AD%E3%82%84%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%9F%E3%81%AD%E3%82%84%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "たねや（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%9F%E3%81%AD%E3%82%84%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "たねや(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "たねや（伊勢丹新宿店）",
+        "access_note": "伊勢丹新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%9F%E3%81%AD%E3%82%84%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%9F%E3%81%AD%E3%82%84%20%E4%BC%8A%E5%8B%A2%E4%B8%B9%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -9600,19 +9664,19 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "両口屋是清(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "両口屋是清（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%A1%E5%8F%A3%E5%B1%8B%E6%98%AF%E6%B8%85%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%A1%E5%8F%A3%E5%B1%8B%E6%98%AF%E6%B8%85%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "両口屋是清(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "両口屋是清（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%A1%E5%8F%A3%E5%B1%8B%E6%98%AF%E6%B8%85%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%A1%E5%8F%A3%E5%B1%8B%E6%98%AF%E6%B8%85%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -9632,11 +9696,11 @@
       },
       {
         "area_id": "shibuya_omotesando",
-        "shop_name": "両口屋是清(渋谷・表参道周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "両口屋是清（渋谷ヒカリエ ShinQs）",
+        "access_note": "渋谷ヒカリエ ShinQs内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%A1%E5%8F%A3%E5%B1%8B%E6%98%AF%E6%B8%85%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%B8%A1%E5%8F%A3%E5%B1%8B%E6%98%AF%E6%B8%85%20%E6%B8%8B%E8%B0%B7%E3%83%92%E3%82%AB%E3%83%AA%E3%82%A8%20ShinQs"
       },
       {
         "area_id": "futako",
@@ -9693,11 +9757,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "仙太郎(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "仙太郎（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BB%99%E5%A4%AA%E9%83%8E%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BB%99%E5%A4%AA%E9%83%8E%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -10022,11 +10086,11 @@
     "shops": [
       {
         "area_id": "roppongi_akasaka",
-        "shop_name": "とらや(六本木・赤坂周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "とらや（東京ミッドタウン）",
+        "access_note": "東京ミッドタウン内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E5%85%AD%E6%9C%AC%E6%9C%A8%E3%83%BB%E8%B5%A4%E5%9D%82"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%A8%E3%82%89%E3%82%84%20%E6%9D%B1%E4%BA%AC%E3%83%9F%E3%83%83%E3%83%89%E3%82%BF%E3%82%A6%E3%83%B3"
       },
       {
         "area_id": "ginza",
@@ -10107,19 +10171,27 @@
       },
       {
         "area_id": "ginza",
-        "shop_name": "千疋屋総本店(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "千疋屋総本店（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "千疋屋総本店（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "千疋屋総本店(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "千疋屋総本店（伊勢丹新宿店）",
+        "access_note": "伊勢丹新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E4%BC%8A%E5%8B%A2%E4%B8%B9%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -10192,11 +10264,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "銀座千疋屋(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座千疋屋（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -10208,11 +10280,11 @@
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "銀座千疋屋(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座千疋屋（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E5%8D%83%E7%96%8B%E5%B1%8B%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "shibuya_omotesando",
@@ -10269,19 +10341,19 @@
     "shops": [
       {
         "area_id": "ginza",
-        "shop_name": "資生堂パーラー(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "資生堂パーラー(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -10293,11 +10365,11 @@
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "資生堂パーラー(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "資生堂パーラー（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "shibuya_omotesando",
@@ -10533,11 +10605,11 @@
       },
       {
         "area_id": "ginza",
-        "shop_name": "人形町今半(銀座・日本橋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "人形町今半（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "shinjuku",
@@ -10852,11 +10924,11 @@
       },
       {
         "area_id": "ikebukuro",
-        "shop_name": "赤坂柿山(池袋周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "赤坂柿山（西武池袋本店）",
+        "access_note": "西武池袋本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B5%A4%E5%9D%82%E6%9F%BF%E5%B1%B1%20%E6%B1%A0%E8%A2%8B"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B5%A4%E5%9D%82%E6%9F%BF%E5%B1%B1%20%E8%A5%BF%E6%AD%A6%E6%B1%A0%E8%A2%8B%E6%9C%AC%E5%BA%97"
       },
       {
         "area_id": "tokyo_station_out",
@@ -11022,11 +11094,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "銀座ウエスト(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "銀座ウエスト（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%82%A6%E3%82%A8%E3%82%B9%E3%83%88%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -11116,11 +11188,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "ヨックモック(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ヨックモック（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -11132,11 +11204,11 @@
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "ヨックモック(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ヨックモック（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "futako",
@@ -11211,11 +11283,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "ヨックモック(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ヨックモック（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
       },
       {
         "area_id": "ikebukuro",
@@ -11227,11 +11299,11 @@
       },
       {
         "area_id": "tokyo_station_out",
-        "shop_name": "ヨックモック(東京駅(改札外)周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ヨックモック（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
       },
       {
         "area_id": "futako",
@@ -11295,11 +11367,11 @@
       },
       {
         "area_id": "shinjuku",
-        "shop_name": "ガトーフェスタ ハラダ(新宿周辺)",
-        "access_note": "最寄り店舗はGoogleマップで確認",
-        "open_hours": "店舗により異なる",
+        "shop_name": "ガトーフェスタ ハラダ（新宿髙島屋）",
+        "access_note": "新宿髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
         "phone": null,
-        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%AC%E3%83%88%E3%83%BC%E3%83%95%E3%82%A7%E3%82%B9%E3%82%BF%20%E3%83%8F%E3%83%A9%E3%83%80%20%E6%96%B0%E5%AE%BF"
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%82%AC%E3%83%88%E3%83%BC%E3%83%95%E3%82%A7%E3%82%B9%E3%82%BF%20%E3%83%8F%E3%83%A9%E3%83%80%20%E6%96%B0%E5%AE%BF%E9%AB%99%E5%B3%B6%E5%B1%8B"
       },
       {
         "area_id": "ikebukuro",

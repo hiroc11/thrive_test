@@ -35,12 +35,13 @@
             <label>キャラクターの英語プロンプト（任意）
               <textarea name="prompt" rows="3" placeholder="17yo boy, messy black hair, sleepy gray eyes, navy hooded cloak ..."></textarea>
             </label>
-            <label>にじボイスの声優
-              <div class="row">
-                <select name="voice_actor_select" class="actor-select"><option value="">（一覧から選ぶ）</option></select>
-                <input name="voice_actor_id" placeholder="声優IDを直接入力してもよい">
-              </div>
+            <label>Aivis の声（AivisHub の音声合成モデルのUUID）
+              <input name="voice_aivis" placeholder="例：a59cb814-0083-4369-8542-f51a29e72af7">
             </label>
+            <label>Fish Audio の声（fish.audio の声のID）
+              <input name="voice_fish" placeholder="例：802e3bc2b27e49c2995d23ef70e6ac89">
+            </label>
+            <p class="hint">声のIDは <a href="https://hub.aivis-project.com/" target="_blank" rel="noopener">AivisHub</a> や <a href="https://fish.audio/" target="_blank" rel="noopener">fish.audio</a> の声のページで確認できます。使う方だけ入力すればOKです。</p>
             <div class="row">
               <button type="submit" class="primary" id="char-submit">登録する</button>
               <button type="button" id="char-cancel" hidden>編集をやめる</button>
@@ -91,19 +92,22 @@
           <ul id="status-list" class="status-list"></ul>
           <form id="keys-form" class="fields keys-form">
             <label>fal.ai の API キー<input name="FAL_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
-            <label>にじボイスの API キー<input name="NIJIVOICE_API_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
+            <label>Aivis Cloud API の API キー<input name="AIVIS_API_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
+            <label>Fish Audio の API キー<input name="FISH_API_KEY" type="password" autocomplete="off" placeholder="変更するときだけ入力"></label>
             <div class="row"><button type="submit" class="primary">キーを保存</button></div>
           </form>
-          <p class="hint">APIキーは <code>webui/keys.env</code> に書き込み、起動し直してください（環境変数 <code>FAL_KEY</code> / <code>NIJIVOICE_API_KEY</code> でも可）。画面には保存しません。</p>
+          <p class="hint">保存したキーは、このPCの <code>webui/keys.env</code> にだけ書き込まれます（GitHubには上がりません）。音声は、下の「音声サービス」で選んだ方のキーがあれば使えます。</p>
         </div>
         <form id="settings-form" class="fields">
-          <label>ナレーション・心の声に使う声優
-            <div class="row">
-              <select name="narrator_select" class="actor-select"><option value="">（一覧から選ぶ）</option></select>
-              <input name="narrator_voice_actor_id" placeholder="声優ID">
-            </div>
+          <label>音声サービス
+            <select name="tts_provider">
+              <option value="aivis">Aivis Cloud API（日本語に強い）</option>
+              <option value="fish">Fish Audio</option>
+            </select>
           </label>
-          <label>話す速さ（0.4〜3.0）<input name="voice_speed" type="number" step="0.1" min="0.4" max="3.0"></label>
+          <label>ナレーション・心の声に使う声（Aivis のモデルUUID）<input name="narrator_aivis"></label>
+          <label>ナレーション・心の声に使う声（Fish Audio の声のID）<input name="narrator_fish"></label>
+          <label>Fish Audio のモデル<input name="fish_model" placeholder="s2-pro"></label>
           <label class="check"><input type="checkbox" name="enable_safety_checker"> fal.ai のセーフティチェッカーを有効にする（enable_safety_checker）</label>
           <label>動画の解像度
             <select name="video_resolution"><option value="720p">720p</option><option value="480p">480p（安い）</option></select>

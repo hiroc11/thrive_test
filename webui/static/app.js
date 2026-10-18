@@ -34,29 +34,6 @@ $$(".tab").forEach((btn) =>
   })
 );
 
-// ---------- 声優一覧（にじボイス） ----------
-async function loadVoiceActors() {
-  let actors = [];
-  try {
-    actors = await api("/api/voice-actors");
-  } catch {
-    return; // キー未設定などのときは、IDの直接入力だけ使える
-  }
-  $$(".actor-select").forEach((sel) => {
-    sel.replaceChildren(new Option("（一覧から選ぶ）", ""));
-    for (const a of actors) {
-      const extra = [a.gender, a.age].filter(Boolean).join("・");
-      sel.append(new Option(`${a.name}${extra ? `（${extra}）` : ""}`, a.id));
-    }
-  });
-}
-// 一覧から選ぶと、隣のID欄に入る
-$$(".actor-select").forEach((sel) =>
-  sel.addEventListener("change", () => {
-    if (sel.value) sel.nextElementSibling.value = sel.value;
-  })
-);
-
 // ---------- 1. キャラクター ----------
 const form = $("#char-form");
 const drop = $("#drop");
@@ -99,7 +76,8 @@ form.addEventListener("submit", async (e) => {
   const body = new FormData();
   body.append("name", form.elements.name.value);
   body.append("prompt", form.elements.prompt.value);
-  body.append("voice_actor_id", form.elements.voice_actor_id.value);
+  body.append("voice_aivis", form.elements.voice_aivis.value);
+  body.append("voice_fish", form.elements.voice_fish.value);
   if (fileInput.files.length) body.append("image", fileInput.files[0]);
   try {
     await api(id ? `/api/characters/${id}` : "/api/characters", { method: id ? "PUT" : "POST", body });
@@ -115,7 +93,8 @@ function editCharacter(c) {
   form.elements.id.value = c.id;
   form.elements.name.value = c.name;
   form.elements.prompt.value = c.prompt;
-  form.elements.voice_actor_id.value = c.voice_actor_id || "";
+  form.elements.voice_aivis.value = c.voices?.aivis || "";
+  form.elements.voice_fish.value = c.voices?.fish || "";
   showPreview(`/files/characters/${c.image}`);
   $("#char-submit").textContent = "更新する";
   $("#char-cancel").hidden = false;
@@ -142,7 +121,8 @@ async function loadCharacters() {
     $("img", card).src = `/files/characters/${c.image}`;
     $(".name", card).textContent = c.name;
     $(".prompt", card).textContent = c.prompt || "（プロンプト未入力）";
-    $(".voice", card).textContent = c.voice_actor_id ? `声優ID：${c.voice_actor_id}` : "声優：未設定";
+    const v = c.voices || {};
+    $(".voice", card).textContent = `声：Aivis ${v.aivis ? "設定済み" : "未設定"}／Fish ${v.fish ? "設定済み" : "未設定"}`;
     $(".edit", card).addEventListener("click", () => editCharacter(c));
     $(".del", card).addEventListener("click", () => deleteCharacter(c));
     list.append(card);
@@ -366,8 +346,10 @@ const sform = $("#settings-form");
 
 async function loadSettings() {
   const s = await api("/api/settings");
-  sform.elements.narrator_voice_actor_id.value = s.narrator_voice_actor_id || "";
-  sform.elements.voice_speed.value = s.voice_speed;
+  sform.elements.tts_provider.value = s.tts_provider;
+  sform.elements.narrator_aivis.value = s.narrator_voice.aivis || "";
+  sform.elements.narrator_fish.value = s.narrator_voice.fish || "";
+  sform.elements.fish_model.value = s.fish_model || "";
   sform.elements.enable_safety_checker.checked = !!s.enable_safety_checker;
   sform.elements.video_resolution.value = s.video_resolution;
   sform.elements.model_image.value = s.models.image;
@@ -380,8 +362,9 @@ sform.addEventListener("submit", async (e) => {
   e.preventDefault();
   try {
     await api("/api/settings", jsonOpts("PUT", {
-      narrator_voice_actor_id: sform.elements.narrator_voice_actor_id.value,
-      voice_speed: parseFloat(sform.elements.voice_speed.value) || 1.0,
+      tts_provider: sform.elements.tts_provider.value,
+      narrator_voice: { aivis: sform.elements.narrator_aivis.value, fish: sform.elements.narrator_fish.value },
+      fish_model: sform.elements.fish_model.value || "s2-pro",
       enable_safety_checker: sform.elements.enable_safety_checker.checked,
       video_resolution: sform.elements.video_resolution.value,
       font_path: sform.elements.font_path.value,
@@ -404,12 +387,12 @@ kform.addEventListener("submit", async (e) => {
   try {
     await api("/api/keys", jsonOpts("PUT", {
       FAL_KEY: kform.elements.FAL_KEY.value,
-      NIJIVOICE_API_KEY: kform.elements.NIJIVOICE_API_KEY.value,
+      AIVIS_API_KEY: kform.elements.AIVIS_API_KEY.value,
+      FISH_API_KEY: kform.elements.FISH_API_KEY.value,
     }));
     kform.reset();
     toast("キーを保存しました");
     await loadStatus();
-    loadVoiceActors();
   } catch (err) {
     toast(err.message);
   }
@@ -421,7 +404,10 @@ async function loadStatus() {
   const fake = (ok) => (!ok && s.fake_mode ? "（動作確認モードなので不要）" : "");
   const items = [
     [`fal.ai（FAL_KEY）${fake(s.fal_key)}`, s.fal_key || s.fake_mode],
-    [`にじボイス（NIJIVOICE_API_KEY）${fake(s.nijivoice_key)}`, s.nijivoice_key || s.fake_mode],
+    [`Aivis Cloud API（AIVIS_API_KEY）${s.tts_provider === "aivis" ? "：使用中" : ""}${fake(s.tts_keys.aivis)}`,
+      s.tts_keys.aivis || s.fake_mode],
+    [`Fish Audio（FISH_API_KEY）${s.tts_provider === "fish" ? "：使用中" : ""}${fake(s.tts_keys.fish)}`,
+      s.tts_keys.fish || s.fake_mode],
     ["FFmpeg", s.ffmpeg],
     [`字幕フォント${s.font ? `：${s.font}` : ""}`, !!s.font],
   ];
@@ -437,5 +423,4 @@ async function loadStatus() {
 buildCuts();
 loadStatus();
 loadSettings();
-loadVoiceActors();
 loadCharacters().then(loadEpisode);

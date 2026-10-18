@@ -1,8 +1,9 @@
-"""生成と書き出しの処理（fal.ai、にじボイス、FFmpeg）。
+"""生成と書き出しの処理（fal.ai、Aivis Cloud API／Fish Audio、FFmpeg）。
 
 環境変数:
   FAL_KEY             fal.ai の API キー
-  NIJIVOICE_API_KEY   にじボイスの API キー
+  AIVIS_API_KEY       Aivis Cloud API の API キー
+  FISH_API_KEY        Fish Audio の API キー
   WEBUI_FAKE=1        外部APIを呼ばず、手元で仮の画像・動画・音声を作る（動作確認用）
 """
 import json
@@ -11,12 +12,15 @@ import shutil
 import subprocess
 import textwrap
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-NIJI_BASE = "https://api.nijivoice.com/api/platform/v1"
+AIVIS_URL = "https://api.aivis-project.com/v1/tts/synthesize"
+FISH_URL = "https://api.fish.audio/v1/tts"
+TTS_PROVIDERS = {"aivis": ("Aivis Cloud API", "AIVIS_API_KEY"), "fish": ("Fish Audio", "FISH_API_KEY")}
 W, H, FPS = 1080, 1920, 30
 MIN_CUT_SEC = 5.0
 
@@ -120,41 +124,42 @@ def generate_video(prompt: str, image: Path, out_dir: Path, settings: dict) -> P
     return download(res["video"]["url"], dest)
 
 
-# ---------- にじボイス ----------
+# ---------- 音声（Aivis Cloud API／Fish Audio） ----------
 
-def _niji(method, path, body=None):
-    key = os.environ.get("NIJIVOICE_API_KEY")
+def _post_audio(url, key_name, body, extra_headers=None, dest=None):
+    """音声合成APIにJSONを送り、返ってきた音声データをそのままファイルに保存する。"""
+    key = os.environ.get(key_name)
     if not key:
-        raise RuntimeError("NIJIVOICE_API_KEY が設定されていません")
-    req = urllib.request.Request(
-        NIJI_BASE + path, method=method, data=json.dumps(body).encode() if body is not None else None,
-        headers={"x-api-key": key, "accept": "application/json", "content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        return json.loads(r.read())
+        raise RuntimeError(f"{key_name} が設定されていません（設定画面でキーを保存してください）")
+    req = urllib.request.Request(url, method="POST", data=json.dumps(body).encode(), headers={
+        "authorization": f"Bearer {key}", "content-type": "application/json", **(extra_headers or {})})
+    try:
+        with urllib.request.urlopen(req, timeout=180) as r, open(dest, "wb") as f:
+            shutil.copyfileobj(r, f)
+    except urllib.error.HTTPError as e:  # エラー内容を画面に出せるよう、本文も付けて返す
+        detail = e.read().decode("utf-8", "replace")[:300]
+        raise RuntimeError(f"音声の生成に失敗しました（{e.code}）: {detail}") from e
+    if dest.stat().st_size < 100:
+        raise RuntimeError("音声データが空でした。声のIDが正しいか確認してください")
+    return dest
 
 
-def voice_actors() -> list[dict]:
-    if fake_mode():
-        return [{"id": "fake-male", "name": "（仮）男性"}, {"id": "fake-female", "name": "（仮）女性"}]
-    data = _niji("GET", "/voice-actors")
-    actors = data.get("voiceActors", data if isinstance(data, list) else [])
-    return [{"id": a.get("id"), "name": a.get("name"), "gender": a.get("gender", ""),
-             "age": a.get("age", "")} for a in actors]
-
-
-def generate_voice(text: str, actor_id: str, out_dir: Path, speed: float = 1.0) -> Path:
+def generate_voice(text: str, provider: str, voice_id: str, out_dir: Path, settings: dict) -> Path:
     dest = out_dir / f"voice_{stamp()}.mp3"
     if fake_mode():
         return _fake_voice(text, dest)
-    if not actor_id:
-        raise RuntimeError("声優が設定されていません（キャラクターまたは設定画面のナレーション用）")
-    res = _niji("POST", f"/voice-actors/{actor_id}/generate-voice",
-                {"script": text, "speed": str(speed), "format": "mp3"})
-    gv = res.get("generatedVoice", res)
-    url = gv.get("audioFileDownloadUrl") or gv.get("audioFileUrl")
-    if not url:
-        raise RuntimeError(f"音声のURLが返ってきませんでした: {res}")
-    return download(url, dest)
+    if provider not in TTS_PROVIDERS:
+        raise RuntimeError(f"音声サービスの指定が不正です: {provider}")
+    if not voice_id:
+        name = TTS_PROVIDERS[provider][0]
+        raise RuntimeError(f"{name}の声のIDが設定されていません（キャラクター、または設定画面のナレーション用）")
+    if provider == "aivis":
+        # model_uuid は AivisHub の音声合成モデルのページに表示されるID
+        return _post_audio(AIVIS_URL, "AIVIS_API_KEY",
+                           {"model_uuid": voice_id, "text": text, "output_format": "mp3"}, dest=dest)
+    # Fish Audio：reference_id は fish.audio の声のページに表示されるID。model ヘッダーで使うモデルを指定する
+    return _post_audio(FISH_URL, "FISH_API_KEY", {"text": text, "reference_id": voice_id, "format": "mp3"},
+                       extra_headers={"model": settings.get("fish_model", "s2-pro")}, dest=dest)
 
 
 # ---------- 動作確認用の仮素材 ----------

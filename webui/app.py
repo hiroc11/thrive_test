@@ -74,8 +74,9 @@ VARIANTS = {"sns": "SNS版", "full": "完全版"}
 IMAGE_TYPES = {"image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp"}
 MAX_IMAGE_BYTES = 20 * 1024 * 1024
 DEFAULT_SETTINGS = {
-    "narrator_voice_actor_id": "",
-    "voice_speed": 1.0,
+    "tts_provider": "aivis",                       # 音声サービス：aivis（Aivis Cloud API）／fish（Fish Audio）
+    "narrator_voice": {"aivis": "", "fish": ""},   # ナレーション・心の声に使う声のID
+    "fish_model": "s2-pro",
     "enable_safety_checker": False,
     "video_resolution": "720p",
     "font_path": "",
@@ -107,6 +108,7 @@ def load_settings():
     s = read_json(SETTINGS, {})
     merged = {**DEFAULT_SETTINGS, **s}
     merged["models"] = {**DEFAULT_SETTINGS["models"], **s.get("models", {})}
+    merged["narrator_voice"] = {**DEFAULT_SETTINGS["narrator_voice"], **s.get("narrator_voice", {})}
     return merged
 
 
@@ -118,11 +120,14 @@ def get_settings():
 @app.put("/api/settings")
 def put_settings(body: dict):
     s = load_settings()
-    for key in ("narrator_voice_actor_id", "font_path", "video_resolution"):
+    for key in ("font_path", "video_resolution", "fish_model"):
         if key in body:
             s[key] = str(body[key]).strip()
-    if "voice_speed" in body:
-        s["voice_speed"] = min(3.0, max(0.4, float(body["voice_speed"])))
+    if body.get("tts_provider") in sv.TTS_PROVIDERS:
+        s["tts_provider"] = body["tts_provider"]
+    for prov in sv.TTS_PROVIDERS:
+        if prov in body.get("narrator_voice", {}):
+            s["narrator_voice"][prov] = str(body["narrator_voice"][prov]).strip()
     if "enable_safety_checker" in body:
         s["enable_safety_checker"] = bool(body["enable_safety_checker"])
     for key in ("image", "image_t2i", "video"):
@@ -139,14 +144,15 @@ def status():
     return {
         "fake_mode": sv.fake_mode(),
         "fal_key": bool(os.environ.get("FAL_KEY")),
-        "nijivoice_key": bool(os.environ.get("NIJIVOICE_API_KEY")),
+        "tts_provider": s["tts_provider"],
+        "tts_keys": {p: bool(os.environ.get(k)) for p, (_, k) in sv.TTS_PROVIDERS.items()},
         "ffmpeg": bool(shutil.which("ffmpeg") and shutil.which("ffprobe")),
         "font": sv.find_font(s.get("font_path", "")),
     }
 
 
 KEYS_FILE = Path(__file__).resolve().parent / "keys.env"
-KEY_NAMES = ("FAL_KEY", "NIJIVOICE_API_KEY")
+KEY_NAMES = ("FAL_KEY", "AIVIS_API_KEY", "FISH_API_KEY")
 
 
 @app.put("/api/keys")
@@ -170,14 +176,6 @@ def put_keys(body: dict):
     for k, v in updates.items():
         os.environ[k] = v  # 起動し直さなくても使えるようにする
     return {"ok": True, "saved": list(updates)}
-
-
-@app.get("/api/voice-actors")
-def get_voice_actors():
-    try:
-        return sv.voice_actors()
-    except Exception as e:  # noqa: BLE001 キーなし・通信エラーは画面に伝える
-        raise HTTPException(502, f"声優一覧を取得できませんでした: {e}") from e
 
 
 # ---------- キャラクター ----------
@@ -212,13 +210,14 @@ def list_characters():
 
 
 @app.post("/api/characters")
-async def create_character(name: str = Form(...), prompt: str = Form(""), voice_actor_id: str = Form(""),
-                           image: UploadFile = File(...)):
+async def create_character(name: str = Form(...), prompt: str = Form(""), voice_aivis: str = Form(""),
+                           voice_fish: str = Form(""), image: UploadFile = File(...)):
     if not name.strip():
         raise HTTPException(400, "名前を入力してください")
     char_id = uuid.uuid4().hex[:10]
     char = {"id": char_id, "name": name.strip(), "prompt": prompt.strip(),
-            "voice_actor_id": voice_actor_id.strip(), "image": await store_image(image, char_id)}
+            "voices": {"aivis": voice_aivis.strip(), "fish": voice_fish.strip()},
+            "image": await store_image(image, char_id)}
     with _lock:
         chars = load_chars()
         chars.append(char)
@@ -228,14 +227,17 @@ async def create_character(name: str = Form(...), prompt: str = Form(""), voice_
 
 @app.put("/api/characters/{char_id}")
 async def update_character(char_id: str, name: str = Form(...), prompt: str = Form(""),
-                           voice_actor_id: str = Form(""), image: UploadFile | None = File(None)):
+                           voice_aivis: str = Form(""), voice_fish: str = Form(""),
+                           image: UploadFile | None = File(None)):
     if not name.strip():
         raise HTTPException(400, "名前を入力してください")
     new_image = await store_image(image, char_id) if image is not None and image.filename else None
     with _lock:
         chars = load_chars()
         char = find_char(chars, char_id)
-        char.update(name=name.strip(), prompt=prompt.strip(), voice_actor_id=voice_actor_id.strip())
+        char.update(name=name.strip(), prompt=prompt.strip(),
+                    voices={"aivis": voice_aivis.strip(), "fish": voice_fish.strip()})
+        char.pop("voice_actor_id", None)  # にじボイス時代の項目は消す
         if new_image:
             (CHAR_DIR / char["image"]).unlink(missing_ok=True)
             char["image"] = new_image
@@ -316,7 +318,7 @@ def write_episode(ep: int, variant: str, body: Episode) -> Path:
             "out_dir": f"assets/episodes/ep{ep:02d}/{variant}",
             "characters": {cid: {"name": c["name"], "prompt": c["prompt"],
                                  "ref": f"assets/characters/{c['image']}",
-                                 "voice_actor_id": c.get("voice_actor_id") or None}
+                                 "voices": c.get("voices", {})}
                            for cid, c in chars.items()},
             "cuts": [
                 {
@@ -468,13 +470,14 @@ def job_voice(ep, variant, n):
     if not cut["dialogue"]:
         raise RuntimeError("セリフが空です")
     s = load_settings()
-    actor = s["narrator_voice_actor_id"]
+    provider = s["tts_provider"]
+    voice = s["narrator_voice"].get(provider, "")
     if cut["speaker"]:
         chars = {c["id"]: c for c in load_chars()}
-        actor = chars.get(cut["speaker"], {}).get("voice_actor_id") or actor
+        voice = chars.get(cut["speaker"], {}).get("voices", {}).get(provider) or voice
     d = cut_dir(ep, variant, n)
     d.mkdir(parents=True, exist_ok=True)
-    path = sv.generate_voice(cut["dialogue"], actor, d, float(s.get("voice_speed", 1.0)))
+    path = sv.generate_voice(cut["dialogue"], provider, voice, d, s)
     set_state(d, "voice", path)
     return "音声を生成しました"
 

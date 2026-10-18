@@ -11,7 +11,6 @@ import os
 import shutil
 import subprocess
 import textwrap
-import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -117,28 +116,17 @@ def _fal(model, arguments):
             time.sleep(5)
 
 
-def _shrink(path: Path) -> Path:
-    """アップロードが時間切れにならないよう、大きい画像は長辺1536pxのJPEGに縮めて送る。"""
-    from PIL import Image
-    if path.suffix.lower() not in (".png", ".jpg", ".jpeg", ".webp") or path.stat().st_size < 1_000_000:
-        return path
-    small = Path(tempfile.gettempdir()) / f"fal_up_{path.stem}.jpg"
-    img = Image.open(path).convert("RGB")
-    img.thumbnail((1536, 1536))
-    img.save(small, quality=90)
-    return small
-
-
 def _fal_upload(path: Path) -> str:
-    import fal_client
-    path = _shrink(path)
-    for attempt in range(5):  # アップロードも、一時的な失敗はやり直す
-        try:
-            return fal_client.upload_file(path)
-        except Exception:  # noqa: BLE001
-            if attempt == 4:
-                raise RuntimeError(f"fal.ai への画像のアップロードが時間切れになりました。通信環境を確認して、もう一度お試しください（{path.name}）")
-            time.sleep(10)
+    """画像をデータURI（文字列）にして、生成の依頼にそのまま入れて送る。
+    fal.ai のファイル置き場へのアップロードが時間切れになる環境があるため、アップロードは使わない。"""
+    import base64
+    import io
+    from PIL import Image
+    img = Image.open(path).convert("RGB")
+    img.thumbnail((1280, 1280))  # 依頼が大きくなりすぎないよう、長辺1280pxに縮める
+    buf = io.BytesIO()
+    img.save(buf, "JPEG", quality=88)
+    return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
 def reference_canvas(ref_paths: list[Path], dest: Path) -> Path:

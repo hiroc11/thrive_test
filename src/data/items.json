@@ -1071,9 +1071,10 @@
       }
     ],
     "search_keyword": "ガトーフェスタ ハラダ グーテ・デ・ロワ",
-    "image_url": null,
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/proudia/cabinet/compass1653876909.jpg?_ex=300x300",
     "jan_code": null,
-    "data_status": "curated"
+    "data_status": "curated",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00typdo.l2rs880d.g00typdo.l2rs9721/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fproudia%2F10000046%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fproudia%2Fi%2F10000046%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222"
   },
   {
     "id": "tokyo-026",
@@ -11498,5 +11499,2003 @@
     "jan_code": null,
     "data_status": "draft",
     "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00typdo.l2rs880d.g00typdo.l2rs9721/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fproudia%2F10000177%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fproudia%2Fi%2F10000177%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222"
+  },
+  {
+    "id": "tokyo-178",
+    "name": "榮太樓總本鋪 ひとくち煉羊羹詰合せ 16本入",
+    "brand_name": "榮太樓總本鋪",
+    "category": "wagashi",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ginza",
+      "shinjuku",
+      "tokyo_station_in",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "16本入",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "榮太樓總本鋪のひとくち煉羊羹詰合せ 16本入です。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:榮太樓總本鋪」1位。銀座三越・日本橋三越本店・京王百貨店新宿店に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "榮太樓總本鋪（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "榮太樓總本鋪（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "榮太樓總本鋪（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "榮太樓總本鋪（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "榮太樓總本鋪（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "榮太樓總本鋪（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "榮太樓總本鋪 ひとくち煉羊羹詰合せ 16本入",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/eitaro-souhonpo/cabinet/hannamagashi/06778150/8869116-mob-a3.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00qn8eo.l2rs8c0a.g00qn8eo.l2rs9929/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Feitaro-souhonpo%2F8869116%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Feitaro-souhonpo%2Fi%2F10000778%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-179",
+    "name": "ヨックモック セット デリス 7種60個入 クッキー",
+    "brand_name": "ヨックモック",
+    "category": "yogashi",
+    "price_tax_in": 6048,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "shinjuku",
+      "shibuya_omotesando",
+      "ginza",
+      "ikebukuro",
+      "futako",
+      "tokyo_station_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "60個入",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "ヨックモックのセット デリス 7種60個入 クッキーです。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「検索:ヨックモック」1位。東京駅一番街・京王百貨店新宿店に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "ヨックモック（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "ヨックモック（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "ヨックモック（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "ヨックモック（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "ヨックモック（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "ヨックモック（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "ヨックモック（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "ヨックモック セット デリス 7種60個入 クッキー",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/yokumoku/cabinet/yokumoku_thumbnail/aw/10345986/delices60_26aw.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00rvx6o.l2rs8d27.g00rvx6o.l2rs97d5/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fyokumoku%2F1010011309130%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fyokumoku%2Fi%2F10000906%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-180",
+    "name": "にんべん 日本橋だし場 だしスープ詰合せ 1袋1人前 本枯鰹節 だし",
+    "brand_name": "にんべん",
+    "category": "savory",
+    "price_tax_in": 5400,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "ginza",
+      "tokyo_station_in",
+      "shinjuku",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "1袋",
+    "temperature": "chilled",
+    "shelf_life_days": 3,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "にんべんの日本橋だし場 だしスープ詰合せ 1袋1人前 本枯鰹節 だしです。冷蔵庫でお早めにお召し上がりください。",
+    "why_recommended": "楽天市場ランキング「検索:にんべん」1位。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "にんべん（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AB%E3%82%93%E3%81%B9%E3%82%93%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "にんべん（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AB%E3%82%93%E3%81%B9%E3%82%93%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "にんべん（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AB%E3%82%93%E3%81%B9%E3%82%93%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "にんべん（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AB%E3%82%93%E3%81%B9%E3%82%93%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "にんべん（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AB%E3%82%93%E3%81%B9%E3%82%93%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "にんべん（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AB%E3%82%93%E3%81%B9%E3%82%93%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "にんべん（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%81%AB%E3%82%93%E3%81%B9%E3%82%93%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "にんべん 日本橋だし場 だしスープ詰合せ 1袋1人前 本枯鰹節 だし",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/ninben/cabinet/10043274/dbg50r_tmb_001.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00pkm8o.l2rs8b78.g00pkm8o.l2rs910e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fninben%2Fdbg50n%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fninben%2Fi%2F10001341%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-181",
+    "name": "人形町今半 和牛 牛肉 A4等級 A5等級 黒毛和牛",
+    "brand_name": "人形町今半",
+    "category": "savory",
+    "price_tax_in": 5400,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "ginza",
+      "ningyocho",
+      "shinjuku",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako",
+      "tokyo_station_in"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "詰合せ",
+    "temperature": "chilled",
+    "shelf_life_days": 4,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "人形町今半の和牛 牛肉 A4等級 A5等級 黒毛和牛です。冷蔵庫でお早めにお召し上がりください。",
+    "why_recommended": "楽天市場ランキング「検索:人形町今半」1位。日本橋髙島屋に店舗あり。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "人形町今半（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
+      },
+      {
+        "area_id": "ningyocho",
+        "shop_name": "人形町今半（人形町周辺の店舗）",
+        "access_note": "人形町周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E4%BA%BA%E5%BD%A2%E7%94%BA%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "人形町今半（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "人形町今半（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "人形町今半（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "人形町今半（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "人形町今半（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "人形町今半（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "人形町今半 和牛 牛肉 A4等級 A5等級 黒毛和牛",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/imahan/cabinet/kiri/krsk-50_1.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00r3bfo.l2rs865f.g00r3bfo.l2rs9a05/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fimahan%2Fkrsk-50%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fimahan%2Fi%2F10000260%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-182",
+    "name": "資生堂パーラー 東京 冬の菓子詰め合わせ チョコ ラングドシャ クッキー",
+    "brand_name": "資生堂パーラー",
+    "category": "yogashi",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza",
+      "shinjuku",
+      "shinagawa_in",
+      "ikebukuro",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "資生堂パーラーの東京 冬の菓子詰め合わせ チョコ ラングドシャ クッキーです。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「検索:資生堂パーラー」1位。東京駅一番街・日本橋髙島屋・京王百貨店新宿店に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "資生堂パーラー（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "資生堂パーラー（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "資生堂パーラー（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "資生堂パーラー（品川駅周辺の店舗）",
+        "access_note": "品川駅周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E5%93%81%E5%B7%9D%E9%A7%85%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "資生堂パーラー（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "資生堂パーラー（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "資生堂パーラー（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "資生堂パーラー 東京 冬の菓子詰め合わせ チョコ ラングドシャ クッキー",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/shiseido-parlour/cabinet/gift/05658582/75551_2609_thum.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00rbf6o.l2rs8dc3.g00rbf6o.l2rs9f55/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshiseido-parlour%2F75551_2018%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fshiseido-parlour%2Fi%2F10000382%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-183",
+    "name": "ブルーボトルコーヒー ベラ・ドノヴァン ブレンド ドリップコーヒー",
+    "brand_name": "ブルーボトルコーヒー",
+    "category": "drink",
+    "price_tax_in": 2150,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party",
+      "in_laws"
+    ],
+    "areas": [
+      "shimbashi",
+      "ebisu",
+      "kiyosumi",
+      "shibuya_omotesando",
+      "shinjuku",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 100,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "ブルーボトルコーヒーのベラ・ドノヴァン ブレンド ドリップコーヒーです。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:ブルーボトルコーヒー」1位。アトレ浜松町・アトレ恵比寿に店舗あり。",
+    "shops": [
+      {
+        "area_id": "shimbashi",
+        "shop_name": "ブルーボトルコーヒー（アトレ浜松町）",
+        "access_note": "アトレ浜松町内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E3%82%A2%E3%83%88%E3%83%AC%E6%B5%9C%E6%9D%BE%E7%94%BA"
+      },
+      {
+        "area_id": "ebisu",
+        "shop_name": "ブルーボトルコーヒー（アトレ恵比寿）",
+        "access_note": "アトレ恵比寿内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E3%82%A2%E3%83%88%E3%83%AC%E6%81%B5%E6%AF%94%E5%AF%BF"
+      },
+      {
+        "area_id": "kiyosumi",
+        "shop_name": "ブルーボトルコーヒー（清澄白河周辺の店舗）",
+        "access_note": "清澄白河周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%B8%85%E6%BE%84%E7%99%BD%E6%B2%B3%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "ブルーボトルコーヒー（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "ブルーボトルコーヒー（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "ブルーボトルコーヒー（品川駅周辺の店舗）",
+        "access_note": "品川駅周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E5%93%81%E5%B7%9D%E9%A7%85%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "ブルーボトルコーヒー ベラ・ドノヴァン ブレンド ドリップコーヒー",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/bluebottlecoffee/cabinet/maclogi/item/main_c001.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00sbp9o.l2rs8cfe.g00sbp9o.l2rs9a0e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbluebottlecoffee%2Fc001%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbluebottlecoffee%2Fi%2F10000005%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-184",
+    "name": "浅草 梅園 どら焼 どらやき 栗どら焼 つぶ餡 栗きんとん餡 6個 8個",
+    "brand_name": "浅草 梅園",
+    "category": "wagashi",
+    "price_tax_in": 3334,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ikebukuro",
+      "asakusa",
+      "ginza",
+      "shinjuku",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "6個",
+    "temperature": "chilled",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "浅草 梅園のどら焼 どらやき 栗どら焼 つぶ餡 栗きんとん餡 6個 8個です。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「検索:浅草 梅園」1位。西武池袋本店に店舗あり。",
+    "shops": [
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "浅草 梅園（西武池袋本店）",
+        "access_note": "西武池袋本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E8%A5%BF%E6%AD%A6%E6%B1%A0%E8%A2%8B%E6%9C%AC%E5%BA%97"
+      },
+      {
+        "area_id": "asakusa",
+        "shop_name": "浅草 梅園（浅草・押上周辺の店舗）",
+        "access_note": "浅草・押上周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E6%B5%85%E8%8D%89%E3%83%BB%E6%8A%BC%E4%B8%8A%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "浅草 梅園（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "浅草 梅園（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "浅草 梅園（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "浅草 梅園（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "浅草 梅園（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%B5%85%E8%8D%89%20%E6%A2%85%E5%9C%92%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "浅草 梅園 どら焼 どらやき 栗どら焼 つぶ餡 栗きんとん餡 6個 8個",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/umezono-asakusa/cabinet/13039808/13453583/dorayaki/imgrc0105079744.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00ureho.l2rs8946.g00ureho.l2rs93e8/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fumezono-asakusa%2Fdorayaki06%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fumezono-asakusa%2Fi%2F10000018%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-185",
+    "name": "新橋玉木屋 あさり佃煮 70g おうちごはん 佃煮 ごはんのお供",
+    "brand_name": "新橋玉木屋",
+    "category": "savory",
+    "price_tax_in": 1026,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party",
+      "in_laws"
+    ],
+    "areas": [
+      "shimbashi",
+      "ginza",
+      "shinjuku",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "新橋玉木屋のあさり佃煮 70g おうちごはん 佃煮 ごはんのお供です。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:新橋玉木屋」1位。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "shimbashi",
+        "shop_name": "新橋玉木屋（新橋・浜松町周辺の店舗）",
+        "access_note": "新橋・浜松町周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%96%B0%E6%A9%8B%E3%83%BB%E6%B5%9C%E6%9D%BE%E7%94%BA%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "新橋玉木屋（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "新橋玉木屋（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "新橋玉木屋（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "新橋玉木屋（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "新橋玉木屋（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "新橋玉木屋（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "新橋玉木屋 あさり佃煮 70g おうちごはん 佃煮 ごはんのお供",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/tamakiya-shop/cabinet/02931759/imgrc0098877534.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00qoumo.l2rs88e4.g00qoumo.l2rs9dbe/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ftamakiya-shop%2Ftanpin13550asari%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Ftamakiya-shop%2Fi%2F10000046%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-186",
+    "name": "新橋玉木屋 つくだ煮詰合せ 佃煮5種入 佃煮 おすすめ お礼の品 お酒",
+    "brand_name": "新橋玉木屋",
+    "category": "savory",
+    "price_tax_in": 3060,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "shimbashi",
+      "ginza",
+      "shinjuku",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "新橋玉木屋のつくだ煮詰合せ 佃煮5種入 佃煮 おすすめ お礼の品 お酒です。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「検索:新橋玉木屋」1位。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "shimbashi",
+        "shop_name": "新橋玉木屋（新橋・浜松町周辺の店舗）",
+        "access_note": "新橋・浜松町周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%96%B0%E6%A9%8B%E3%83%BB%E6%B5%9C%E6%9D%BE%E7%94%BA%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "新橋玉木屋（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "新橋玉木屋（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "新橋玉木屋（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "新橋玉木屋（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "新橋玉木屋（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "新橋玉木屋（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "新橋玉木屋 つくだ煮詰合せ 佃煮5種入 佃煮 おすすめ お礼の品 お酒",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/tamakiya-shop/cabinet/03852666/12541931/imgrc0105512000.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00qoumo.l2rs88e4.g00qoumo.l2rs9dbe/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ftamakiya-shop%2F15025%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Ftamakiya-shop%2Fi%2F10000129%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-187",
+    "name": "榮太樓總本鋪 榮太樓 竹かご風呂敷セット 和菓子詰合せ・寒椿",
+    "brand_name": "榮太樓總本鋪",
+    "category": "wagashi",
+    "price_tax_in": 4980,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ginza",
+      "shinjuku",
+      "tokyo_station_in",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "榮太樓總本鋪の榮太樓 竹かご風呂敷セット 和菓子詰合せ・寒椿です。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:榮太樓總本鋪」2位。銀座三越・日本橋三越本店・京王百貨店新宿店に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "榮太樓總本鋪（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "榮太樓總本鋪（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "榮太樓總本鋪（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "榮太樓總本鋪（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "榮太樓總本鋪（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "榮太樓總本鋪（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "榮太樓總本鋪 榮太樓 竹かご風呂敷セット 和菓子詰合せ・寒椿",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/eitaro-souhonpo/cabinet/08527017/7661535-w-25-mob-a.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00qn8eo.l2rs8c0a.g00qn8eo.l2rs9929/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Feitaro-souhonpo%2F7661535-winter%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Feitaro-souhonpo%2Fi%2F10000952%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-188",
+    "name": "資生堂パーラー ゼリー フリュイジュレ 8個入 フルーツゼリー 5種8個",
+    "brand_name": "資生堂パーラー",
+    "category": "yogashi",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza",
+      "shinjuku",
+      "shinagawa_in",
+      "ikebukuro",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "8個入",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "資生堂パーラーのゼリー フリュイジュレ 8個入 フルーツゼリー 5種8個です。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:資生堂パーラー」2位。東京駅一番街・日本橋髙島屋・京王百貨店新宿店に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "資生堂パーラー（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "資生堂パーラー（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "資生堂パーラー（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "資生堂パーラー（品川駅周辺の店舗）",
+        "access_note": "品川駅周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E5%93%81%E5%B7%9D%E9%A7%85%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "資生堂パーラー（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "資生堂パーラー（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "資生堂パーラー（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "資生堂パーラー ゼリー フリュイジュレ 8個入 フルーツゼリー 5種8個",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/shiseido-parlour/cabinet/06857522/fg/75612_2025_thum.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00rbf6o.l2rs8dc3.g00rbf6o.l2rs9f55/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshiseido-parlour%2F75612%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fshiseido-parlour%2Fi%2F10000284%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-189",
+    "name": "ブルーボトルコーヒー スリー・アフリカズ オリジナルブレンド コーヒー豆",
+    "brand_name": "ブルーボトルコーヒー",
+    "category": "drink",
+    "price_tax_in": 2150,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party",
+      "in_laws"
+    ],
+    "areas": [
+      "shimbashi",
+      "ebisu",
+      "kiyosumi",
+      "shibuya_omotesando",
+      "shinjuku",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 100,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "ブルーボトルコーヒーのスリー・アフリカズ オリジナルブレンド コーヒー豆です。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:ブルーボトルコーヒー」2位。アトレ浜松町・アトレ恵比寿に店舗あり。",
+    "shops": [
+      {
+        "area_id": "shimbashi",
+        "shop_name": "ブルーボトルコーヒー（アトレ浜松町）",
+        "access_note": "アトレ浜松町内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E3%82%A2%E3%83%88%E3%83%AC%E6%B5%9C%E6%9D%BE%E7%94%BA"
+      },
+      {
+        "area_id": "ebisu",
+        "shop_name": "ブルーボトルコーヒー（アトレ恵比寿）",
+        "access_note": "アトレ恵比寿内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E3%82%A2%E3%83%88%E3%83%AC%E6%81%B5%E6%AF%94%E5%AF%BF"
+      },
+      {
+        "area_id": "kiyosumi",
+        "shop_name": "ブルーボトルコーヒー（清澄白河周辺の店舗）",
+        "access_note": "清澄白河周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%B8%85%E6%BE%84%E7%99%BD%E6%B2%B3%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "ブルーボトルコーヒー（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "ブルーボトルコーヒー（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "ブルーボトルコーヒー（品川駅周辺の店舗）",
+        "access_note": "品川駅周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E5%93%81%E5%B7%9D%E9%A7%85%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "ブルーボトルコーヒー スリー・アフリカズ オリジナルブレンド コーヒー豆",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/bluebottlecoffee/cabinet/item/2026/imgrc0118793459.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00sbp9o.l2rs8cfe.g00sbp9o.l2rs9a0e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbluebottlecoffee%2Fc003%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbluebottlecoffee%2Fi%2F10000007%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-190",
+    "name": "ブルーボトルコーヒー インスタントコーヒーセット 5本入×2箱 持ち運び",
+    "brand_name": "ブルーボトルコーヒー",
+    "category": "drink",
+    "price_tax_in": 4082,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "shimbashi",
+      "ebisu",
+      "kiyosumi",
+      "shibuya_omotesando",
+      "shinjuku",
+      "shinagawa_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "5本入",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "ブルーボトルコーヒーのインスタントコーヒーセット 5本入×2箱 持ち運びです。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「検索:ブルーボトルコーヒー」2位。アトレ浜松町・アトレ恵比寿に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "shimbashi",
+        "shop_name": "ブルーボトルコーヒー（アトレ浜松町）",
+        "access_note": "アトレ浜松町内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E3%82%A2%E3%83%88%E3%83%AC%E6%B5%9C%E6%9D%BE%E7%94%BA"
+      },
+      {
+        "area_id": "ebisu",
+        "shop_name": "ブルーボトルコーヒー（アトレ恵比寿）",
+        "access_note": "アトレ恵比寿内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E3%82%A2%E3%83%88%E3%83%AC%E6%81%B5%E6%AF%94%E5%AF%BF"
+      },
+      {
+        "area_id": "kiyosumi",
+        "shop_name": "ブルーボトルコーヒー（清澄白河周辺の店舗）",
+        "access_note": "清澄白河周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%B8%85%E6%BE%84%E7%99%BD%E6%B2%B3%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "ブルーボトルコーヒー（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "ブルーボトルコーヒー（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "ブルーボトルコーヒー（品川駅周辺の店舗）",
+        "access_note": "品川駅周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%AB%E3%83%BC%E3%83%9C%E3%83%88%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%92%E3%83%BC%20%E5%93%81%E5%B7%9D%E9%A7%85%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "ブルーボトルコーヒー インスタントコーヒーセット 5本入×2箱 持ち運び",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/bluebottlecoffee/cabinet/maclogi/item/main_s346.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00sbp9o.l2rs8cfe.g00sbp9o.l2rs9a0e/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbluebottlecoffee%2Fs346%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbluebottlecoffee%2Fi%2F10000841%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-191",
+    "name": "新橋玉木屋 葡萄あさり 60g ぶどう山椒 佃煮 おうちごはん",
+    "brand_name": "新橋玉木屋",
+    "category": "savory",
+    "price_tax_in": 1404,
+    "price_tier": "under_3000",
+    "target_scenes": [
+      "female_office",
+      "casual_party",
+      "in_laws"
+    ],
+    "areas": [
+      "shimbashi",
+      "ginza",
+      "shinjuku",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "詰合せ",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "compact_a4",
+    "handoff_script": "新橋玉木屋の葡萄あさり 60g ぶどう山椒 佃煮 おうちごはんです。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:新橋玉木屋」2位。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "shimbashi",
+        "shop_name": "新橋玉木屋（新橋・浜松町周辺の店舗）",
+        "access_note": "新橋・浜松町周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%96%B0%E6%A9%8B%E3%83%BB%E6%B5%9C%E6%9D%BE%E7%94%BA%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "新橋玉木屋（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "新橋玉木屋（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "新橋玉木屋（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "新橋玉木屋（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "新橋玉木屋（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "新橋玉木屋（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%96%B0%E6%A9%8B%E7%8E%89%E6%9C%A8%E5%B1%8B%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "新橋玉木屋 葡萄あさり 60g ぶどう山椒 佃煮 おうちごはん",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/tamakiya-shop/cabinet/08973938/imgrc0098938191.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00qoumo.l2rs88e4.g00qoumo.l2rs9dbe/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Ftamakiya-shop%2Fbudo-asari%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Ftamakiya-shop%2Fi%2F10000162%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-192",
+    "name": "榮太樓總本鋪 榮太樓飴 果汁飴 箱入 詰合せ10本入 飴ポーチ付",
+    "brand_name": "榮太樓總本鋪",
+    "category": "wagashi",
+    "price_tax_in": 6912,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "ginza",
+      "shinjuku",
+      "tokyo_station_in",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "10本入",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "榮太樓總本鋪の榮太樓飴 果汁飴 箱入 詰合せ10本入 飴ポーチ付です。よろしければ皆さんで召し上がってください。",
+    "why_recommended": "楽天市場ランキング「検索:榮太樓總本鋪」3位。銀座三越・日本橋三越本店・京王百貨店新宿店に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "榮太樓總本鋪（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "榮太樓總本鋪（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "榮太樓總本鋪（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "榮太樓總本鋪（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "榮太樓總本鋪（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "榮太樓總本鋪（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "榮太樓總本鋪（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E6%A6%AE%E5%A4%AA%E6%A8%93%E7%B8%BD%E6%9C%AC%E9%8B%AA%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "榮太樓總本鋪 榮太樓飴 果汁飴 箱入 詰合せ10本入 飴ポーチ付",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/eitaro-souhonpo/cabinet/07457924/imgrc0102282211.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00qn8eo.l2rs8c0a.g00qn8eo.l2rs9929/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Feitaro-souhonpo%2F351%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Feitaro-souhonpo%2Fi%2F10000389%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-193",
+    "name": "資生堂パーラー カレー詰め合わせ CRM レトルト カレー 5種 10個",
+    "brand_name": "資生堂パーラー",
+    "category": "savory",
+    "price_tax_in": 7020,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "ginza",
+      "shinjuku",
+      "shinagawa_in",
+      "ikebukuro",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "10個",
+    "temperature": "chilled",
+    "shelf_life_days": 365,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "資生堂パーラーのカレー詰め合わせ CRM レトルト カレー 5種 10個です。冷蔵庫でお早めにお召し上がりください。",
+    "why_recommended": "楽天市場ランキング「検索:資生堂パーラー」3位。東京駅一番街・日本橋髙島屋・京王百貨店新宿店に店舗あり。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "資生堂パーラー（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "資生堂パーラー（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "資生堂パーラー（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "shinagawa_in",
+        "shop_name": "資生堂パーラー（品川駅周辺の店舗）",
+        "access_note": "品川駅周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E5%93%81%E5%B7%9D%E9%A7%85%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "資生堂パーラー（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "資生堂パーラー（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "資生堂パーラー（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "資生堂パーラー カレー詰め合わせ CRM レトルト カレー 5種 10個",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/shiseido-parlour/cabinet/gift/gourmet-g/38172_2023_thum_r.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00rbf6o.l2rs8dc3.g00rbf6o.l2rs9f55/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshiseido-parlour%2F38172%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fshiseido-parlour%2Fi%2F10000437%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-194",
+    "name": "人形町今半 黒毛和牛しゃぶしゃぶ用 400g",
+    "brand_name": "人形町今半",
+    "category": "savory",
+    "price_tax_in": 7668,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "ginza",
+      "ningyocho",
+      "shinjuku",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako",
+      "tokyo_station_in"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "詰合せ",
+    "temperature": "chilled",
+    "shelf_life_days": 4,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "人形町今半の黒毛和牛しゃぶしゃぶ用 400gです。冷蔵庫でお早めにお召し上がりください。",
+    "why_recommended": "楽天市場ランキング「検索:人形町今半」4位。日本橋髙島屋に店舗あり。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "人形町今半（日本橋髙島屋）",
+        "access_note": "日本橋髙島屋内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E9%AB%99%E5%B3%B6%E5%B1%8B"
+      },
+      {
+        "area_id": "ningyocho",
+        "shop_name": "人形町今半（人形町周辺の店舗）",
+        "access_note": "人形町周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E4%BA%BA%E5%BD%A2%E7%94%BA%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "人形町今半（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "人形町今半（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "人形町今半（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "人形町今半（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "人形町今半（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "人形町今半（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E4%BA%BA%E5%BD%A2%E7%94%BA%E4%BB%8A%E5%8D%8A%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "人形町今半 黒毛和牛しゃぶしゃぶ用 400g",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/imahan/cabinet/shabu/ksb-050_1.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00r3bfo.l2rs865f.g00r3bfo.l2rs9a05/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fimahan%2Fksb-050%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fimahan%2Fi%2F10000072%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-195",
+    "name": "ヨックモック アソルティモン ドゥ ビスキュイ 4種55個入 クッキー",
+    "brand_name": "ヨックモック",
+    "category": "yogashi",
+    "price_tax_in": 5400,
+    "price_tier": "5000_10000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws"
+    ],
+    "areas": [
+      "tokyo_station_out",
+      "shinjuku",
+      "shibuya_omotesando",
+      "ginza",
+      "ikebukuro",
+      "futako",
+      "tokyo_station_in"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "55個入",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "ヨックモックのアソルティモン ドゥ ビスキュイ 4種55個入 クッキーです。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「検索:ヨックモック」7位。東京駅一番街・京王百貨店新宿店に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "ヨックモック（東京駅一番街）",
+        "access_note": "東京駅一番街内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85%E4%B8%80%E7%95%AA%E8%A1%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "ヨックモック（京王百貨店新宿店）",
+        "access_note": "京王百貨店新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E4%BA%AC%E7%8E%8B%E7%99%BE%E8%B2%A8%E5%BA%97%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "ヨックモック（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "ヨックモック（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "ヨックモック（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "ヨックモック（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_in",
+        "shop_name": "ヨックモック（東京駅(改札内)周辺の店舗）",
+        "access_note": "東京駅(改札内)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%A8%E3%83%83%E3%82%AF%E3%83%A2%E3%83%83%E3%82%AF%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%86%85)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "ヨックモック アソルティモン ドゥ ビスキュイ 4種55個入 クッキー",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/yokumoku/cabinet/yokumoku_thumbnail/aw/10346023/biscuit4_55_26aw_b.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00rvx6o.l2rs8d27.g00rvx6o.l2rs97d5/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fyokumoku%2F1010011315040%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fyokumoku%2Fi%2F10000908%2F&rafcid=wsc_i_is_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-196",
+    "name": "銀座あけぼの それぞれ 12袋入 おかき せんべい 詰合せ",
+    "brand_name": "銀座あけぼの",
+    "category": "savory",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ginza",
+      "shinjuku",
+      "ebisu",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "12袋入",
+    "temperature": "ambient",
+    "shelf_life_days": 14,
+    "is_sweet": false,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "銀座あけぼののそれぞれ 12袋入 おかき せんべい 詰合せです。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「せんべい・米菓」41位。銀座三越・日本橋三越本店・伊勢丹新宿店・恵比寿三越に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座あけぼの（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "銀座あけぼの（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "銀座あけぼの（伊勢丹新宿店）",
+        "access_note": "伊勢丹新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E4%BC%8A%E5%8B%A2%E4%B8%B9%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "ebisu",
+        "shop_name": "銀座あけぼの（恵比寿三越）",
+        "access_note": "恵比寿三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%81%B5%E6%AF%94%E5%AF%BF%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "銀座あけぼの（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "銀座あけぼの（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "銀座あけぼの（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "銀座あけぼの（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%81%82%E3%81%91%E3%81%BC%E3%81%AE%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "銀座あけぼの それぞれ 12袋入 おかき せんべい 詰合せ",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/akebono/cabinet/regular/sorezore/sorezorei530_600x600.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00pajbo.l2rs8488.g00pajbo.l2rs97c6/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fakebono%2F1498404%2F&rafcid=wsc_i_ra_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-197",
+    "name": "ブールミッシュ 吉田菊次郎 グランリュクス21個入り",
+    "brand_name": "ブールミッシュ",
+    "category": "yogashi",
+    "price_tax_in": 3240,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "asakusa",
+      "ginza",
+      "shinjuku",
+      "ikebukuro",
+      "tokyo_station_out",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": true,
+    "piece_count": "21個入り",
+    "temperature": "ambient",
+    "shelf_life_days": 40,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "ブールミッシュの吉田菊次郎 グランリュクス21個入りです。個包装なので、皆さんで分けていただけたらと思います。",
+    "why_recommended": "楽天市場ランキング「洋菓子」43位。松屋浅草に店舗あり。",
+    "shops": [
+      {
+        "area_id": "asakusa",
+        "shop_name": "ブールミッシュ（松屋浅草）",
+        "access_note": "松屋浅草内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A5%20%E6%9D%BE%E5%B1%8B%E6%B5%85%E8%8D%89"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "ブールミッシュ（銀座・日本橋周辺の店舗）",
+        "access_note": "銀座・日本橋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A5%20%E9%8A%80%E5%BA%A7%E3%83%BB%E6%97%A5%E6%9C%AC%E6%A9%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "ブールミッシュ（新宿周辺の店舗）",
+        "access_note": "新宿周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A5%20%E6%96%B0%E5%AE%BF%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "ブールミッシュ（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A5%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "ブールミッシュ（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A5%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "ブールミッシュ（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A5%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "ブールミッシュ（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E3%83%96%E3%83%BC%E3%83%AB%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A5%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "ブールミッシュ 吉田菊次郎 グランリュクス21個入り",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/boulmich/cabinet/01518733/bm/gl-21_780-19.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00qbmpo.l2rs8012.g00qbmpo.l2rs9cb6/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fboulmich%2Fm3bm-e%2F&rafcid=wsc_i_ra_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
+  },
+  {
+    "id": "tokyo-198",
+    "name": "千疋屋総本店 フルートジェリー 9本入 ゼリー 詰め合わせ",
+    "brand_name": "千疋屋総本店",
+    "category": "yogashi",
+    "price_tax_in": 4878,
+    "price_tier": "3000_5000",
+    "target_scenes": [
+      "business_exec",
+      "in_laws",
+      "female_office"
+    ],
+    "areas": [
+      "ginza",
+      "shinjuku",
+      "ebisu",
+      "tokyo_station_out",
+      "ikebukuro",
+      "shibuya_omotesando",
+      "futako"
+    ],
+    "is_individually_wrapped": false,
+    "piece_count": "9本入",
+    "temperature": "chilled",
+    "shelf_life_days": 3,
+    "is_sweet": true,
+    "evening_availability": "medium",
+    "bag_size": "standard",
+    "handoff_script": "千疋屋総本店のフルートジェリー 9本入 ゼリー 詰め合わせです。冷蔵庫でお早めにお召し上がりください。",
+    "why_recommended": "楽天市場ランキング「洋菓子」58位。銀座三越・日本橋三越本店・伊勢丹新宿店・恵比寿三越に店舗あり。日持ちは未確認。",
+    "shops": [
+      {
+        "area_id": "ginza",
+        "shop_name": "千疋屋総本店（銀座三越）",
+        "access_note": "銀座三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E9%8A%80%E5%BA%A7%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "ginza",
+        "shop_name": "千疋屋総本店（日本橋三越本店）",
+        "access_note": "日本橋三越本店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%97%A5%E6%9C%AC%E6%A9%8B%E4%B8%89%E8%B6%8A%E6%9C%AC%E5%BA%97"
+      },
+      {
+        "area_id": "shinjuku",
+        "shop_name": "千疋屋総本店（伊勢丹新宿店）",
+        "access_note": "伊勢丹新宿店内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E4%BC%8A%E5%8B%A2%E4%B8%B9%E6%96%B0%E5%AE%BF%E5%BA%97"
+      },
+      {
+        "area_id": "ebisu",
+        "shop_name": "千疋屋総本店（恵比寿三越）",
+        "access_note": "恵比寿三越内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%81%B5%E6%AF%94%E5%AF%BF%E4%B8%89%E8%B6%8A"
+      },
+      {
+        "area_id": "tokyo_station_out",
+        "shop_name": "千疋屋総本店（東京駅(改札外)周辺の店舗）",
+        "access_note": "東京駅(改札外)周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%9D%B1%E4%BA%AC%E9%A7%85(%E6%94%B9%E6%9C%AD%E5%A4%96)%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "ikebukuro",
+        "shop_name": "千疋屋総本店（池袋周辺の店舗）",
+        "access_note": "池袋周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%B1%A0%E8%A2%8B%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "shibuya_omotesando",
+        "shop_name": "千疋屋総本店（渋谷・表参道周辺の店舗）",
+        "access_note": "渋谷・表参道周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E6%B8%8B%E8%B0%B7%E3%83%BB%E8%A1%A8%E5%8F%82%E9%81%93%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      },
+      {
+        "area_id": "futako",
+        "shop_name": "千疋屋総本店（二子玉川周辺の店舗）",
+        "access_note": "二子玉川周辺の店舗内（売場は公式サイトで確認）",
+        "open_hours": "施設の営業時間に準じる",
+        "phone": null,
+        "google_maps_url": "https://www.google.com/maps/search/?api=1&query=%E5%8D%83%E7%96%8B%E5%B1%8B%E7%B7%8F%E6%9C%AC%E5%BA%97%20%E4%BA%8C%E5%AD%90%E7%8E%89%E5%B7%9D%E5%91%A8%E8%BE%BA%E3%81%AE%E5%BA%97%E8%88%97"
+      }
+    ],
+    "search_keyword": "千疋屋総本店 フルートジェリー 9本入 ゼリー 詰め合わせ",
+    "image_url": "https://thumbnail.image.rakuten.co.jp/@0_mall/sembikiya/cabinet/00435300/09444386/imgrc0100450877.jpg?_ex=300x300",
+    "rakuten_item_url": "https://hb.afl.rakuten.co.jp/hgc/g00pan5o.l2rs8d1c.g00pan5o.l2rs9ded/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fsembikiya%2F0854-33sm%2F&rafcid=wsc_i_ra_406b30cb-09e7-4cee-b890-d76cdbe2e222",
+    "jan_code": null,
+    "data_status": "draft"
   }
 ]

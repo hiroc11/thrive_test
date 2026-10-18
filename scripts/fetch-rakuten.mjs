@@ -52,7 +52,9 @@ async function search(keyword, mode) {
     sort: "standard",
   });
   if (AFF_ID) params.set("affiliateId", AFF_ID);
-  const headers = withReferer ? { Referer: REFERER, Origin: new URL(REFERER).origin } : {};
+  const origin = new URL(REFERER).origin;
+  // ブラウザは Referer を "https://example.com/" のように末尾スラッシュ付きで送る
+  const headers = withReferer ? { Referer: `${origin}/`, Origin: origin } : {};
   MODES[mode](params, headers);
   const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`, { headers });
   const text = await res.text();
@@ -68,7 +70,8 @@ async function search(keyword, mode) {
 
 let mode = process.env.RAKUTEN_AUTH_MODE ?? env.RAKUTEN_AUTH_MODE ?? "header";
 if (process.argv.includes("--probe")) {
-  for (const ref of [false, true]) {
+  console.log(`Referer: ${new URL(REFERER).origin}/`);
+  for (const ref of [true]) {
     withReferer = ref;
     for (const m of ["query", "header"]) {
       const label = `${m} / Referer${ref ? "あり" : "なし"}`;

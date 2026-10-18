@@ -6,6 +6,7 @@ import rawItems from "@/data/items.json";
 import type { Area, GiftLog, Item, PriceTier, Scene } from "@/lib/types";
 import { AREAS, BUDGETS, MUSTS, SCENES, type Must } from "@/lib/constants";
 import { loadLogs, saveLogs } from "@/lib/storage";
+import { isAvailable, todayJst } from "@/lib/availability";
 import { Pill } from "@/components/ui";
 import { ItemCard } from "@/components/ItemCard";
 import { LogSheet, OrderSheet, ShopSheet } from "@/components/Modals";
@@ -22,8 +23,9 @@ const MapView = dynamic(() => import("@/components/MapView"), {
 const ITEMS = rawItems as Item[];
 const EVENING_SCORE = { high: 2, medium: 1, morning_only: 0 };
 
+// 期間限定は「今しか買えない」ので少し上に出す
 const score = (i: Item) =>
-  (i.data_status === "curated" ? 100 : 0) + EVENING_SCORE[i.evening_availability] * 10 + i.target_scenes.length;
+  (i.data_status === "curated" ? 100 : 0) + (i.is_limited ? 15 : 0) + EVENING_SCORE[i.evening_availability] * 10 + i.target_scenes.length;
 
 const MUST_TEST: Record<Must, (i: Item) => boolean> = {
   wrapped: (i) => i.is_individually_wrapped,
@@ -48,6 +50,9 @@ export default function Home() {
 
   const [helpOpen, setHelpOpen] = useState(false);
   const [view, setView] = useState<"list" | "map">("list");
+  // 静的ページなので、期限切れの判定は表示する端末の日付で行う（ビルドし直さなくても翌日には消える）
+  const [today, setToday] = useState("");
+  useEffect(() => setToday(todayJst()), []);
 
   useEffect(() => {
     setLogs(loadLogs());
@@ -82,11 +87,12 @@ export default function Home() {
     () =>
       ITEMS.filter(
         (i) =>
+          isAvailable(i, today) &&
           (!scene || i.target_scenes.includes(scene)) &&
           (!budget || i.price_tier === budget) &&
           [...musts].every((m) => MUST_TEST[m](i)),
       ).sort((a, b) => score(b) - score(a)),
-    [scene, budget, musts],
+    [scene, budget, musts, today],
   );
 
   const results = useMemo(

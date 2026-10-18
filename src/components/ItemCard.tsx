@@ -1,7 +1,8 @@
 "use client";
-import { AlertTriangle, Info, Lightbulb, Circle, MapPin, MessageSquareQuote, Plus, ShoppingCart, ExternalLink } from "lucide-react";
+import { AlertTriangle, CalendarClock, Info, Lightbulb, Sparkles, Circle, MapPin, MessageSquareQuote, Plus, ShoppingCart, ExternalLink } from "lucide-react";
 import type { Area, Item } from "@/lib/types";
 import { yen } from "@/lib/constants";
+import { limitedLabels } from "@/lib/availability";
 
 const tempLabel = { ambient: "常温", chilled: "要冷蔵" };
 const bagLabel = { compact_a4: "A4バッグ収納可", standard: "標準紙袋", large: "大きめ" };
@@ -16,6 +17,7 @@ export function ItemCard({
   onOrder: () => void;
   onLog: () => void;
 }) {
+  const lim = limitedLabels(item);
   const shop = item.shops.find((s) => s.area_id === area) ?? item.shops[0];
   const specs = [
     item.is_individually_wrapped ? `個包装 ${item.piece_count}` : item.piece_count,
@@ -30,6 +32,22 @@ export function ItemCard({
         <div className="mb-3 flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-2 text-sm font-bold text-accent">
           <AlertTriangle size={16} />
           <span className="tabular-nums">{duplicateDate.replaceAll("-", "/")}</span> に渡しています(被り注意)
+        </div>
+      )}
+      {(lim.limited || lim.isNew || lim.upcoming) && (
+        <div className="mb-2 flex flex-wrap items-center gap-1.5 text-xs font-bold">
+          {lim.limited && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-accent px-2 py-0.5 text-white">
+              <CalendarClock size={12} />期間限定
+            </span>
+          )}
+          {lim.isNew && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-ink px-2 py-0.5 text-white">
+              <Sparkles size={12} />新商品
+            </span>
+          )}
+          {lim.until && <span className="tabular-nums text-accent">{lim.until}</span>}
+          {lim.upcoming && <span className="tabular-nums text-slate-600">{lim.upcoming}</span>}
         </div>
       )}
       <header className="flex items-start justify-between gap-3">

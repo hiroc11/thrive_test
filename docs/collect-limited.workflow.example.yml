@@ -1,0 +1,35 @@
+# 期間限定・新商品の候補を週1回集めて、確認用のプルリクエストを作る（例）
+# 使うには .github/workflows/collect-limited.yml にコピーし、README の「GitHub Actions で自動化する場合」を参照。
+# items.json には追加しない。候補(data/candidates.json)の差分をPRにするだけで、追加は人が approve:limited で行う。
+name: collect-limited
+on:
+  schedule:
+    - cron: "0 0 * * 1" # 毎週月曜 9:00 (JST)
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  collect:
+    # 楽天APIは許可IPからしか呼べないため、GitHubのクラウド実行環境(ubuntu-latest)は使えない。
+    # 自宅Macをセルフホストランナーとして登録し、そこで動かす。
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run collect:limited
+        env:
+          RAKUTEN_APP_ID: ${{ secrets.RAKUTEN_APP_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_REFERER: ${{ secrets.RAKUTEN_REFERER }}
+          NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID: ${{ secrets.NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID }}
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bot/collect-limited
+          commit-message: "期間限定・新商品の候補を更新"
+          title: "期間限定・新商品の候補を更新"
+          body: "npm run list:limited で確認し、OKなものを npm run approve:limited -- <番号> で追加してください。"
+          add-paths: data/candidates.json

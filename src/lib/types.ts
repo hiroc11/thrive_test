@@ -40,6 +40,10 @@ export interface Item {
   rakuten_item_url?: string;
   jan_code: string | null;
   data_status: "curated" | "draft"; // draft = 店舗・日持ち等が未確認
+  // 期間限定・新商品（任意）。日付は YYYY-MM-DD（日本時間）
+  available_from?: string;
+  available_until?: string; // この日を過ぎたら自動で非表示
+  is_limited?: boolean;
 }
 
 export interface GiftLog {

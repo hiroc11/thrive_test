@@ -15,7 +15,10 @@
     "import:candidates": "node scripts/import-candidates.mjs",
     "enrich": "npm run fetch:ranking && npm run fetch:shops && npm run fetch:gaps && npm run import:candidates",
     "fetch:gaps": "node scripts/fetch-gap-candidates.mjs",
-    "annotate:shops": "node scripts/annotate-shops.mjs"
+    "annotate:shops": "node scripts/annotate-shops.mjs",
+    "collect:limited": "node scripts/collect-limited.mjs",
+    "list:limited": "node scripts/approve-limited.mjs --list",
+    "approve:limited": "node scripts/approve-limited.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

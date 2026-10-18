@@ -2,14 +2,26 @@
 
 自分のPCだけで使う、縦型ショートアニメの制作画面です。
 
-## 準備
+## かんたん起動（ダブルクリック）
+
+1. Python と FFmpeg をインストールする（最初の1回だけ）
+   - Windows：python.org から Python を入れる（最初の画面で「Add python.exe to PATH」にチェック）。FFmpeg はコマンドプロンプトで `winget install Gyan.FFmpeg`
+   - Mac：python.org から Python を入れる。FFmpeg はターミナルで `brew install ffmpeg`（Homebrew が必要）
+2. `webui` フォルダの起動ファイルをダブルクリックする
+   - Windows：`start_windows.bat`
+   - Mac：`start_mac.command`（初回は右クリック →「開く」）
+3. 初回は `webui/keys.env` が自動で作られるので、メモ帳などで開いて API キーを書き込み、起動し直す
+
+`keys.env` はこのPCだけに置かれ、GitHub には上がりません。
+
+## 手動で準備する場合
 
 1. Python 3.10 以上と FFmpeg をインストールする（`ffmpeg` と `ffprobe` にPATHを通す）
 2. ライブラリを入れる
    ```
    pip install -r webui/requirements.txt
    ```
-3. APIキーを環境変数に設定する（画面やファイルには保存しません）
+3. API キーを `webui/keys.env` に書く（`keys.env.example` をコピーして作る）か、環境変数に設定する
    - `FAL_KEY`：fal.ai のキー
    - `NIJIVOICE_API_KEY`：にじボイスのキー
 

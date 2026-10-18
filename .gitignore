@@ -5,3 +5,6 @@ __pycache__/
 assets/episodes/
 exports/
 webui/settings.local.json
+
+# APIキー（このPCだけに置く）
+webui/keys.env

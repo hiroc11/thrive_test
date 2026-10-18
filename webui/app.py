@@ -27,6 +27,25 @@ from pydantic import BaseModel, Field
 import services as sv
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def load_keys_file():
+    """webui/keys.env（このPCだけに置くAPIキーのファイル）があれば、環境変数として読み込む。"""
+    import os
+    path = Path(__file__).resolve().parent / "keys.env"
+    if not path.exists():
+        return
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key, value = key.strip(), value.strip().strip('"').strip("'")
+        if value and not os.environ.get(key):  # すでに環境変数があれば、そちらを優先する
+            os.environ[key] = value
+
+
+load_keys_file()
 STATIC = Path(__file__).resolve().parent / "static"
 CHAR_DIR = ROOT / "assets" / "characters"
 CHAR_DB = CHAR_DIR / "characters.json"

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "fetch:rakuten": "node scripts/fetch-rakuten.mjs"
+    "fetch:rakuten": "node scripts/fetch-rakuten.mjs",
+    "probe:rakuten": "node scripts/fetch-rakuten.mjs --probe"
   },
   "dependencies": {
     "lucide-react": "^0.454.0",

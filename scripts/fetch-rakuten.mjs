@@ -27,31 +27,56 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const only = process.argv.find((a) => a.startsWith("--limit="));
 const targets = only ? items.slice(0, Number(only.split("=")[1])) : items;
-for (const item of targets) {
-  if (item.image_url && !force) continue;
+// accessKey の渡し方は記事により異なるため3通りを用意（--probe で自動判定）
+const MODES = {
+  query: (params, headers) => params.set("accessKey", ACCESS_KEY),
+  header: (params, headers) => (headers.accessKey = ACCESS_KEY),
+  bearer: (params, headers) => (headers.Authorization = `Bearer ${ACCESS_KEY}`),
+};
+
+async function search(keyword, mode) {
   const params = new URLSearchParams({
     format: "json",
     formatVersion: "2",
     applicationId: APP_ID,
-    accessKey: ACCESS_KEY,
-    keyword: item.search_keyword,
+    keyword,
     hits: "1",
     imageFlag: "1",
     sort: "standard",
   });
   if (AFF_ID) params.set("affiliateId", AFF_ID);
+  const headers = { Referer: REFERER, Origin: new URL(REFERER).origin };
+  MODES[mode](params, headers);
+  const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`, { headers });
+  const text = await res.text();
+  let data;
   try {
-    const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`, {
-      headers: { Referer: REFERER, Origin: new URL(REFERER).origin },
-    });
-    const text = await res.text();
-    let data;
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`${res.status} ${text.slice(0, 200)}`);
+  }
+  if (!res.ok) throw new Error(`${res.status} ${JSON.stringify(data).slice(0, 200)}`);
+  return data;
+}
+
+let mode = process.env.RAKUTEN_AUTH_MODE ?? env.RAKUTEN_AUTH_MODE ?? "header";
+if (process.argv.includes("--probe")) {
+  for (const m of Object.keys(MODES)) {
     try {
-      data = JSON.parse(text);
-    } catch {
-      throw new Error(`${res.status} ${text.slice(0, 200)}`);
+      await search("とらや 羊羹", m);
+      console.log(`OK  ${m} 方式で接続できました（.env.local に RAKUTEN_AUTH_MODE=${m} を追加してください）`);
+    } catch (e) {
+      console.log(`NG  ${m}: ${e.message}`);
     }
-    if (!res.ok) throw new Error(`${res.status} ${data.error ?? ""} ${data.error_description ?? JSON.stringify(data).slice(0, 200)}`);
+    await sleep(1100);
+  }
+  process.exit(0);
+}
+
+for (const item of targets) {
+  if (item.image_url && !force) continue;
+  try {
+    const data = await search(item.search_keyword, mode);
     const hit = data.Items?.[0];
     if (hit) {
       const img = hit.mediumImageUrls?.[0];

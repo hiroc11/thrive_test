@@ -53,3 +53,30 @@ export const MUSTS: { id: Must; label: string }[] = [
 
 export const areaLabel = (id: string) => AREAS.find((a) => a.id === id)?.label ?? id;
 export const yen = (n: number) => `¥${n.toLocaleString("ja-JP")}`;
+
+// 地図表示用のエリア中心座標（駅・街の中心のおおよその位置）
+export const AREA_COORDS: Record<string, [number, number]> = {
+  tokyo_station_in: [35.6812, 139.7671],
+  tokyo_station_out: [35.6797, 139.7702],
+  shinagawa_in: [35.6285, 139.7387],
+  roppongi_akasaka: [35.6697, 139.7339],
+  shibuya_omotesando: [35.6618, 139.7041],
+  ginza: [35.6717, 139.7649],
+  shinjuku: [35.6909, 139.7003],
+  ikebukuro: [35.7295, 139.7109],
+  ueno: [35.7138, 139.7773],
+  asakusa: [35.7111, 139.7966],
+  ningyocho: [35.6863, 139.7826],
+  kanda: [35.6955, 139.7708],
+  shimbashi: [35.6662, 139.7583],
+  kagurazaka: [35.7020, 139.7385],
+  ebisu: [35.6467, 139.7101],
+  jiyugaoka: [35.6077, 139.6690],
+  futako: [35.6116, 139.6264],
+  kiyosumi: [35.6820, 139.7990],
+  ryogoku: [35.6960, 139.7930],
+  nippori: [35.7281, 139.7710],
+  shibamata: [35.7580, 139.8775],
+  nakano: [35.7058, 139.6657],
+  haneda: [35.5494, 139.7798],
+};

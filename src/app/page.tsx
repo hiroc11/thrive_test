@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { BookOpen, CircleHelp, Search, UserRound } from "lucide-react";
+import dynamic from "next/dynamic";
+import { BookOpen, CircleHelp, List, Map as MapIcon, Search, UserRound } from "lucide-react";
 import rawItems from "@/data/items.json";
 import type { Area, GiftLog, Item, PriceTier, Scene } from "@/lib/types";
 import { AREAS, BUDGETS, MUSTS, SCENES, type Must } from "@/lib/constants";
@@ -12,6 +13,11 @@ import { LogTab } from "@/components/LogTab";
 import { HelpSheet } from "@/components/HelpSheet";
 
 const HELP_SEEN_KEY = "temiyage.helpSeen.v1";
+// Leaflet はブラウザ専用なのでサーバー描画しない
+const MapView = dynamic(() => import("@/components/MapView"), {
+  ssr: false,
+  loading: () => <div className="h-[60vh] animate-pulse rounded-2xl bg-slate-200" />,
+});
 
 const ITEMS = rawItems as Item[];
 const EVENING_SCORE = { high: 2, medium: 1, morning_only: 0 };
@@ -38,6 +44,7 @@ export default function Home() {
   const [logItem, setLogItem] = useState<Item | null>(null);
 
   const [helpOpen, setHelpOpen] = useState(false);
+  const [view, setView] = useState<"list" | "map">("list");
 
   useEffect(() => {
     setLogs(loadLogs());
@@ -66,19 +73,25 @@ export default function Home() {
     return m;
   }, [logs, recipient]);
 
+  // エリア以外の条件で絞り込んだ商品（地図のピンの件数に使う）
+  const baseResults = useMemo(
+    () =>
+      ITEMS.filter(
+        (i) =>
+          (!scene || i.target_scenes.includes(scene)) &&
+          (!budget || i.price_tier === budget) &&
+          [...musts].every((m) => MUST_TEST[m](i)),
+      ),
+    [scene, budget, musts],
+  );
+
   const results = useMemo(() => {
-    const list = ITEMS.filter(
-      (i) =>
-        (!scene || i.target_scenes.includes(scene)) &&
-        (!area || area === "online" || i.areas.includes(area)) &&
-        (!budget || i.price_tier === budget) &&
-        [...musts].every((m) => MUST_TEST[m](i)),
-    );
+    const list = baseResults.filter((i) => !area || area === "online" || i.areas.includes(area));
     // おすすめ順: 確認済み優先 → 夕方の買いやすさ × 汎用性(対応シーン数)
     const score = (i: Item) =>
       (i.data_status === "curated" ? 100 : 0) + EVENING_SCORE[i.evening_availability] * 10 + i.target_scenes.length;
     return list.sort((a, b) => score(b) - score(a));
-  }, [scene, area, budget, musts]);
+  }, [baseResults, area]);
 
   const toggleMust = (m: Must) =>
     setMusts((prev) => {
@@ -132,8 +145,24 @@ export default function Home() {
             </label>
           </section>
 
-          <p className="mb-2 mt-5 text-sm text-slate-600"><span className="font-bold tabular-nums text-ink">{results.length}</span>件 おすすめ順</p>
-          <div className="space-y-3">
+          <div className="mb-2 mt-5 flex items-center justify-between">
+            <p className="text-sm text-slate-600"><span className="font-bold tabular-nums text-ink">{results.length}</span>件 おすすめ順</p>
+            <div className="flex rounded-lg bg-slate-200 p-0.5 text-xs font-bold">
+              <TabBtn active={view === "list"} onClick={() => setView("list")}><List size={14} />リスト</TabBtn>
+              <TabBtn active={view === "map"} onClick={() => setView("map")}><MapIcon size={14} />地図</TabBtn>
+            </div>
+          </div>
+          {view === "map" && (
+            <div className="mb-4">
+              <MapView
+                items={baseResults}
+                selected={area}
+                onSelect={(a) => { setArea(a); setView("list"); }}
+              />
+              <p className="mt-2 text-xs text-slate-500">数字は今の条件に合う商品数です。ピンをタップするとそのエリアのリストを表示します。</p>
+            </div>
+          )}
+          <div className={`space-y-3 ${view === "map" ? "hidden" : ""}`}>
             {results.map((i) => (
               <ItemCard
                 key={i.id}
@@ -180,7 +209,7 @@ export default function Home() {
 
 function TabBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={`flex items-center justify-center gap-1 rounded-lg py-2 ${active ? "bg-white shadow-sm" : "text-slate-600"}`}>
+    <button onClick={onClick} className={`flex items-center justify-center gap-1 rounded-lg px-2 py-2 ${active ? "bg-white shadow-sm" : "text-slate-600"}`}>
       {children}
     </button>
   );

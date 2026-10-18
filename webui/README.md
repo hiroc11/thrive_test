@@ -4,9 +4,9 @@
 
 ## かんたん起動（ダブルクリック）
 
-1. Python と FFmpeg をインストールする（最初の1回だけ）
-   - Windows：python.org から Python を入れる（最初の画面で「Add python.exe to PATH」にチェック）。FFmpeg はコマンドプロンプトで `winget install Gyan.FFmpeg`
-   - Mac：python.org から Python を入れる。FFmpeg はターミナルで `brew install ffmpeg`（Homebrew が必要）
+1. python.org から Python をインストールする（最初の1回だけ）
+   - Windows：最初の画面で「Add python.exe to PATH」にチェックを入れる
+   - FFmpeg は自分で入れなくてよい。見つからなければ、初回起動時に自動でダウンロードする（Intel Mac でも可）
 2. `webui` フォルダの起動ファイルをダブルクリックする
    - Windows：`start_windows.bat`
    - Mac：`start_mac.command`（初回は右クリック →「開く」）

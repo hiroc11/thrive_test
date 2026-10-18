@@ -10,12 +10,6 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
-where ffmpeg > nul 2>&1
-if errorlevel 1 (
-  echo [注意] FFmpeg が見つかりません。書き出し機能を使うにはインストールが必要です。
-  echo   コマンドプロンプトで次を実行してください: winget install Gyan.FFmpeg
-  echo.
-)
 if not exist keys.env (
   copy keys.env.example keys.env > nul
   echo [お知らせ] webui フォルダに keys.env を作りました。メモ帳で開いて API キーを書き込んでください。

@@ -46,6 +46,21 @@ def load_keys_file():
 
 
 load_keys_file()
+
+
+def ensure_ffmpeg():
+    """FFmpeg が見つからなければ、static-ffmpeg で自動ダウンロードして使えるようにする（初回のみ数分）。"""
+    if shutil.which("ffmpeg") and shutil.which("ffprobe"):
+        return
+    try:
+        import static_ffmpeg
+        print("FFmpeg を準備しています（初回はダウンロードに数分かかります）…", flush=True)
+        static_ffmpeg.add_paths(weak=True)
+    except Exception as e:  # noqa: BLE001 失敗しても画面は使えるようにし、設定画面で未設定と表示する
+        print(f"[注意] FFmpeg を自動で準備できませんでした: {e}", flush=True)
+
+
+ensure_ffmpeg()
 STATIC = Path(__file__).resolve().parent / "static"
 CHAR_DIR = ROOT / "assets" / "characters"
 CHAR_DB = CHAR_DIR / "characters.json"

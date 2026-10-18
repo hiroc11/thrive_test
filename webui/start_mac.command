@@ -7,11 +7,6 @@ if ! command -v python3 > /dev/null; then
   read -p "Enterキーで閉じます"
   exit 1
 fi
-if ! command -v ffmpeg > /dev/null; then
-  echo "[注意] FFmpeg が見つかりません。書き出し機能を使うにはインストールが必要です。"
-  echo "  ターミナルで次を実行してください: brew install ffmpeg"
-  echo
-fi
 if [ ! -f keys.env ]; then
   cp keys.env.example keys.env
   echo "[お知らせ] webui フォルダに keys.env を作りました。テキストエディットで開いて API キーを書き込んでください。"

@@ -17,6 +17,8 @@ for (const f of ["scripts/out/ranking.json", "scripts/out/shop-directory.json"])
   }
 }
 const ranking = JSON.parse(readFileSync("scripts/out/ranking.json", "utf8"));
+// npm run fetch:gaps の結果（足りないマスを狙った検索）があれば候補に加える
+if (existsSync("scripts/out/gap-search.json")) ranking.push(...JSON.parse(readFileSync("scripts/out/gap-search.json", "utf8")));
 const directory = JSON.parse(readFileSync("scripts/out/shop-directory.json", "utf8"));
 const ITEMS_PATH = "src/data/items.json";
 const items = JSON.parse(readFileSync(ITEMS_PATH, "utf8"));
@@ -26,11 +28,12 @@ const areaLabel = Object.fromEntries(AREAS);
 const NOISE_NAME = /訳あり|わけあり|お試し|業務用|大容量|アウトレット|福袋|ふるさと納税|定期便|まとめ買い|\d+箱セット|ケース販売|ポイント\d+倍|クーポン/;
 // 手土産にならない飲料ジャンル（ランキング取得時に大ジャンル配下として混ざる）
 const OFF_GENRE = /^(水・炭酸水|炭酸飲料|スポーツドリンク|野菜・果実飲料|スムージー|お酢飲料|牛乳|植物性ミルク|フルーツ入り乳飲料|乳性・乳酸菌飲料|ゼリー飲料|希釈用ドリンク|氷|ノンアルコール|ココア・チョコレートドリンク|その他|水・ソフトドリンク)$/;
-const PROMO = /誕生日|退職|お世話になりました|お礼|御礼|産休|お供え|御供|供物|菓子折り?|高級|詰め合わせ|お取り寄せ|ハロウィン|クリスマス|新年|年末年始|春|夏|秋|冬|出産|結婚|新築|快気|法事|香典返し|買い回り|買いまわり|酒蔵直送|直送|地酒|人気|おしゃれ|かわいい|プチギフト|ばらまき|個包装|小袋サイズ|※\S*|≪|≫|＜|＞|<|>|\.|\//;
+const PROMO = /^(?:20\d\d|[A-Z]{1,3}-?\d{1,4}|送料込み?|帰省|お年賀|御年賀|贈答品?|お見舞い?|数量|限定|お菓子|洋菓子|和菓子|焼き菓子|東京|銀座|日本橋|誕生日|退職|お世話になりました|お礼|御礼|産休|お供え|御供|供物|菓子折り?|高級|詰め合わせ|お取り寄せ|ハロウィン|クリスマス|新年|年末年始|春|夏|秋|冬|出産|結婚|新築|快気|法事|香典返し|買い回り|買いまわり|酒蔵直送|直送|地酒|人気|おしゃれ|かわいい|プチギフト|ばらまき|個包装|小袋サイズ|※\S*|≪|≫|＜|＞|<|>|\.|\/)$/; // 単語単位で一致したら除く（「銀座あけぼの」の「銀座」は消さない）
 const cleanName = (s) =>
   s
     .split(/[\s　]+/)
-    .filter((w) => w && !PROMO.test(w))
+    .map((w) => w.replace(/[｜|].*$/, "").replace(/[（(][^）)]*[）)]?|^[^（(]*[）)]/g, ""))
+    .filter((w, i, arr) => w && !PROMO.test(w) && arr.indexOf(w) === i)
     .join(" ")
     .replace(/【[^】]*】|［[^］]*］|\[[^\]]*\]|《[^》]*》|★[^★]*★|◆[^◆]*◆/g, " ")
     .replace(/送料無料|楽天ランキング\S*|ランキング\d*位?|あす楽|公式|ギフト|プレゼント|お祝い|内祝い?|お返し|お中元|お歳暮|御中元|御歳暮|母の日|父の日|敬老の日|ホワイトデー|バレンタイン|手土産|お土産|贈り物|スイーツ|お菓子|のし|熨斗|対応|可能|個包装|個装|常温便?|日持ち\S*|賞味期限\S*/g, " ")

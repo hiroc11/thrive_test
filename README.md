@@ -33,9 +33,10 @@ npm run dev   # http://localhost:3000
 npm run coverage            # docs/coverage.md を作り直す（比較の基準は docs/coverage-baseline.json）
 npm run fetch:ranking       # 楽天ランキングAPI → scripts/out/ranking.json
 npm run fetch:shops         # 公式ショップ一覧（scripts/shop-sources.json）→ scripts/out/shop-directory.json
+npm run fetch:gaps          # 足りないマスを既存ブランドの公式店で検索 → scripts/out/gap-search.json
 npm run import:candidates -- --dry-run   # 追加される商品を確認だけ
 npm run import:candidates   # items.json に追加して coverage を更新
 npm run fetch:rakuten       # 追加分の画像・リンクを補完（任意）
 ```
 
-追加の条件は「楽天で販売中」かつ「ブランド名がそのエリアの公式ショップ一覧に載っている」ことです。追加分はすべて `data_status: "draft"` になります。公式の一覧がない商店街中心のエリア（人形町・神楽坂・自由が丘・清澄白河・両国・日暮里/巣鴨・中野）は、この仕組みでは埋まりません。
+追加の条件は「楽天で販売中」かつ「収録済みブランドの公式店の商品」であることです。エリアはそのブランドの既存エリアと、公式ショップ一覧に名前が載っているエリアです。追加分はすべて `data_status: "draft"` になります。公式の一覧がない商店街中心のエリア（人形町・神楽坂・自由が丘・清澄白河・両国・日暮里/巣鴨・中野）は、この仕組みでは埋まりません。

@@ -1,6 +1,10 @@
 // 楽天市場 商品検索API で items.json に画像URL・楽天アフィリエイトURLを書き込む
 // 使い方: npm run fetch:rakuten   (.env.local に RAKUTEN_APP_ID / RAKUTEN_ACCESS_KEY が必要)
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import dns from "node:dns";
+
+// 楽天の許可IPはIPv4で登録するため、IPv6経由にならないようIPv4を優先
+dns.setDefaultResultOrder("ipv4first");
 
 const env = existsSync(".env.local")
   ? Object.fromEntries(

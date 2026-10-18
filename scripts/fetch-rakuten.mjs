@@ -90,11 +90,29 @@ if (process.argv.includes("--probe")) {
   process.exit(0);
 }
 
+// 見つからなかった商品は、細かい言葉を外した検索語で順に再検索する
+const NOISE = /\d+(個|本|枚|袋|粒|食|棹|瓶)入?|\d+号|詰合せ|詰め合わせ|小箱|大缶|小缶|缶入|限定|\(.*?\)|（.*?）|「|」|〈.*?〉|・/g;
+function keywordsFor(item) {
+  const product = item.name.replace(item.brand_name, "").replace(NOISE, " ").replace(/\s+/g, " ").trim();
+  const firstWord = product.split(" ")[0] ?? "";
+  return [...new Set([
+    item.search_keyword,
+    `${item.brand_name} ${product}`.trim(),
+    `${item.brand_name} ${firstWord}`.trim(),
+    item.brand_name, // 最終手段: ブランド名のみ（同ブランドの別商品の画像になることがある）
+  ])].filter(Boolean);
+}
+
 for (const item of targets) {
   if (item.image_url && !force) continue;
   try {
-    const data = await search(item.search_keyword, mode);
-    const hit = data.Items?.[0];
+    let hit;
+    for (const kw of keywordsFor(item)) {
+      const data = await search(kw, mode);
+      hit = data.Items?.[0];
+      if (hit) break;
+      await sleep(1100);
+    }
     if (hit) {
       const img = hit.mediumImageUrls?.[0];
       item.image_url = typeof img === "string" ? img.replace(/\?_ex=\d+x\d+/, "?_ex=300x300") : null;

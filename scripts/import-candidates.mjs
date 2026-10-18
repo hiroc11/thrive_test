@@ -26,8 +26,12 @@ const areaLabel = Object.fromEntries(AREAS);
 const NOISE_NAME = /訳あり|わけあり|お試し|業務用|大容量|アウトレット|福袋|ふるさと納税|定期便|まとめ買い|\d+箱セット|ケース販売|ポイント\d+倍|クーポン/;
 // 手土産にならない飲料ジャンル（ランキング取得時に大ジャンル配下として混ざる）
 const OFF_GENRE = /^(水・炭酸水|炭酸飲料|スポーツドリンク|野菜・果実飲料|スムージー|お酢飲料|牛乳|植物性ミルク|フルーツ入り乳飲料|乳性・乳酸菌飲料|ゼリー飲料|希釈用ドリンク|氷|ノンアルコール|ココア・チョコレートドリンク|その他|水・ソフトドリンク)$/;
+const PROMO = /誕生日|退職|お世話になりました|お礼|御礼|産休|お供え|御供|供物|菓子折り?|高級|詰め合わせ|お取り寄せ|ハロウィン|クリスマス|新年|年末年始|春|夏|秋|冬|出産|結婚|新築|快気|法事|香典返し|買い回り|買いまわり|酒蔵直送|直送|地酒|人気|おしゃれ|かわいい|プチギフト|ばらまき|個包装|小袋サイズ|※\S*|≪|≫|＜|＞|<|>|\.|\//;
 const cleanName = (s) =>
   s
+    .split(/[\s　]+/)
+    .filter((w) => w && !PROMO.test(w))
+    .join(" ")
     .replace(/【[^】]*】|［[^］]*］|\[[^\]]*\]|《[^》]*》|★[^★]*★|◆[^◆]*◆/g, " ")
     .replace(/送料無料|楽天ランキング\S*|ランキング\d*位?|あす楽|公式|ギフト|プレゼント|お祝い|内祝い?|お返し|お中元|お歳暮|御中元|御歳暮|母の日|父の日|敬老の日|ホワイトデー|バレンタイン|手土産|お土産|贈り物|スイーツ|お菓子|のし|熨斗|対応|可能|個包装|個装|常温便?|日持ち\S*|賞味期限\S*/g, " ")
     .replace(/\s+/g, " ")
@@ -40,10 +44,17 @@ const shopToBrand = (shop) =>
     .replace(/[【】\[\]（）()]/g, " ")
     .trim();
 
-const knownBrands = [...new Set(items.map((i) => i.brand_name))].sort((a, b) => b.length - a.length);
+// 精度優先: 既に収録しているブランドの商品だけを採用する（ショップ一覧の本文に偶然含まれる語で誤判定するのを防ぐ）
+// 「空也」のような2文字のブランドは他の語に紛れて誤一致するため対象外
+const knownBrands = [...new Set(items.map((i) => i.brand_name))]
+  .filter((b) => normalize(b).length >= 3)
+  .sort((a, b) => b.length - a.length);
+const brandAreas = {};
+for (const i of items) for (const a of i.areas) (brandAreas[i.brand_name] ??= new Set()).add(a);
 function brandOf(r) {
-  const text = `${r.shopName} ${r.itemName}`;
-  return knownBrands.find((b) => normalize(text).includes(normalize(b))) ?? shopToBrand(r.shopName);
+  const name = normalize(r.itemName), shop = normalize(r.shopName);
+  // 商品名にブランド名があり、かつ公式店（店名にもブランド名）であること
+  return knownBrands.find((b) => name.includes(normalize(b)) && shop.includes(normalize(b).slice(0, 4))) ?? null;
 }
 
 function categoryOf(r, name) {
@@ -89,9 +100,12 @@ const similar = (a, b) => {
   const inter = [...A].filter((x) => B.has(x)).length;
   return inter / Math.max(1, Math.min(A.size, B.size));
 };
-const existing = items.map((i) => ({ brand: normalize(i.brand_name), name: normalize(i.name) }));
+// ブランド名を除いた商品名で比べる。入数が違えば別商品（価格帯が変わるため）
+const core = (brand, name) => normalize(name.replace(brand, ""));
+const countOf = (name) => name.normalize("NFKC").match(/\d+\s*(個|枚|本|袋|粒|切|缶|箱|棹)/)?.[0] ?? "";
+const existing = items.map((i) => ({ brand: normalize(i.brand_name), core: core(i.brand_name, i.name), count: countOf(i.name) }));
 const isDuplicate = (brand, name) =>
-  existing.some((e) => e.brand === normalize(brand) && similar(e.name, normalize(name)) > 0.6);
+  existing.some((e) => e.brand === normalize(brand) && e.count === countOf(name) && similar(e.core, core(brand, name)) > 0.6);
 
 // ---- 追加 ----
 const grid = countCells(items);
@@ -110,7 +124,9 @@ for (const r of [...ranking].sort((a, b) => a.rank - b.rank)) {
   const brand = brandOf(r);
   const name = cleanName(r.itemName);
   if (!brand || name.length < 4) { skipped.noise++; continue; }
-  const hits = areasFor(brand);
+  const dirHits = areasFor(brand);
+  const known = [...(brandAreas[brand] ?? [])].filter((a) => !dirHits.some((h) => h.area === a)).map((a) => ({ area: a, sources: [] }));
+  const hits = [...dirHits, ...known];
   if (!hits.length) { skipped.noArea++; continue; }
   if (isDuplicate(brand, name)) { skipped.duplicate++; continue; }
   const cat = categoryOf(r, name);
@@ -139,9 +155,9 @@ for (const r of [...ranking].sort((a, b) => a.rank - b.rank)) {
     evening_availability: "medium",
     bag_size: r.itemPrice < 3000 ? "compact_a4" : "standard",
     handoff_script: `${brand}の${short}です。${attr.is_individually_wrapped ? "個包装なので、皆さんで分けていただけたらと思います。" : attr.temperature === "chilled" ? "冷蔵庫でお早めにお召し上がりください。" : "よろしければ皆さんで召し上がってください。"}`,
-    why_recommended: `楽天市場ランキング「${r.genre_name}」${r.rank}位。${sources.join("・")}に店舗あり。${attr.shelf_life_known ? "" : "日持ちは未確認。"}`,
+    why_recommended: `楽天市場ランキング「${r.genre_name}」${r.rank}位。${sources.length ? `${sources.join("・")}に店舗あり。` : ""}${attr.shelf_life_known ? "" : "日持ちは未確認。"}`,
     shops: hits.flatMap((h) =>
-      h.sources.map((s) => ({
+      (h.sources.length ? h.sources : [`${areaLabel[h.area]}周辺の店舗`]).map((s) => ({
         area_id: h.area,
         shop_name: `${brand}（${s}）`,
         access_note: `${s}内（売場は公式サイトで確認）`,
@@ -157,7 +173,7 @@ for (const r of [...ranking].sort((a, b) => a.rank - b.rank)) {
     data_status: "draft",
   };
   items.push(item);
-  existing.push({ brand: normalize(brand), name: normalize(item.name) });
+  existing.push({ brand: normalize(brand), core: core(brand, item.name), count: countOf(item.name) });
   for (const a of areas) grid[a][cat][tier]++;
   perBrand[brand] = (perBrand[brand] ?? 0) + 1;
   added.push(item);

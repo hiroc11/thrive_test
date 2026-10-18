@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { BookOpen, Search, UserRound } from "lucide-react";
+import { BookOpen, CircleHelp, Search, UserRound } from "lucide-react";
 import rawItems from "@/data/items.json";
 import type { Area, GiftLog, Item, PriceTier, Scene } from "@/lib/types";
 import { AREAS, BUDGETS, MUSTS, SCENES, type Must } from "@/lib/constants";
@@ -9,6 +9,9 @@ import { Pill } from "@/components/ui";
 import { ItemCard } from "@/components/ItemCard";
 import { LogSheet, OrderSheet, ShopSheet } from "@/components/Modals";
 import { LogTab } from "@/components/LogTab";
+import { HelpSheet } from "@/components/HelpSheet";
+
+const HELP_SEEN_KEY = "temiyage.helpSeen.v1";
 
 const ITEMS = rawItems as Item[];
 const EVENING_SCORE = { high: 2, medium: 1, morning_only: 0 };
@@ -34,7 +37,20 @@ export default function Home() {
   const [orderItem, setOrderItem] = useState<Item | null>(null);
   const [logItem, setLogItem] = useState<Item | null>(null);
 
-  useEffect(() => setLogs(loadLogs()), []);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  useEffect(() => {
+    setLogs(loadLogs());
+    try {
+      if (!localStorage.getItem(HELP_SEEN_KEY)) setHelpOpen(true);
+    } catch {}
+  }, []);
+  const closeHelp = () => {
+    setHelpOpen(false);
+    try {
+      localStorage.setItem(HELP_SEEN_KEY, "1");
+    } catch {}
+  };
   const updateLogs = (next: GiftLog[]) => { setLogs(next); saveLogs(next); };
 
   const recipients = useMemo(() => [...new Set(logs.map((l) => l.recipient_name))], [logs]);
@@ -76,7 +92,12 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-2xl px-4 pb-16">
       <header className="sticky top-0 z-30 -mx-4 border-b border-line bg-bg/95 px-4 pb-2 pt-3 backdrop-blur">
-        <h1 className="text-lg font-black tracking-tight">TEMIYAGE <span className="text-accent">10s</span></h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-black tracking-tight">TEMIYAGE <span className="text-accent">10s</span></h1>
+          <button onClick={() => setHelpOpen(true)} aria-label="使い方" className="flex items-center gap-1 rounded-full px-2 py-1 text-xs font-bold text-slate-600 hover:bg-slate-200">
+            <CircleHelp size={18} />使い方
+          </button>
+        </div>
         <nav className="mt-2 grid grid-cols-2 gap-1 rounded-xl bg-slate-200 p-1 text-sm font-bold">
           <TabBtn active={tab === "search"} onClick={() => setTab("search")}><Search size={16} />10秒で手土産を探す</TabBtn>
           <TabBtn active={tab === "log"} onClick={() => setTab("log")}>
@@ -143,6 +164,7 @@ export default function Home() {
         </div>
       )}
 
+      <HelpSheet open={helpOpen} onClose={closeHelp} />
       <ShopSheet item={shopItem} onClose={() => setShopItem(null)} />
       <OrderSheet item={orderItem} area={area ?? "all"} onClose={() => setOrderItem(null)} />
       <LogSheet

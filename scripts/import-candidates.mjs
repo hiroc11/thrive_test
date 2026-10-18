@@ -1,0 +1,170 @@
+// 楽天ランキング(scripts/out/ranking.json) × 公式ショップ一覧(scripts/out/shop-directory.json) から、
+// 不足しているマスを埋める商品を src/data/items.json に draft として追加する
+// 採用条件: 楽天で販売中（＝実在）かつ、ブランド名がそのエリアの公式ショップ一覧に載っていること
+// 使い方: npm run import:candidates   (--dry-run で追加せず候補だけ表示)
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { AREAS, TARGET_PER_CELL, countCells, isMajorCell, normalize, tierOf } from "./lib/catalog.mjs";
+
+const DRY = process.argv.includes("--dry-run");
+const FILL_UP_TO = TARGET_PER_CELL + 1; // 不足マスを3品まで埋める
+const MAX_NEW_PER_BRAND = 3;
+
+for (const f of ["scripts/out/ranking.json", "scripts/out/shop-directory.json"]) {
+  if (!existsSync(f)) {
+    console.error(`${f} がありません。先に npm run fetch:ranking と npm run fetch:shops を実行してください`);
+    process.exit(1);
+  }
+}
+const ranking = JSON.parse(readFileSync("scripts/out/ranking.json", "utf8"));
+const directory = JSON.parse(readFileSync("scripts/out/shop-directory.json", "utf8"));
+const ITEMS_PATH = "src/data/items.json";
+const items = JSON.parse(readFileSync(ITEMS_PATH, "utf8"));
+const areaLabel = Object.fromEntries(AREAS);
+
+// ---- 正規化 ----
+const NOISE_NAME = /訳あり|わけあり|お試し|業務用|大容量|アウトレット|福袋|ふるさと納税|定期便|まとめ買い|\d+箱セット|ケース販売|ポイント\d+倍|クーポン/;
+const cleanName = (s) =>
+  s
+    .replace(/【[^】]*】|［[^］]*］|\[[^\]]*\]|《[^》]*》|★[^★]*★|◆[^◆]*◆/g, " ")
+    .replace(/送料無料|楽天ランキング\S*|ランキング\d*位?|あす楽|公式|ギフト|プレゼント|お祝い|内祝い?|お返し|お中元|お歳暮|御中元|御歳暮|母の日|父の日|敬老の日|ホワイトデー|バレンタイン|手土産|お土産|贈り物|スイーツ|お菓子|のし|熨斗|対応|可能|個包装|個装|常温便?|日持ち\S*|賞味期限\S*/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 40)
+    .trim();
+const shopToBrand = (shop) =>
+  shop
+    .replace(/楽天市場店|楽天市場|楽天店|公式オンラインショップ|オンラインショップ|公式ショップ|公式通販|オンラインストア|通販|本店|ショップ|SHOP|Online|ONLINE|公式/g, "")
+    .replace(/[【】\[\]（）()]/g, " ")
+    .trim();
+
+const knownBrands = [...new Set(items.map((i) => i.brand_name))].sort((a, b) => b.length - a.length);
+function brandOf(r) {
+  const text = `${r.shopName} ${r.itemName}`;
+  return knownBrands.find((b) => normalize(text).includes(normalize(b))) ?? shopToBrand(r.shopName);
+}
+
+function categoryOf(r, name) {
+  if (/せんべい|煎餅|おかき|あられ|佃煮|海苔|のり|おつまみ|珍味|かつお節/.test(name)) return "savory";
+  if (/羊羹|ようかん|最中|もなか|どら焼|どらやき|大福|団子|だんご|饅頭|まんじゅう|甘納豆|わらび|きんつば|金鍔/.test(name)) return "wagashi";
+  if (/日本茶|緑茶|煎茶|ほうじ茶|抹茶ティー|コーヒー|珈琲|紅茶|日本酒|純米|吟醸|焼酎|梅酒/.test(name)) return "drink";
+  return r.category;
+}
+
+function attributesOf(r, name) {
+  const t = `${r.itemName} ${r.itemCaption}`;
+  const shelf = Number(t.match(/(?:賞味期限|日持ち|消費期限)[^\d]{0,12}(\d{1,3})\s*日/)?.[1] ?? t.match(/製造日?(?:から|より)[^\d]{0,5}(\d{1,3})\s*日/)?.[1] ?? 0);
+  const chilled = /要冷蔵|冷蔵便|冷凍便|要冷凍|クール便/.test(t);
+  const pieces = name.match(/\d+\s*(個|枚|本|袋|粒|切|缶|箱)(入り?)?/)?.[0] ?? "詰合せ";
+  return {
+    is_individually_wrapped: /個包装|個装|個別包装/.test(t),
+    piece_count: pieces,
+    temperature: chilled ? "chilled" : "ambient",
+    shelf_life_days: shelf || (chilled ? 3 : 14),
+    shelf_life_known: Boolean(shelf),
+  };
+}
+
+// エリア判定: ブランド名がそのエリアの公式ショップ一覧の本文に出てくるか
+function areasFor(brand) {
+  const key = normalize(brand);
+  if (key.length < 3) return [];
+  const hits = [];
+  for (const [area, srcs] of Object.entries(directory)) {
+    const found = srcs.filter((s) => s.text.includes(key)).map((s) => s.name);
+    if (found.length) hits.push({ area, sources: found });
+  }
+  return hits;
+}
+
+const scenesFor = (price) =>
+  price < 3000 ? ["female_office", "casual_party", "in_laws"] : price < 5000 ? ["business_exec", "in_laws", "female_office"] : ["business_exec", "in_laws"];
+
+// ---- 重複判定 ----
+const bigrams = (s) => new Set([...Array(Math.max(0, s.length - 1))].map((_, i) => s.slice(i, i + 2)));
+const similar = (a, b) => {
+  const A = bigrams(a), B = bigrams(b);
+  const inter = [...A].filter((x) => B.has(x)).length;
+  return inter / Math.max(1, Math.min(A.size, B.size));
+};
+const existing = items.map((i) => ({ brand: normalize(i.brand_name), name: normalize(i.name) }));
+const isDuplicate = (brand, name) =>
+  existing.some((e) => e.brand === normalize(brand) && similar(e.name, normalize(name)) > 0.6);
+
+// ---- 追加 ----
+const grid = countCells(items);
+const needs = (cat, tier, areas) => areas.some((a) => isMajorCell(cat, tier) && grid[a][cat][tier] < FILL_UP_TO);
+const seenCodes = new Set();
+const perBrand = {};
+let nextId = Math.max(...items.map((i) => Number(i.id.split("-")[1]))) + 1;
+const added = [];
+const skipped = { noise: 0, noArea: 0, duplicate: 0, cellFull: 0, brandCap: 0 };
+
+for (const r of [...ranking].sort((a, b) => a.rank - b.rank)) {
+  if (!r.itemName || !r.itemPrice || seenCodes.has(r.itemCode)) continue;
+  seenCodes.add(r.itemCode);
+  if (NOISE_NAME.test(r.itemName) || r.itemPrice < 800 || r.itemPrice > 30000) { skipped.noise++; continue; }
+  const brand = brandOf(r);
+  const name = cleanName(r.itemName);
+  if (!brand || name.length < 4) { skipped.noise++; continue; }
+  const hits = areasFor(brand);
+  if (!hits.length) { skipped.noArea++; continue; }
+  if (isDuplicate(brand, name)) { skipped.duplicate++; continue; }
+  const cat = categoryOf(r, name);
+  const tier = tierOf(r.itemPrice);
+  const areas = hits.map((h) => h.area);
+  if (!needs(cat, tier, areas)) { skipped.cellFull++; continue; }
+  if ((perBrand[brand] ?? 0) >= MAX_NEW_PER_BRAND) { skipped.brandCap++; continue; }
+
+  const attr = attributesOf(r, name);
+  const short = name.replace(brand, "").trim() || name;
+  const sources = [...new Set(hits.flatMap((h) => h.sources))];
+  const item = {
+    id: `tokyo-${String(nextId++).padStart(3, "0")}`,
+    name: name.includes(brand) ? name : `${brand} ${short}`,
+    brand_name: brand,
+    category: cat,
+    price_tax_in: r.itemPrice,
+    price_tier: tier,
+    target_scenes: scenesFor(r.itemPrice),
+    areas,
+    is_individually_wrapped: attr.is_individually_wrapped,
+    piece_count: attr.piece_count,
+    temperature: attr.temperature,
+    shelf_life_days: attr.shelf_life_days,
+    is_sweet: cat === "wagashi" || cat === "yogashi",
+    evening_availability: "medium",
+    bag_size: r.itemPrice < 3000 ? "compact_a4" : "standard",
+    handoff_script: `${brand}の${short}です。${attr.is_individually_wrapped ? "個包装なので、皆さんで分けていただけたらと思います。" : attr.temperature === "chilled" ? "冷蔵庫でお早めにお召し上がりください。" : "よろしければ皆さんで召し上がってください。"}`,
+    why_recommended: `楽天市場ランキング「${r.genre_name}」${r.rank}位。${sources.join("・")}に店舗あり。${attr.shelf_life_known ? "" : "日持ちは未確認。"}`,
+    shops: hits.flatMap((h) =>
+      h.sources.map((s) => ({
+        area_id: h.area,
+        shop_name: `${brand}（${s}）`,
+        access_note: `${s}内（売場は公式サイトで確認）`,
+        open_hours: "施設の営業時間に準じる",
+        phone: null,
+        google_maps_url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${brand} ${s}`)}`,
+      })),
+    ),
+    search_keyword: `${brand} ${short}`.slice(0, 60),
+    image_url: r.image ? String(r.image).replace(/\?_ex=\d+x\d+/, "?_ex=300x300") : null,
+    rakuten_item_url: r.url,
+    jan_code: null,
+    data_status: "draft",
+  };
+  items.push(item);
+  existing.push({ brand: normalize(brand), name: normalize(item.name) });
+  for (const a of areas) grid[a][cat][tier]++;
+  perBrand[brand] = (perBrand[brand] ?? 0) + 1;
+  added.push(item);
+  console.log(`ADD ${item.id} [${cat}/${tier}] ${item.name} ¥${item.price_tax_in} → ${areas.map((a) => areaLabel[a]).join(",")}`);
+}
+
+console.log(`\n追加 ${added.length}件 / 除外: ノイズ${skipped.noise} 店舗確認不可${skipped.noArea} 重複${skipped.duplicate} マス充足${skipped.cellFull} ブランド上限${skipped.brandCap}`);
+if (DRY) {
+  console.log("--dry-run のため items.json は変更していません");
+} else {
+  writeFileSync(ITEMS_PATH, JSON.stringify(items, null, 2) + "\n");
+  execFileSync(process.execPath, ["scripts/coverage.mjs"], { stdio: "inherit" });
+}

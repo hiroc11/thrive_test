@@ -24,3 +24,18 @@ npm run dev   # http://localhost:3000
 ## データについて
 
 価格・店舗・営業時間・日持ちは目安です。公開前に各店舗の公式情報で確認・更新してください。店舗電話番号は未設定（`phone: null`）のため、確認したものから追記してください。
+
+## 商品データの網羅チェックと補充
+
+エリア（23）× ジャンル（4）× 予算（4）の網羅状況を `docs/coverage.md` に出し、足りないマスを楽天市場ランキングと公式ショップ一覧から補充します。楽天APIは許可IPのMacからだけ実行できます。
+
+```bash
+npm run coverage            # docs/coverage.md を作り直す（比較の基準は docs/coverage-baseline.json）
+npm run fetch:ranking       # 楽天ランキングAPI → scripts/out/ranking.json
+npm run fetch:shops         # 公式ショップ一覧（scripts/shop-sources.json）→ scripts/out/shop-directory.json
+npm run import:candidates -- --dry-run   # 追加される商品を確認だけ
+npm run import:candidates   # items.json に追加して coverage を更新
+npm run fetch:rakuten       # 追加分の画像・リンクを補完（任意）
+```
+
+追加の条件は「楽天で販売中」かつ「ブランド名がそのエリアの公式ショップ一覧に載っている」ことです。追加分はすべて `data_status: "draft"` になります。公式の一覧がない商店街中心のエリア（人形町・神楽坂・自由が丘・清澄白河・両国・日暮里/巣鴨・中野）は、この仕組みでは埋まりません。

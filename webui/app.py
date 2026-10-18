@@ -80,7 +80,8 @@ DEFAULT_SETTINGS = {
     "enable_safety_checker": False,
     "video_resolution": "720p",
     "font_path": "",
-    "image_mode": "multi",                         # 静止画の作り方：multi（参考画像を複数そのまま渡す）／kontext（1枚にまとめる）
+    "image_mode": "multi",
+    "bgm_volume": 0.2,                             # BGMの音量（0〜1。セリフが聞こえるよう小さめ）                         # 静止画の作り方：multi（参考画像を複数そのまま渡す）／kontext（1枚にまとめる）
     "models": {
         "image": "fal-ai/flux-kontext/dev",
         "image_multi": "fal-ai/bytedance/seedream/v4/edit",
@@ -141,6 +142,11 @@ def put_settings(body: dict):
             s["narrator_voice"][prov] = str(body["narrator_voice"][prov]).strip()
     if "enable_safety_checker" in body:
         s["enable_safety_checker"] = bool(body["enable_safety_checker"])
+    if "bgm_volume" in body:
+        try:
+            s["bgm_volume"] = min(max(float(body["bgm_volume"]), 0.0), 1.0)
+        except (TypeError, ValueError):
+            raise HTTPException(400, "BGMの音量は0〜1の数字で指定してください")
     if body.get("image_mode") in ("multi", "kontext"):
         s["image_mode"] = body["image_mode"]
     for key in ("image", "image_multi", "image_t2i", "video"):
@@ -277,6 +283,9 @@ class Cut(BaseModel):
     motion_prompt: str = ""     # 英語のカメラ・動きのプロンプト
     characters: list[str] = Field(default_factory=list)
     use_prev_ref: bool = False  # 前のカットの静止画を背景・色の参考にする
+    length: float = Field(0, ge=0, le=15)       # カットの長さ（秒）。0なら自動
+    video_start: float = Field(0, ge=0, le=10)  # 動画の使い始め（秒）
+    se_start: float = Field(0, ge=0, le=15)     # 効果音を鳴らし始める秒
 
 
 class Episode(BaseModel):
@@ -311,7 +320,9 @@ def read_episode(ep: int, variant: str) -> dict:
         cuts.append(Cut(dialogue=line.get("text", ""), speaker=line.get("speaker", ""),
                         image_prompt=c.get("image_prompt") or "", motion_prompt=c.get("motion_prompt") or "",
                         characters=c.get("characters", []),
-                        use_prev_ref=bool(c.get("use_prev_ref", False))).model_dump())
+                        use_prev_ref=bool(c.get("use_prev_ref", False)),
+                        length=c.get("length_sec", 0) or 0, video_start=c.get("video_start", 0) or 0,
+                        se_start=c.get("se_start", 0) or 0).model_dump())
     cuts += [Cut().model_dump() for _ in range(CUTS_PER_EPISODE - len(cuts))]
     return {"episode": ep, "variant": variant, "title": data.get("title", ""), "cuts": cuts}
 
@@ -339,7 +350,10 @@ def write_episode(ep: int, variant: str, body: Episode) -> Path:
                 {
                     **(old_cuts[i] if i < len(old_cuts) else {}),
                     "id": f"C{i + 1:02d}",
-                    "duration": 5,
+                    "duration": cut.length or 5,
+                    "length_sec": cut.length,
+                    "video_start": cut.video_start,
+                    "se_start": cut.se_start,
                     "characters": [k for k in cut.characters if k in chars],
                     "image_prompt": cut.image_prompt.strip(),
                     "motion_prompt": cut.motion_prompt.strip(),
@@ -385,6 +399,69 @@ def media_url(path: Path) -> str:
     return "/media/" + path.relative_to(ROOT).as_posix() + f"?v={int(path.stat().st_mtime)}"
 
 
+AUDIO_EXTS = {".mp3", ".wav", ".m4a", ".aac", ".ogg"}
+MAX_AUDIO_BYTES = 30 * 1024 * 1024
+
+
+async def read_audio(upload: UploadFile) -> tuple[bytes, str]:
+    ext = Path(upload.filename or "").suffix.lower()
+    if ext not in AUDIO_EXTS:
+        raise HTTPException(400, "音声は MP3 / WAV / M4A / AAC / OGG のみ登録できます")
+    data = await upload.read()
+    if len(data) > MAX_AUDIO_BYTES:
+        raise HTTPException(400, "音声ファイルが大きすぎます（30MBまで）")
+    return data, ext
+
+
+def bgm_dir(ep: int, variant: str) -> Path:
+    check_ep(ep, variant)
+    return MEDIA_DIR / f"ep{ep:02d}" / variant
+
+
+def find_bgm(ep: int, variant: str) -> Path | None:
+    files = sorted(bgm_dir(ep, variant).glob("bgm.*"))
+    return files[0] if files else None
+
+
+@app.post("/api/episodes/{ep}/{variant}/bgm")
+async def upload_bgm(ep: int, variant: str, file: UploadFile = File(...)):
+    data, ext = await read_audio(file)
+    d = bgm_dir(ep, variant)
+    d.mkdir(parents=True, exist_ok=True)
+    for old in d.glob("bgm.*"):
+        old.unlink()
+    (d / f"bgm{ext}").write_bytes(data)
+    return {"ok": True}
+
+
+@app.delete("/api/episodes/{ep}/{variant}/bgm")
+def delete_bgm(ep: int, variant: str):
+    for old in bgm_dir(ep, variant).glob("bgm.*"):
+        old.unlink()
+    return {"ok": True}
+
+
+@app.post("/api/episodes/{ep}/{variant}/cuts/{n}/se")
+async def upload_se(ep: int, variant: str, n: int, file: UploadFile = File(...)):
+    data, ext = await read_audio(file)
+    d = cut_dir(ep, variant, n)
+    d.mkdir(parents=True, exist_ok=True)
+    path = d / f"se_{sv.stamp()}{ext}"
+    path.write_bytes(data)
+    set_state(d, "se", path)
+    return {"ok": True}
+
+
+@app.delete("/api/episodes/{ep}/{variant}/cuts/{n}/se")
+def delete_se(ep: int, variant: str, n: int):
+    d = cut_dir(ep, variant, n)
+    with _lock:
+        st = load_state(d)
+        st.pop("se", None)
+        write_json(d / "state.json", st)
+    return {"ok": True}
+
+
 @app.get("/api/episodes/{ep}/{variant}/media")
 def get_media(ep: int, variant: str):
     out = []
@@ -392,12 +469,13 @@ def get_media(ep: int, variant: str):
         d = cut_dir(ep, variant, n)
         st = load_state(d)
         item = {}
-        for kind in ("image", "video", "voice"):
+        for kind in ("image", "video", "voice", "se"):
             if st.get(kind) and (d / st[kind]).exists():
                 item[kind] = media_url(d / st[kind])
         out.append(item)
     exported = EXPORT_DIR / f"ep{ep:02d}_{variant}.mp4"
-    return {"cuts": out, "export": media_url(exported) if exported.exists() else None}
+    bgm = find_bgm(ep, variant)
+    return {"bgm": media_url(bgm) if bgm else None, "cuts": out, "export": media_url(exported) if exported.exists() else None}
 
 
 @app.get("/media/{path:path}")
@@ -536,10 +614,18 @@ def job_export(ep, variant):
             elif n == 1:
                 notes.append("日本語フォントが見つからないため字幕なし（設定でフォントを指定してください）")
         seg = work / f"seg_{n:02d}.mp4"
-        sv.render_segment(visual, kind, voice, sub, seg)
+        se = d / st["se"] if st.get("se") and (d / st["se"]).exists() else None
+        sv.render_segment(visual, kind, voice, sub, seg, length=cut["length"], start=cut["video_start"],
+                          se=se, se_start=cut["se_start"])
         segments.append(seg)
     out = EXPORT_DIR / f"ep{ep:02d}_{variant}.mp4"
-    sv.concat(segments, out)
+    bgm = find_bgm(ep, variant)
+    if bgm:
+        joined = work / "joined.mp4"
+        sv.concat(segments, joined)
+        sv.add_bgm(joined, bgm, load_settings().get("bgm_volume", 0.2), out)
+    else:
+        sv.concat(segments, out)
     shutil.rmtree(work, ignore_errors=True)
     return f"{VARIANTS[variant]}を書き出しました（{out.relative_to(ROOT)}）" + ("。" + "、".join(notes) if notes else "")
 

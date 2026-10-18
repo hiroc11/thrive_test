@@ -139,6 +139,8 @@ function buildCuts() {
     node.dataset.n = i + 1;
     $(".cut-id", node).textContent = `C${String(i + 1).padStart(2, "0")}`;
     $$(".gen", node).forEach((btn) => btn.addEventListener("click", () => generate(i + 1, btn.dataset.kind, node)));
+    $(".se-file", node).addEventListener("change", (e) => uploadAudio(`${epUrl()}/cuts/${i + 1}/se`, e.target, "効果音"));
+    $(".se-del", node).addEventListener("click", () => removeAudio(`${epUrl()}/cuts/${i + 1}/se`, "効果音"));
     wrap.append(node);
   }
 }
@@ -178,6 +180,9 @@ function fillEpisode(data) {
     $(".image_prompt", cut).value = c.image_prompt || "";
     $(".motion_prompt", cut).value = c.motion_prompt || "";
     $(".use_prev_ref", cut).checked = !!c.use_prev_ref;
+    $(".length", cut).value = c.length || 0;
+    $(".video_start", cut).value = c.video_start || 0;
+    $(".se_start", cut).value = c.se_start || 0;
     $$(".chip input", cut).forEach((box) => {
       box.checked = (c.characters || []).includes(box.value);
       box.closest(".chip").classList.toggle("on", box.checked);
@@ -195,6 +200,9 @@ function collectEpisode() {
       image_prompt: $(".image_prompt", cut).value,
       motion_prompt: $(".motion_prompt", cut).value,
       use_prev_ref: $(".use_prev_ref", cut).checked,
+      length: Number($(".length", cut).value) || 0,
+      video_start: Number($(".video_start", cut).value) || 0,
+      se_start: Number($(".se_start", cut).value) || 0,
       characters: $$(".chip input:checked", cut).map((b) => b.value),
     })),
   };
@@ -266,12 +274,18 @@ function setPreview(cut, media) {
   if (media.video && video.getAttribute("src") !== media.video) video.src = media.video;
   audio.hidden = !media.voice;
   if (media.voice && audio.getAttribute("src") !== media.voice) audio.src = media.voice;
+  const se = $(".pv-se", cut);
+  se.hidden = $(".se-del", cut).hidden = !media.se;
+  if (media.se && se.getAttribute("src") !== media.se) se.src = media.se;
   $(".gen[data-kind=video]", cut).title = media.image ? "" : "先に静止画を生成してください";
 }
 
 async function loadMedia() {
   const data = await api(`${epUrl()}/media`);
   $$(".cut").forEach((cut, i) => setPreview(cut, data.cuts[i] || {}));
+  const bgm = $("#bgm-audio");
+  bgm.hidden = $("#bgm-del").hidden = !data.bgm;
+  if (data.bgm && bgm.getAttribute("src") !== data.bgm) bgm.src = data.bgm;
   for (const v of ["sns", "full"]) {
     // 書き出し結果はどちらの版を表示中でも見られるようにする
     const res = v === variant ? data : await api(`${epUrl(v)}/media`).catch(() => ({}));
@@ -285,6 +299,35 @@ async function loadMedia() {
     }
   }
 }
+
+// 効果音・BGMのファイルを送る／外す
+async function uploadAudio(url, input, label) {
+  const file = input.files[0];
+  input.value = "";
+  if (!file) return;
+  const form = new FormData();
+  form.append("file", file);
+  try {
+    await api(url, { method: "POST", body: form });
+    toast(`${label}を登録しました`);
+    loadMedia();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+async function removeAudio(url, label) {
+  try {
+    await api(url, { method: "DELETE" });
+    toast(`${label}を外しました`);
+    loadMedia();
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+$("#bgm-file").addEventListener("change", (e) => uploadAudio(`${epUrl()}/bgm`, e.target, "BGM"));
+$("#bgm-del").addEventListener("click", () => removeAudio(`${epUrl()}/bgm`, "BGM"));
 
 async function waitJob(job, onTick) {
   while (job.status === "running") {
@@ -360,6 +403,7 @@ async function loadSettings() {
   sform.elements.model_image_t2i.value = s.models.image_t2i;
   sform.elements.model_video.value = s.models.video;
   sform.elements.font_path.value = s.font_path || "";
+  sform.elements.bgm_volume.value = s.bgm_volume ?? 0.2;
 }
 
 sform.addEventListener("submit", async (e) => {
@@ -373,6 +417,7 @@ sform.addEventListener("submit", async (e) => {
       video_resolution: sform.elements.video_resolution.value,
       font_path: sform.elements.font_path.value,
       image_mode: sform.elements.image_mode.value,
+      bgm_volume: Number(sform.elements.bgm_volume.value || 0.2),
       models: {
         image_multi: sform.elements.model_image_multi.value,
         image: sform.elements.model_image.value,

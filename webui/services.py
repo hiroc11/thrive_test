@@ -268,14 +268,19 @@ def subtitle_png(text: str, font_path: str, dest: Path) -> Path:
 
 
 def render_segment(visual: Path | None, kind: str, voice: Path | None, subtitle: Path | None,
-                   dest: Path) -> float:
-    """1カット分を 1080x1920・30fps・音声付きのMP4にする。尺は音声に合わせて最低5秒。"""
-    dur = MIN_CUT_SEC
+                   dest: Path, length: float = 0, start: float = 0,
+                   se: Path | None = None, se_start: float = 0) -> float:
+    """1カット分を 1080x1920・30fps・音声付きのMP4にする。
+    length が0なら自動（最低5秒、セリフが長ければ音声に合わせる）。指定があってもセリフが切れないよう延ばす。
+    start は動画の使い始めの秒、se は効果音（se_start 秒から鳴らす）。"""
+    dur = length if length > 0 else MIN_CUT_SEC
     if voice:
-        dur = max(dur, media_seconds(voice) + 0.8)
+        dur = max(dur, media_seconds(voice) + (0.5 if length > 0 else 0.8))
     cmd = ["ffmpeg", "-loglevel", "error", "-y"]
     fit = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1,fps={FPS}"
     if kind == "video":
+        if start > 0:
+            cmd += ["-ss", f"{start}"]
         cmd += ["-i", str(visual)]
         vchain = f"[0:v]{fit},tpad=stop_mode=clone:stop_duration={dur},trim=duration={dur},setpts=PTS-STARTPTS"
     elif kind == "image":
@@ -294,17 +299,39 @@ def render_segment(visual: Path | None, kind: str, voice: Path | None, subtitle:
         vchain += f"[base];[base][{n}:v]overlay=0:0"
         n += 1
     vchain += "[v]"
+    # 音は「無音（長さの基準）＋セリフ＋効果音」を重ねる
+    cmd += ["-f", "lavfi", "-t", f"{dur}", "-i", "anullsrc=r=44100:cl=stereo"]
+    achain, labels = f"[{n}:a]aresample=44100[a0]", ["[a0]"]
+    n += 1
     if voice:
         cmd += ["-i", str(voice)]
-        achain = f"[{n}:a]adelay=300:all=1,apad,atrim=duration={dur},aresample=44100[a]"
-    else:
-        cmd += ["-f", "lavfi", "-t", f"{dur}", "-i", "anullsrc=r=44100:cl=stereo"]
-        achain = f"[{n}:a]atrim=duration={dur}[a]"
+        achain += f";[{n}:a]aresample=44100,aformat=channel_layouts=stereo,adelay=300:all=1[a1]"
+        labels.append("[a1]")
+        n += 1
+    if se:
+        cmd += ["-i", str(se)]
+        delay = int(max(se_start, 0) * 1000)
+        achain += f";[{n}:a]aresample=44100,aformat=channel_layouts=stereo,adelay={delay}:all=1,volume=0.8[a2]"
+        labels.append("[a2]")
+    achain += f";{''.join(labels)}amix=inputs={len(labels)}:duration=first:normalize=0,atrim=duration={dur}[a]"
     cmd += ["-filter_complex", f"{vchain};{achain}", "-map", "[v]", "-map", "[a]", "-t", f"{dur}",
             "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "veryfast", "-crf", "20",
             "-c:a", "aac", "-ar", "44100", "-ac", "2", str(dest)]
     subprocess.run(cmd, check=True, capture_output=True)
     return dur
+
+
+def add_bgm(video: Path, bgm: Path, volume: float, dest: Path):
+    """書き出した動画にBGMを重ねる。BGMが短ければ繰り返し、最後の1.5秒でフェードアウトする。"""
+    total = media_seconds(video)
+    fade = max(total - 1.5, 0)
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(video), "-stream_loop", "-1", "-i", str(bgm),
+                    "-filter_complex",
+                    f"[1:a]aresample=44100,aformat=channel_layouts=stereo,volume={volume},"
+                    f"atrim=duration={total},afade=t=out:st={fade}:d=1.5[b];"
+                    f"[0:a][b]amix=inputs=2:duration=first:normalize=0[a]",
+                    "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-ar", "44100",
+                    "-movflags", "+faststart", str(dest)], check=True, capture_output=True)
 
 
 def concat(segments: list[Path], dest: Path):

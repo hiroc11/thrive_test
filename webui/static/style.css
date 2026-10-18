@@ -173,3 +173,10 @@ code { background: var(--bg); padding: 1px 4px; border-radius: 4px; }
   .settings-grid { grid-template-columns: 1fr; }
 }
 .keys-form { margin: 12px 0; }
+
+/* カットの長さ・効果音・BGM */
+.timing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.timing input { width: 100%; }
+.se-row, .bgm-row { align-items: center; flex-wrap: wrap; margin: 6px 0; }
+.se-row audio, .bgm-row audio { height: 32px; max-width: 220px; }
+.file-btn { display: inline-block; padding: 6px 12px; border: 1px solid currentColor; border-radius: 6px; cursor: pointer; font-size: 0.9em; }

@@ -76,6 +76,12 @@
           <button class="primary export-btn" data-variant="full">完全版書き出し</button>
           <span id="export-status" class="status"></span>
         </div>
+        <div class="row bgm-row">
+          <label class="file-btn">BGMを選ぶ（MP3など）<input type="file" id="bgm-file" accept=".mp3,.wav,.m4a,.aac,.ogg" hidden></label>
+          <audio id="bgm-audio" controls hidden></audio>
+          <button type="button" id="bgm-del" hidden>BGMを外す</button>
+        </div>
+        <p class="hint">BGMは書き出しのときに全体に小さく流れます（この版だけに付きます。音量は設定タブで変更）。</p>
         <div class="export-results">
           <figure data-variant="sns"><figcaption>SNS版</figcaption><video controls hidden></video><a download hidden>ダウンロード</a></figure>
           <figure data-variant="full"><figcaption>完全版</figcaption><video controls hidden></video><a download hidden>ダウンロード</a></figure>
@@ -122,6 +128,7 @@
           <label>静止画のモデル（Kontext）<input name="model_image"></label>
           <label>静止画のモデル（キャラ参照なし）<input name="model_image_t2i"></label>
           <label>動画のモデル<input name="model_video"></label>
+          <label>BGMの音量（0〜1、初期値0.2）<input name="bgm_volume" type="number" min="0" max="1" step="0.05"></label>
           <label>字幕の日本語フォントのパス（空なら自動で探す）<input name="font_path" placeholder="例：C:/Windows/Fonts/meiryob.ttc"></label>
           <div class="row"><button type="submit" class="primary">設定を保存</button></div>
         </form>
@@ -146,6 +153,16 @@
         <button class="gen" data-kind="image">① 静止画生成</button>
         <button class="gen" data-kind="video">② 5秒動画生成</button>
         <button class="gen" data-kind="voice">③ 音声生成</button>
+      </div>
+      <div class="timing">
+        <label>カットの長さ（秒・0なら自動）<input type="number" class="length" min="0" max="15" step="0.5" value="0"></label>
+        <label>動画の使い始め（秒）<input type="number" class="video_start" min="0" max="10" step="0.5" value="0"></label>
+        <label>効果音を鳴らす秒<input type="number" class="se_start" min="0" max="15" step="0.5" value="0"></label>
+      </div>
+      <div class="row se-row">
+        <label class="file-btn">効果音を選ぶ<input type="file" class="se-file" accept=".mp3,.wav,.m4a,.aac,.ogg" hidden></label>
+        <audio class="pv-se" controls hidden></audio>
+        <button type="button" class="se-del" hidden>効果音を外す</button>
       </div>
       <div class="job-status status"></div>
       <div class="previews">

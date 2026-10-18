@@ -1,5 +1,5 @@
 // 楽天市場 商品検索API で items.json に画像URL・楽天アフィリエイトURLを書き込む
-// 使い方: npm run fetch:rakuten   (.env.local に RAKUTEN_APP_ID が必要)
+// 使い方: npm run fetch:rakuten   (.env.local に RAKUTEN_APP_ID / RAKUTEN_ACCESS_KEY が必要)
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 
 const env = existsSync(".env.local")
@@ -12,9 +12,11 @@ const env = existsSync(".env.local")
     )
   : {};
 const APP_ID = process.env.RAKUTEN_APP_ID ?? env.RAKUTEN_APP_ID;
+const ACCESS_KEY = process.env.RAKUTEN_ACCESS_KEY ?? env.RAKUTEN_ACCESS_KEY;
+const REFERER = process.env.RAKUTEN_REFERER ?? env.RAKUTEN_REFERER ?? "http://localhost:3000";
 const AFF_ID = process.env.NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID ?? env.NEXT_PUBLIC_RAKUTEN_AFFILIATE_ID;
-if (!APP_ID) {
-  console.error(".env.local に RAKUTEN_APP_ID=... を設定してください");
+if (!APP_ID || !ACCESS_KEY) {
+  console.error(".env.local に RAKUTEN_APP_ID と RAKUTEN_ACCESS_KEY を設定してください");
   process.exit(1);
 }
 
@@ -29,6 +31,7 @@ for (const item of items) {
     format: "json",
     formatVersion: "2",
     applicationId: APP_ID,
+    accessKey: ACCESS_KEY,
     keyword: item.search_keyword,
     hits: "1",
     imageFlag: "1",
@@ -36,7 +39,9 @@ for (const item of items) {
   });
   if (AFF_ID) params.set("affiliateId", AFF_ID);
   try {
-    const res = await fetch(`https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?${params}`);
+    const res = await fetch(`https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?${params}`, {
+      headers: { Referer: REFERER, Origin: new URL(REFERER).origin },
+    });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error_description ?? data.error ?? res.status);
     const hit = data.Items?.[0];

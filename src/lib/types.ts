@@ -34,6 +34,7 @@ export interface Item {
   shops: Shop[];
   search_keyword: string;
   image_url: string | null;
+  rakuten_item_url?: string;
   jan_code: string | null;
 }
 

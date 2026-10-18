@@ -21,7 +21,7 @@ export function storeLinks(item: Item): StoreLink[] {
     {
       store: "rakuten",
       label: "楽天市場",
-      url: RAKUTEN_ID ? `https://hb.afl.rakuten.co.jp/ichiba/${RAKUTEN_ID}/?pc=${enc(rakuten)}&link_type=text` : rakuten,
+      url: item.rakuten_item_url ?? (RAKUTEN_ID ? `https://hb.afl.rakuten.co.jp/ichiba/${RAKUTEN_ID}/?pc=${enc(rakuten)}&link_type=text` : rakuten),
     },
     {
       store: "amazon",

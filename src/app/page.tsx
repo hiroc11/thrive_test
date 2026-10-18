@@ -151,7 +151,8 @@ export default function Home() {
               <p className="rounded-xl border border-dashed border-line p-6 text-center text-sm text-slate-500">条件に合う手土産がありません。条件を減らしてください。</p>
             )}
           </div>
-          <p className="mt-6 text-xs text-slate-400">価格・販売店舗・日持ちは目安です。購入前に各店の公式情報をご確認ください。</p>
+          <p className="mt-6 text-xs text-slate-400">価格・販売店舗・日持ちは目安です。購入前に各店の公式情報をご確認ください。本ページはアフィリエイト広告(PR)を含みます。</p>
+          <p className="mt-1 text-xs text-slate-400"><a href="https://developers.rakuten.com/" target="_blank" rel="noopener noreferrer" className="underline">Supported by Rakuten Developers</a></p>
         </>
       ) : (
         <div className="mt-4">

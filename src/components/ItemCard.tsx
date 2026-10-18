@@ -33,7 +33,11 @@ export function ItemCard({
         </div>
       )}
       <header className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+        {item.image_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.image_url} alt="" loading="lazy" className="h-16 w-16 shrink-0 rounded-lg border border-line object-cover" />
+        )}
+        <div className="min-w-0 flex-1">
           <p className="text-xs text-slate-500">{item.brand_name}</p>
           <h3 className="font-bold leading-snug">{item.name}</h3>
         </div>
